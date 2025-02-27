@@ -2,9 +2,12 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Navigation from '@/components/navigation'
 export const metadata: Metadata = {
-  title: 'Consagrados',
-  description: 'Created with v0'
-}
+  title: "Consagrados",
+  description: "Created with v0",
+  icons: {
+    icon: "/cdalogosvg.svg",
+  },
+};
 
 export default function RootLayout({
   children,

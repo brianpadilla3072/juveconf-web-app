@@ -5,15 +5,15 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MenuIcon } from "lucide-react";
-
+import CDAsvg from "@/public/CDAsvg.svg";
 export default function Navigation() {
   const [open, setOpen] = useState(false);
 
   const menuItems = [
     { name: "Inicio", href: "/" },
+    { name: "Vision", href: "/#vision" },
+    { name: "Mision", href: "/#mision" },
     { name: "Entradas", href: "/payment" },
-    { name: "Ponentes", href: "/ponetes" },
-   
   ];
 
   return (
@@ -24,7 +24,7 @@ export default function Navigation() {
       >
         <div className="container mx-auto px-4 h-20 flex items-center justify-between">
           <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IMG-20250217-WA0034.jpg-z0Oie7hCp3xpFT0rNKTnFpUtFgDB2O.jpeg"
+            src={CDAsvg}
             alt="Logo Consagrados a Jesús"
             width={60}
             height={60}
@@ -70,7 +70,6 @@ export default function Navigation() {
             </SheetContent>
           </Sheet>
           {/* Header */}
-
         </div>
       </header>
     </>
