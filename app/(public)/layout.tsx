@@ -1,4 +1,4 @@
-import './globals.css'
+import Navigation from '@/components/navigation';
   export const metadata = {
     title: 'Nombre del Congreso',
     description: 'Descripción del congreso',
@@ -7,7 +7,9 @@ import './globals.css'
   export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
       <html lang="es">
-        <body>          
+        <body>
+        <Navigation/>
+          
           {children}
         </body>
       </html>
