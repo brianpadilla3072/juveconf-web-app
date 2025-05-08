@@ -77,15 +77,17 @@ export default function Navigation() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="px-3 py-2 text-gray-700 hover:text-red-600 rounded-md transition-colors font-medium flex items-center gap-1"
+                className="px-3 py-2 text-gray-700 hover:text-orange-600 rounded-md transition-colors font-medium flex items-center gap-1"
               >
                 {item.icon}
                 {item.name}
               </Link>
             ))}
-            <Button className="ml-4 bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white">
+            <Link href="/login">
+            <Button className="ml-4 bg-gradient-to-r from-orange-700 to-orange-500 hover:from-orange-500 hover:to-orange-700 text-white">
               ¡Igresar!
             </Button>
+            </Link>
           </nav>
         </div>
       </div>
