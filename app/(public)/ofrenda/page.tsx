@@ -7,17 +7,18 @@ import { Check, Copy, Flame } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { motion } from "framer-motion"
 
-interface DonationCardProps {
-  cvu: string
-  alias: string
-  title: string
-  description: string
-}
 
-export default function DonationCard({ cvu, alias, title, description }: DonationCardProps) {
+
+export default function DonationCard() {
   const [copiedCVU, setCopiedCVU] = useState(false)
   const [copiedAlias, setCopiedAlias] = useState(false)
   const [showThanks, setShowThanks] = useState(false)
+    const cvu = process.env.NEXT_PUBLIC_DONATION_CVU!
+  const alias = process.env.NEXT_PUBLIC_DONATION_ALIAS!
+  const email = process.env.NEXT_PUBLIC_DONATION_EMAIL!
+  const title = "Apoyá nuestra misión"
+  const description = "Tu ayuda nos permite seguir avanzando con este fuego que no se apaga."
+
 
   const copyToClipboard = async (text: string, type: "cvu" | "alias") => {
     try {
@@ -135,7 +136,7 @@ export default function DonationCard({ cvu, alias, title, description }: Donatio
             <div className="bg-gradient-to-r from-red-50 to-yellow-50 p-4 rounded-lg">
               <p className="text-sm text-gray-700 text-center">
                 <span className="font-semibold">¡Cada aporte enciende la llama!</span> Después de realizar tu donación,
-                envíanos un mensaje a <span className="font-semibold text-red-700">info@consagradosajesus.org</span>{" "}
+                envíanos un mensaje a <span className="font-semibold text-red-700">{email}</span>{" "}
                 para agradecerte personalmente.
               </p>
             </div>

@@ -162,7 +162,7 @@ export default function PaymentForm() {
   const { combos, isLoading, error } = useQueryCombos();
   const { createPreference, loading: paymentLoading, error: paymentError } = useMercadoPago();
   const { events, isLoading: isLoadingEvents, error: errorEvents } = useQueryEvents();
-  const [enableSaleDate, setEnableSaleDate] = useState<boolean>(!hasSalesStarted(events[0]?.salesStartDate));
+  const [enableSaleDate, setEnableSaleDate] = useState<boolean>(hasSalesStarted(events[0]?.salesStartDate));
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [attendees, setAttendees] = useState<Attendee[]>([]);
  
