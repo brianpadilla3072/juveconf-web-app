@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 interface Attendee {
   name: string;
-  dni: string;
+  cuil: string;
 }
 
 interface PaymentPayload {
