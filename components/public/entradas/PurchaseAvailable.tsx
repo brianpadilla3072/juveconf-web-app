@@ -21,14 +21,16 @@ export default function PurchaseAvailable({
 }: any) {
 
   return (
-    <form onSubmit={handleSubmit} className="bg-gradient-to-b from-white to-orange-50/50 p-2 md:p-4 max-h-[90vh] overflow-auto">
-      <Card className="mx-auto max-w-6xl">
-        <CardHeader>
-          <CardTitle className="text-2xl md:text-3xl font-bold text-center">Registro de Entrada</CardTitle>
-          <CardDescription className="text-center">
-            Completa tus datos y selecciona tu plan para asegurar tu lugar
-          </CardDescription>
-        </CardHeader>
+    <form onSubmit={handleSubmit} className="bg-gradient-to-b from-white to-blue-50 p-2 md:p-6 max-h-[90vh] overflow-auto">
+      <Card className="mx-auto max-w-6xl border border-blue-100 shadow-lg overflow-hidden">
+        <div className="bg-blue-900 text-white p-1">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-2xl md:text-3xl font-bold text-center text-white">Registro de Entrada</CardTitle>
+            <CardDescription className="text-center text-blue-100">
+              Completa tus datos y selecciona tu plan para asegurar tu lugar
+            </CardDescription>
+          </CardHeader>
+        </div>
         <CardContent>
           {/* Mostrar mensaje de error aquí */}
           {errorMessage && (
@@ -54,9 +56,9 @@ export default function PurchaseAvailable({
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users className="h-4 w-4" />
+              <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg">
+                <div className="flex items-center gap-2 text-sm font-medium text-blue-800">
+                  <Users className="h-5 w-5 text-blue-600" />
                   <span>Invitados ({attendeeCount})</span>
                 </div>
               </div>
@@ -95,8 +97,13 @@ export default function PurchaseAvailable({
             {/* Right Content */}
             <div className="space-y-6">
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users className="h-4 w-4" />
+                <div className="flex items-center gap-2 text-sm font-medium text-blue-800 bg-blue-50 p-3 rounded-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <path d="M12 18v-6"/>
+                    <path d="M9 15h6"/>
+                  </svg>
                   <span>Selecciona tu Plan</span>
                 </div>
                 <Select defaultValue={selectedPlan?.id} onValueChange={handlePlanChange}>
@@ -116,9 +123,12 @@ export default function PurchaseAvailable({
               <Separator />
 
               <div className="space-y-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CalendarDays className="h-4 w-4" />
-                  <span>Resumen</span>
+                <div className="flex items-center gap-2 text-sm font-medium text-blue-800 bg-blue-50 p-3 rounded-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
+                    <rect width="20" height="14" x="2" y="5" rx="2"/>
+                    <line x1="2" x2="22" y1="10" y2="10"/>
+                  </svg>
+                  <span>Método de Pago</span>
                 </div>
                 <div className="rounded-lg border p-4 space-y-2">
                   <div className="flex justify-between text-sm">

@@ -22,7 +22,7 @@ export default function Navigation() {
   ]
 
   return (
-    <header className="w-full bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+    <header className="w-full bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-blue-900/10">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center">
@@ -35,7 +35,7 @@ export default function Navigation() {
                 className="object-contain"
               />
             </div>
-            <span className="font-bold text-lg bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-orange-500">
+            <span className="font-bold text-lg text-blue-900">
               Consagrados a Jesús
             </span>
           </Link>
@@ -48,7 +48,7 @@ export default function Navigation() {
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="bg-white border-[#FFA500]/20">
+              <SheetContent side="right" className="bg-white border-l border-blue-900/10">
                 <nav className="flex flex-col gap-4 mt-8">
                   {menuItems.map((item) => {
                     const active = pathname === item.href;
@@ -57,8 +57,8 @@ export default function Navigation() {
                         <Button
                           asChild
                           variant="ghost"
-                          className={`w-full justify-start text-lg transition-all duration-300 flex items-center gap-2
-                            ${active ? 'text-orange-700 bg-orange-50 font-bold underline' : 'text-gray-800 hover:text-[#FF4D00] hover:bg-[#FFE5B4]/20'}`}
+                          className={`w-full justify-start text-lg transition-all duration-300 flex items-center gap-3
+                            ${active ? 'text-orange-600 bg-orange-50 font-semibold' : 'text-blue-900/90 hover:text-orange-500 hover:bg-orange-50/50'}`}
                           onClick={() => setOpen(false)}
                         >
                           <span className="flex items-center gap-2">
@@ -69,8 +69,8 @@ export default function Navigation() {
                       </Link>
                     );
                   })}
-                  <Button className="bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white w-full mt-4">
-                    ¡Inscribite!
+                  <Button className="bg-orange-500 hover:bg-orange-600 text-white w-full mt-4 transition-colors">
+                    ¡Inscríbete!
                   </Button>
                 </nav>
               </SheetContent>
@@ -85,7 +85,7 @@ export default function Navigation() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`px-3 py-2 rounded-md transition-colors font-medium flex items-center gap-1 ${active ? 'text-orange-700 bg-orange-50 font-bold underline' : 'text-gray-700 hover:text-orange-600'}`}
+                  className={`px-4 py-2.5 rounded-lg transition-all duration-300 font-medium flex items-center gap-2 ${active ? 'text-orange-600 bg-orange-50 font-semibold' : 'text-blue-900/90 hover:text-orange-500 hover:bg-orange-50/50'}`}
                 >
                   {item.icon}
                   {item.name}

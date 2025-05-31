@@ -46,34 +46,58 @@ const invitadosPorAnio = [
 
 export default function InvitadosPage() {
   return (
-    <section className="py-10 px-4 md:px-8 max-w-6xl mx-auto w-full">
-      <h1 className="text-4xl font-bold text-orange-700 mb-12 text-center">Invitados por Año</h1>
-      <div className="space-y-16">
+    <section className="pt-24 pb-12 px-4 md:px-8 w-full bg-gradient-to-b from-white to-blue-50 min-h-screen flex flex-col items-center">
+      <div className="w-full max-w-7xl">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-4">Nuestros Invitados</h1>
+          <div className="h-1.5 w-24 bg-gradient-to-r from-blue-600 to-orange-500 mx-auto mb-6 rounded-full"></div>
+          <p className="text-lg text-blue-800/80 max-w-2xl mx-auto">
+            Conoce a los increíbles ministros y líderes que nos acompañan en esta edición
+          </p>
+        </div>
+      </div>
+      
+      <div className="w-full flex justify-center mt-8">
+        <div className="w-full max-w-7xl space-y-20">
         {invitadosPorAnio.map((anio) => (
-          <div key={anio.anio} className="mb-10">
-            <h2 className="text-2xl md:text-3xl font-semibold text-orange-600 mb-8 border-b border-orange-200 pb-2 text-center">
-              {anio.anio}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-10 justify-items-center">
+          <div key={anio.anio} className="mb-16">
+            <div className="relative mb-10">
+              <h2 className="relative z-10 text-3xl md:text-4xl font-bold text-center mt-12 mb-8">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-orange-500 mb-2">
+                  CAJ {anio.anio}
+                </span>
+              </h2>
+            </div>
+            
+            <div className="flex gap-6 md:gap-8 justify-center  px-10">
               {anio.invitados.map((inv) => (
                 <div
                   key={inv.nombre}
-                  className="bg-white rounded-xl shadow-lg p-6 border-t-4 border-orange-500 w-full max-w-xs flex flex-col items-center hover:scale-105 transition-transform duration-200"
+                  className="bg-white rounded-xl shadow-md overflow-visible border border-blue-100 min-w-[280px] max-w-xs flex-shrink-0 flex flex-col items-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 relative"
+                  style={{ zIndex: 1 }}
                 >
-                  <img
-                    src={inv.foto}
-                    alt={inv.nombre}
-                    className="w-24 h-24 rounded-full object-cover mb-4 border-4 border-orange-200"
-                  />
-                  <h3 className="font-bold text-lg text-orange-700 mb-1 text-center">{inv.nombre}</h3>
-                  <div className="text-sm text-gray-600 mb-1 text-center">{inv.rol}</div>
-                  <div className="text-xs text-gray-500 text-center">{inv.ciudad}</div>
+                  <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-white p-1" style={{ zIndex: 1000 }}>
+                    <div className="relative w-full h-full rounded-full overflow-hidden">
+                      <img 
+                        src={inv.foto}
+                        alt={inv.nombre}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        style={{ zIndex: 1001 }}
+                      />
+                    </div>
+                  </div>
+                  <div className="p-6 pt-16 mt-4 text-center">
+                    <h3 className="font-bold text-xl text-blue-900 mb-1">{inv.nombre}</h3>
+                    <div className="text-orange-600 font-medium mb-2">{inv.rol}</div>
+                    <div className="text-sm text-blue-900/70">{inv.ciudad}</div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         ))}
       </div>
-    </section>
+    </div>
+  </section>
   );
 }

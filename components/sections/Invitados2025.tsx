@@ -22,18 +22,7 @@ const invitados = [
     lugar: "Córdoba, Argentina",
     foto: "https://randomuser.me/api/portraits/men/86.jpg"
   },
-  {
-    nombre: "Sofía Torres",
-    rol: "Líder de alabanza",
-    lugar: "Rosario, Argentina",
-    foto: "https://randomuser.me/api/portraits/women/65.jpg"
-  },
-  {
-    nombre: "Juan Pérez",
-    rol: "Pastor invitado",
-    lugar: "Buenos Aires, Argentina",
-    foto: "https://randomuser.me/api/portraits/men/45.jpg"
-  }
+  
 ];
 
 // Componente para el carrusel de invitados
@@ -58,43 +47,78 @@ function InvitadosCarousel() {
   function next() { setStart((s) => Math.min(maxStart, s + 1)); }
 
   return (
-    <div className="w-full flex flex-col items-center">
-      <div className="relative w-full max-w-4xl">
-        {invitados.length > visible && (
-          <button onClick={prev} disabled={start===0}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 bg-orange-200 hover:bg-orange-300 text-orange-700 rounded-full p-2 shadow z-10 transition ${start===0?'opacity-50 cursor-not-allowed':'opacity-100'}`}
-            aria-label="Anterior"
-          >
-            <ChevronLeft size={22} strokeWidth={2.2} />
-          </button>
-        )}
-        <div className="flex gap-6 md:gap-8 justify-center px-10">
-          {invitados.slice(start, start+visible).map((inv) => (
-            <div
-              key={inv.nombre}
-              className="bg-white rounded-lg shadow p-6 border-t-4 border-orange-500 min-w-[260px] max-w-xs flex-shrink-0 flex flex-col items-center"
+    <section className="mt-1 py-16 px-4 bg-gradient-to-b from-blue-50 to-white">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">Nuestros Invitados</h2>
+          <div className="h-1 w-16 bg-orange-500 mx-auto mb-6 rounded-full"></div>
+          <p className="text-lg text-blue-900/80 max-w-2xl mx-auto">
+            Conoce a los ministros y líderes que nos acompañarán en este tiempo de avivamiento y adoración.
+          </p>
+        </div>
+
+        <div className="relative mt-16 w-full max-w-6xl mx-auto" style={{marginTop:'3rem', paddingTop:'1.5rem'}}>
+          {invitados.length > visible && (
+            <button 
+              onClick={prev} 
+              disabled={start===0}
+              className={`absolute -left-4 top-1/2 -translate-y-1/2 bg-white hover:bg-blue-50 text-blue-900 rounded-full p-2 shadow-lg z-10 transition-all ${start===0?'opacity-50 cursor-not-allowed':'opacity-100 hover:scale-110'}`}
+              aria-label="Anterior"
             >
-              <img
-                src={inv.foto}
-                alt={inv.nombre}
-                className="w-24 h-24 rounded-full object-cover mb-4 border-4 border-orange-200"
-              />
-              <h3 className="font-bold text-lg text-orange-700">{inv.nombre}</h3>
-              <div className="text-sm text-gray-600">{inv.rol}</div>
-              <div className="text-xs text-gray-500">{inv.lugar}</div>
-            </div>
+              <ChevronLeft size={24} strokeWidth={2.5} />
+            </button>
+          )}
+          
+          <div className="flex gap-6 md:gap-8 mt-6 justify-center px-10" >
+            {invitados.slice(start, start+visible).map((inv) => (
+              <div
+                key={inv.nombre}
+                className="bg-white rounded-xl shadow-md overflow-visible border border-blue-100 min-w-[280px] max-w-xs flex-shrink-0 flex flex-col items-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 relative"
+                style={{ zIndex: 1 }}
+              >
+                <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg bg-white p-1" style={{ zIndex: 1000 }}>
+                  <div className="relative w-full h-full rounded-full overflow-hidden">
+                    <img 
+                      src={inv.foto}
+                      alt={inv.nombre}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      style={{ zIndex: 1001 }}
+                    />
+                  </div>
+                </div>
+                <div className="p-6 pt-16 mt-4 text-center">
+                  <h3 className="font-bold text-xl text-blue-900 mb-1">{inv.nombre}</h3>
+                  <div className="text-orange-600 font-medium mb-2">{inv.rol}</div>
+                  <div className="text-sm text-blue-900/70">{inv.lugar}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {invitados.length > visible && (
+            <button 
+              onClick={next} 
+              disabled={start===maxStart}
+              className={`absolute -right-4 top-1/2 -translate-y-1/2 bg-white hover:bg-blue-50 text-blue-900 rounded-full p-2 shadow-lg z-10 transition-all ${start===maxStart?'opacity-50 cursor-not-allowed':'opacity-100 hover:scale-110'}`}
+              aria-label="Siguiente"
+            >
+              <ChevronRight size={24} strokeWidth={2.5} />
+            </button>
+          )}
+        </div>
+        
+        <div className="flex justify-center mt-8 gap-2">
+          {Array.from({ length: Math.ceil(invitados.length / visible) }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setStart(i * visible)}
+              className={`w-3 h-3 rounded-full transition-all ${i * visible === start ? 'bg-orange-500 w-8' : 'bg-blue-200'}`}
+              aria-label={`Ir a la página ${i + 1}`}
+            />
           ))}
         </div>
-        {invitados.length > visible && (
-          <button onClick={next} disabled={start===maxStart}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 bg-orange-200 hover:bg-orange-300 text-orange-700 rounded-full p-2 shadow z-10 transition ${start===maxStart?'opacity-50 cursor-not-allowed':'opacity-100'}`}
-            aria-label="Siguiente"
-          >
-            <ChevronRight size={22} strokeWidth={2.2} />
-          </button>
-        )}
       </div>
-    </div>
+    </section>
   );
 }
 

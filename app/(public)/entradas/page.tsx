@@ -12,6 +12,7 @@ import { useQueryEvents } from "@/hooks/Events/useQueryEvents";
 import { useTransferOrder } from "@/hooks/Transfers/useTransferOrder";
 import { Attendee } from "@/entities/Attendee";
 import PurchaseAvailable from "@/components/public/entradas/PurchaseAvailable";
+import PurchaseInstructions from "@/components/public/entradas/PurchaseInstructions";
 import { PreguntasFrecuentes } from "@/components/ConsagradosAJ2025Sections";
 
 
@@ -136,7 +137,7 @@ export default function PaymentForm() {
 
   return (
     <>
-    <PurchaseAvailable
+    {/* /* <PurchaseAvailable
       combos={combos}
       attendees={attendees}
       selectedPlan={selectedPlan}
@@ -150,8 +151,9 @@ export default function PaymentForm() {
       paymentLoading={paymentLoading}
       updateAttendee={updateAttendee}
       errorMessage={errorMessage}
-    />
-    <div className="mt-12">
+    /> */}
+    <PurchaseInstructions />
+    <div className="mt-8">
       <PreguntasFrecuentes />
     </div>
  

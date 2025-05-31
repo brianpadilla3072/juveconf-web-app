@@ -53,13 +53,16 @@ export default function DonationCard() {
   }
 
   return (
-    <Card className="shadow-xl overflow-hidden border-0 bg-white m-3 lg:m-14">
-      <CardHeader className="bg-gradient-to-r from-red-600 via-orange-500 to-yellow-500 text-white pb-6">
-        <div className="flex items-center justify-center mb-2">
-          <Flame className="h-8 w-8 text-white fill-white mr-2" />
+    <Card className="shadow-xl overflow-hidden border border-blue-100 bg-white m-3 lg:m-14 max-w-4xl mx-auto">
+      <CardHeader className="bg-gradient-to-r from-blue-700 to-blue-900 text-white pb-8 pt-10 px-8">
+        <div className="flex flex-col items-center">
+          <div className="bg-blue-600/20 p-3 rounded-full mb-4">
+            <Flame className="h-10 w-10 text-white fill-white" />
+          </div>
+          <CardTitle className="text-3xl md:text-4xl font-bold text-center mb-2">{title}</CardTitle>
+          <div className="h-1 w-20 bg-gradient-to-r from-blue-400 to-orange-400 rounded-full my-3"></div>
+          <CardDescription className="text-blue-100/90 text-center text-base max-w-2xl">{description}</CardDescription>
         </div>
-        <CardTitle className="text-2xl font-bold text-center">{title}</CardTitle>
-        <CardDescription className="text-white/90 text-center">{description}</CardDescription>
       </CardHeader>
       <CardContent className="pt-6 pb-6 relative">
         {showThanks && (
@@ -133,10 +136,10 @@ export default function DonationCard() {
           </div>
 
           <div className="pt-4">
-            <div className="bg-gradient-to-r from-red-50 to-yellow-50 p-4 rounded-lg">
-              <p className="text-sm text-gray-700 text-center">
-                <span className="font-semibold">¡Cada aporte enciende la llama!</span> Después de realizar tu donación,
-                envíanos un mensaje a <span className="font-semibold text-red-700">{email}</span>{" "}
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-lg border border-blue-100">
+              <p className="text-sm text-blue-800 text-center">
+                <span className="font-semibold text-blue-900">¡Cada aporte enciende la llama!</span> Después de realizar tu donación,
+                envíanos un mensaje a <span className="font-semibold text-blue-700 underline">{email}</span>{" "}
                 para agradecerte personalmente.
               </p>
             </div>

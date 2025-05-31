@@ -1,4 +1,5 @@
 import Navigation from '@/components/navigation';
+import { Footer } from '@/components/sections/Footer';
 
 export const metadata = {
   title: 'Consagrados a Jesus',
@@ -15,6 +16,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <main>
         {children}
       </main>
+      <Footer />
     </div>
   );
 }

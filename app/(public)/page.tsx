@@ -7,21 +7,20 @@ import {
   NuestroOrigen,
   NuestraVision,
   Lema2025,
-  TestimoniosBreves,
+  // TestimoniosBreves,
   Cronograma,
   PreguntasFrecuentes,
 } from "@/components/ConsagradosAJ2025Sections";
 
 export default function Index() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-[#FFF3DC] ">
+    <div className="min-h-screen bg-gradient-to-b from-white to-orange-50">
       <HeroSection />
       <Lema2025 />
       <Invitados2025 />
       <NuestroOrigen />
       <NuestraVision />
-      <TestimoniosBreves />
-
+      {/* <TestimoniosBreves /> */}
 
     </div>
   );
