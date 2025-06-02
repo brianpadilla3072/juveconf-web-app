@@ -420,18 +420,13 @@ export function CronogramaEventos() {
 
                 {isMobile && (
                   <div className="mt-6 pt-6 border-t border-blue-100">
-                    <button
-                      className="w-full flex items-center justify-center px-4 py-2 border border-white/30 text-white rounded-full font-medium hover:bg-black/5 hover:backdrop-blur-sm transition-all duration-300 text-lg"
-                      onClick={() => {
-                        const element = document.getElementById("entradas");
-                        if (element) {
-                          element.scrollIntoView({ behavior: "smooth" });
-                        }
-                      }}
-                    >
-                      <CalendarCheck className="mr-2 h-5 w-5" />
-                      Reservar mi lugar
-                    </button>
+                    <a
+                className="inline-flex items-center px-8 py-3 border border-white/30 text-white rounded-full font-medium hover:bg-black/5 hover:backdrop-blur-sm transition-all duration-300 text-lg"
+                href="/entradas"
+              >
+                <CalendarCheck className="mr-2 h-5 w-5" />
+                Reservar mi lugar para el evento
+              </a>
                   </div>
                 )}
               </div>
@@ -441,18 +436,13 @@ export function CronogramaEventos() {
           {/* Botón de acción en desktop */}
           {!isMobile && (
             <div className="mt-12 text-center">
-              <button
+              <a
                 className="inline-flex items-center px-8 py-3 border border-white/30 text-white rounded-full font-medium hover:bg-black/5 hover:backdrop-blur-sm transition-all duration-300 text-lg"
-                onClick={() => {
-                  const element = document.getElementById("entradas");
-                  if (element) {
-                    element.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
+                href="/entradas"
               >
                 <CalendarCheck className="mr-2 h-5 w-5" />
                 Reservar mi lugar para el evento
-              </button>
+              </a>
             </div>
           )}
         </div>

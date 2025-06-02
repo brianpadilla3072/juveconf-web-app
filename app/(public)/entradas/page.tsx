@@ -145,7 +145,7 @@ export default function PaymentForm() {
       updateAttendee={updateAttendee}
       errorMessage={errorMessage}
     /> */}
-    <PurchaseInstructions />
+    <PurchaseInstructions id="entradas"/>
       <PreguntasFrecuentes />
  
     <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
