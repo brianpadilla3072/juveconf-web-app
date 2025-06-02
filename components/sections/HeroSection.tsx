@@ -47,7 +47,7 @@ export function HeroSection() {
   return (
     <section 
       ref={heroRef}
-      className="relative h-[80vh] w-full overflow-hidden"
+      className="relative h-[99vh] w-full overflow-hidden"
     >
       {/* Capa de fondo */}
       <div 
@@ -60,6 +60,7 @@ export function HeroSection() {
           transition: 'transform 0.1s ease-out',
           transform: isVisible ? `translate3d(0, ${scrollY}px, 0)` : 'translate3d(0, 0, 0)',
           willChange: 'transform',
+          inset: '-123px'
         }}
       />
       
@@ -67,16 +68,17 @@ export function HeroSection() {
       <div 
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0) 100%)',
+          background: 'linear-gradient(to top, rgb(0, 0, 0) 0%, rgba(0, 0, 0, 0.54) 50%, rgba(0, 0, 0, 0.56) 100%)',
           opacity: 0.7,
           transition: 'transform 0.1s ease-out',
           transform: isVisible ? `translate3d(0, ${scrollY * 0.3}px, 0)` : 'translate3d(0, 0, 0)',
           willChange: 'transform',
+          inset: '-123px'
         }}
       />
       
       {/* Contenido */}
-      <div className="absolute inset-0 flex items-center justify-center mt-4">
+      <div className="absolute inset-0 flex items-center justify-center">
         <div className="z-30 text-center">
           <div className="space-y-6">
             <h1 style={{

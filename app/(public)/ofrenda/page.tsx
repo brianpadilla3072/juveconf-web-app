@@ -1,5 +1,5 @@
 "use client";
-
+import Image from 'next/image';
 import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Check, Copy, Flame } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
 import donationBackground from "../../../public/images/hero/hero-background.jpg";
-
+import logo from "../../../public/images/logo.webp";
 export default function DonationCard() {
   // Estados para copiar y mostrar agradecimiento
   const [copiedCVU, setCopiedCVU] = useState(false);
@@ -20,11 +20,11 @@ export default function DonationCard() {
   const sectionRef = useRef<HTMLElement>(null);
 
   // Datos de donación (provienen de variables de entorno)
-  const cvu = process.env.NEXT_PUBLIC_DONATION_CVU!;
-  const alias = process.env.NEXT_PUBLIC_DONATION_ALIAS!;
+  const cvu = '0000003100005464217573';
+  const alias = 'consagradosajesus';
   const email = process.env.NEXT_PUBLIC_DONATION_EMAIL!;
-  const title = "Apoyá nuestra misión";
-  const description = "Tu ayuda nos permite seguir avanzando con este fuego que no se apaga.";
+  const title = "¿Cómo puedo colaborar?";
+  
 
   // Manejo del scroll para parallax
   useEffect(() => {
@@ -121,36 +121,15 @@ export default function DonationCard() {
                   </CardTitle>
                   <div className="h-1 w-20 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full my-3" />
                   <CardDescription className="text-white/70 text-center text-base max-w-2xl">
-                    {description}
+                  Tus oraciones son fundamentales para este proyecto, y tu presencia en el evento puede marcar una gran diferencia. Estas son las dos formas principales en las que podés colaborar con nosotros.
+                  <br />
+  Además, si el Espíritu Santo te guía a hacerlo, podés sembrar una ofrenda para ayudarnos a cubrir los gastos y seguir creciendo. El alias para transferencias es:
                   </CardDescription>
                 </div>
               </CardHeader>
 
               <CardContent className="pt-6 pb-6 relative">
-                {showThanks && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 flex items-center justify-center z-10"
-                  >
-                    <div className="w-full h-full backdrop-blur-[10px] bg-white/60 rounded-xl p-6 flex flex-col items-center justify-center shadow-xl border border-white/20">
-                      <motion.div
-                        initial={{ scale: 0.5 }}
-                        animate={{ scale: [1, 1.2, 1] }}
-                        transition={{ duration: 0.5, times: [0, 0.5, 1] }}
-                      >
-                        <Flame className="h-16 w-16 text-red-600 fill-red-500 mb-4 drop-shadow-lg" />
-                      </motion.div>
-                      <h3 className="text-2xl font-bold mb-2 text-red-700">
-                        ¡Gracias por tu apoyo!
-                      </h3>
-                      <p className="text-center text-red-800">
-                        Tu contribución ayuda a mantener viva la llama
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
+               
 
                 <div className="space-y-6">
                   <div className="space-y-3">
@@ -215,13 +194,9 @@ export default function DonationCard() {
                     <div className="bg-gradient-to-r from-piedras-50/50 to-piedras-100/50 p-6 rounded-lg border border-piedras-100/50">
                       <p className="text-sm text-white/80 text-center">
                         <span className="font-semibold text-white/90">
-                          ¡Cada aporte enciende la llama!
+                          ¡Gracias por tu apoyo!
                         </span>{" "}
-                        Después de realizar tu donación, envíanos un mensaje a{" "}
-                        <span className="font-semibold text-orange-500/90 underline">
-                          {email}
-                        </span>{" "}
-                        para agradecerte personalmente.
+                        Por motivos de organizacion la cuenta esta a nombre de <span className="font-semibold text-orange-500/90">Estefania Victoria Vazquez</span>
                       </p>
                     </div>
                   </div>
@@ -231,6 +206,23 @@ export default function DonationCard() {
           </div>
         </div>
       </div>
+      {showThanks && (
+  <motion.div
+    initial={{ scale: 0, opacity: 0 }}
+    animate={{ scale: [0, 1.2, 1], opacity: 1 }}
+    exit={{ scale: 0.5, opacity: 0 }}
+    transition={{ duration: 0.6, ease: "easeOut" }}
+    className="fixed bottom-10 right-10 z-50"
+  >
+    <motion.div
+      animate={{ scale: [1, 1.3, 1], rotate: [0, 5, -5, 0] }}
+      transition={{ repeat: Infinity, duration: 1.2, ease: "easeInOut" }}
+      className="text-red-500"
+    >
+        <Image src={logo} alt="Logo" width={192} height={192} className="object-contain opacity-80" />
+    </motion.div>
+  </motion.div>
+)}
     </section>
   );
 }

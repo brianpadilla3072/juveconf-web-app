@@ -65,7 +65,7 @@ export function NuestraVision() {
 
       {/* Contenido principal */}
       <div className="relative z-20 py-16 px-4">
-        <div className="max-w-5xl mx-auto bg-piedra-900/50 rounded-2xl shadow-xl backdrop-blur-md p-8 md:p-12 lg:p-16 ">
+        <div className="max-w-5xl mx-auto bg-piedra-900/50 rounded-2xl shadow-xl border border-white/20  backdrop-blur-[6px] p-8 md:p-12 lg:p-16 ">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/3 mb-8 md:mb-0 md:pr-8 relative h-32 w-32">
               <Image src={logo} alt="Logo" width={192} height={192} className="object-contain opacity-80 " />
@@ -73,7 +73,7 @@ export function NuestraVision() {
             <div className="md:w-2/3 text-white space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold">Nuestra Visión</h2>
               <p className="text-lg leading-relaxed text-white-100/60">
-                Por mucho tiempo, el cuerpo de Cristo estuvo fracturado: divisiones, malos tratos, competencia. <span className="font-semibold text-white">"Consagrados a Jesús"</span> viene a romper con esas estructuras, manifestando la unión dada por el Espíritu (<span className="text-orange-300 font-medium">Efesios 4:3-6</span>), enseñando a poner la mirada en Jesús y echar raíces donde Dios nos puso.
+                Por mucho tiempo, el cuerpo de Cristo estuvo fracturado: divisiones, malos tratos, competencia. <span className="font-semibold text-orange-500">"Consagrados a Jesús"</span> viene a romper con esas estructuras, manifestando la unión dada por el Espíritu (<span className="text-orange-500 font-medium">Efesios 4:3-6</span>), enseñando a poner la mirada en Jesús y echar raíces donde Dios nos puso.
               </p>
               <div className="p-4  rounded-lg border-l-4 border-orange-400">
                 <p className="italic text-white-100/60">

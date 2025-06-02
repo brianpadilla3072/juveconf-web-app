@@ -15,6 +15,7 @@ export default function Navigation() {
 
   const menuItems = [
     { name: "Inicio", href: "/" },
+    { name: "Nosotros", href: "/#nuestro-origen" },
     { name: "Cronograma", href: "/cronograma" },
     { name: "Entradas", href: "/entradas" },
     { name: "Ofrendas", href: "/ofrenda", icon: <Heart className="h-4 w-4 text-orange-500 stroke-orange-500 fill-none" /> },

@@ -146,9 +146,7 @@ export default function PaymentForm() {
       errorMessage={errorMessage}
     /> */}
     <PurchaseInstructions />
-    <div className="mt-8">
       <PreguntasFrecuentes />
-    </div>
  
     <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
       <DialogContent>
