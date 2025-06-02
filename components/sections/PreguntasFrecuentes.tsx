@@ -30,7 +30,7 @@ const faqs = [
           href="https://wa.me/5492914326563"
           className="text-orange-300 font-medium hover:underline hover:text-orange-200 transition-colors"
         >
-          +54 9 291 432 6563
+           +54 9 291 432 6563
         </a>
         .
       </div>

@@ -103,6 +103,10 @@ const config: Config = {
             height: "var(--radix-accordion-content-height)",
           },
         },
+        'pulse-scale': {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.05)' },
+        },
         "accordion-up": {
           from: {
             height: "var(--radix-accordion-content-height)",
@@ -115,6 +119,7 @@ const config: Config = {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        'pulse-scale': 'pulse-scale 1.5s ease-in-out infinite',
       },
     },
   },

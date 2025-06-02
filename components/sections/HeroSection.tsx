@@ -12,33 +12,22 @@ export function HeroSection() {
   useEffect(() => {
     const handleScroll = () => {
       if (!heroRef.current) return;
-      
+
       const rect = heroRef.current.getBoundingClientRect();
-      const isElementInView = (
-        rect.top <= window.innerHeight && rect.bottom >= 0
-      );
-      
+      const isElementInView = rect.top <= window.innerHeight && rect.bottom >= 0;
       setIsVisible(isElementInView);
-      
+
       if (isElementInView) {
-        // Calcula el desplazamiento basado en la posición del scroll
         const scrollPosition = window.scrollY;
         const elementPosition = rect.top + scrollPosition;
-        const windowHeight = window.innerHeight;
-        
-        // Ajusta la velocidad del efecto parallax (0.5 es la intensidad)
         const parallaxValue = (scrollPosition - elementPosition) * 0.5;
         setScrollY(parallaxValue);
       }
     };
 
-    // Añadir el event listener
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    // Llamar una vez al montar para establecer el estado inicial
     handleScroll();
-    
-    // Limpiar el event listener al desmontar
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
@@ -49,7 +38,7 @@ export function HeroSection() {
       ref={heroRef}
       className="relative h-[99vh] w-full overflow-hidden"
     >
-      {/* Capa de fondo */}
+      {/* Fondo con efecto parallax */}
       <div 
         className="absolute inset-0"
         style={{
@@ -63,8 +52,8 @@ export function HeroSection() {
           inset: '-123px'
         }}
       />
-      
-      {/* Gradiente */}
+
+      {/* Gradiente oscuro */}
       <div 
         className="absolute inset-0"
         style={{
@@ -76,8 +65,8 @@ export function HeroSection() {
           inset: '-123px'
         }}
       />
-      
-      {/* Contenido */}
+
+      {/* Contenido centrado */}
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="z-30 text-center">
           <div className="space-y-6">
@@ -91,12 +80,38 @@ export function HeroSection() {
             }}>
               <span style={{ display: 'block' }}>CONSAGRADOS A JESÚS</span>
             </h1>
+
+            {/* Logo con efecto de latido */}
             <div className="w-40 h-40 mx-auto">
-              <Image src={logo} alt="Logo" width={192} height={192} className="object-contain opacity-80" />
+              <Image
+                src={logo}
+                alt="Logo"
+                width={192}
+                height={192}
+                className="object-contain"
+                style={{
+                  opacity: 0.8,
+                  animation: 'pulse-heart 1.5s ease-in-out infinite'
+                }}
+              />
             </div>
           </div>
         </div>
       </div>
+
+      {/* Keyframes embebidos */}
+      <style jsx>{`
+        @keyframes pulse-heart {
+          0%, 100% {
+            transform: scale(1);
+            opacity: 0.8;
+          }
+          50% {
+            transform: scale(1.1);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </section>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-
+import { ClientLoaderWrapper } from "./ClientLoaderWrapper";
 import { Module, useNavigationStore } from "../../store/navigationStore";
 import { useSyncActiveModule } from "@/hooks/useSyncActiveModule";
 import type React from "react";
@@ -53,9 +53,9 @@ export default function DashboardLayout({
     mod.charAt(0).toUpperCase() + mod.slice(1);
 
   return (
-    <SyncModuleProvider>
-
-      <div className="min-h-screen bg-gray-50">
+    <ClientLoaderWrapper>
+      <SyncModuleProvider>
+            <div className="min-h-screen bg-gray-50">
         {sidebarOpen && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
@@ -208,6 +208,7 @@ export default function DashboardLayout({
         </div>
       </div>
     </SyncModuleProvider>
+    </ClientLoaderWrapper>
 
   );
 }

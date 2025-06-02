@@ -56,8 +56,8 @@ export default function PurchaseInstructions() {
 
       {/* Contenido principal */}
       <div className="relative z-20 py-16 px-4 max-h-[90vh] overflow-auto">
-      <div className="rounded-xl bg-piedra/10 backdrop-blur-[6px] mx-auto max-w-6xl border  border-white/30 shadow-lg overflow-hidden">
-      <div className=" text-white p-2">
+        <div className="rounded-xl bg-piedra/10 backdrop-blur-[6px] mx-auto max-w-6xl border  border-white/30 shadow-lg overflow-hidden">
+          <div className=" text-white p-2">
             <div className="flex flex-col m-auto justify-center items-center space-y-2 p-8 pb-4">
               <div className="tracking-tight m-auto w-full justify-center items-center text-2xl md:text-3xl font-bold text-center text-white">
                 Compra de Entradas
@@ -76,10 +76,9 @@ export default function PurchaseInstructions() {
                 <p className="text-white/60 mb-4">
                   Envía un mensaje al WhatsApp:{" "}
                   <a
-                    href="https://wa.me/542915335545" className="text-orange-500 hover:text-orange-400"
+                    href="https://wa.me/5492914326563" className="text-orange-500 hover:text-orange-400"
                   >
-                    2915-335545
-                  </a>
+                    +54 9 291 432 6563                  </a>
                 </p>
                 <div className="bg-piedra-100/30 p-4 rounded-lg backdrop-blur-lg bg-white/10">
                   <p className="text-sm text-neutral-300">
@@ -91,13 +90,13 @@ export default function PurchaseInstructions() {
                 <h3 className="text-lg font-semibold  text-white mb-2">2. Pago</h3>
                 <p className=" text-white/60 mb-4">Realiza la transferencia a la cuenta:</p>
                 <div className="bg-piedra-100/30 p-4 rounded-lg backdrop-blur-lg bg-white/10">
-                  <p className="text-sm font-medium text-neutral-300">Consagrados.a.jesus</p>
+                  <p className="text-sm font-medium text-neutral-300">consagradosajesus</p>
                 </div>
               </div>
               <div className="text-center">
-                <Button 
+                <Button
                   className="inline-flex items-center px-8 py-3 border border-white/30 text-white rounded-full font-medium bg-black/5 hover:bg-black/10 transition-all duration-300 text-lg">
-                  <a href="https://wa.me/542915335545" className="flex items-center space-x-2">
+                  <a href="https://wa.me/5492914326563" className="flex items-center space-x-2">
                     <MessageSquare className="text-white w-5 h-5 mr-2" />
                     <span>¡Contactar por WhatsApp!</span>
                   </a>

@@ -86,7 +86,7 @@ const getBorderColor = (titulo: string): string => {
 const cronograma = [
   {
     dia: "19 de Septiembre",
-    fechaCompleta: "Sábado 19 de Septiembre, 2025",
+    fechaCompleta: "Viernes 19 de Septiembre, 2025",
     lugar: "Salones Arizu",
     direccion: "Av. Cerri 997, Bahia Blanca",
     bloques: [
@@ -106,38 +106,38 @@ const cronograma = [
       {
         hora: "15:00",
         titulo: "Taller 1",
-        detalle: "Agustín Schiro (Grupos por edades y ministerios)",
+        detalle: "Agustín Schiro",
         duracion: "1h 30min"
       },
       {
         hora: "16:30",
         titulo: "Taller 2",
-        detalle: "Griselda Alba (Grupos por interés y ministerios)",
+        detalle: "Griselda Alba",
         duracion: "1h"
       },
       {
         hora: "17:30",
         titulo: "Break 2",
-        detalle: "Merienda liviana (incluida)",
+        detalle: "",
         duracion: "1h 30min"
       },
       {
         hora: "19:30",
         titulo: "Plenaria final",
-        detalle: "Valentino Nicolás (Adoración colectiva)",
+        detalle: "Valentino Nicolás",
         duracion: "2h 30min"
       },
       {
         hora: "22:00",
         titulo: "Cierre",
-        detalle: "Palabras finales y agradecimientos",
+        detalle: "",
         duracion: "30min"
       }
     ]
   },
   {
     dia: "20 de Septiembre",
-    fechaCompleta: "Domingo 20 de Septiembre, 2025",
+    fechaCompleta: "Sábado 20 de Septiembre, 2025",
     lugar: "Salones Arizu",
     direccion: "Av. Cerri 997, Bahia Blanca",
     bloques: [
@@ -151,31 +151,31 @@ const cronograma = [
       {
         hora: "12:30",
         titulo: "Break",
-        detalle: "Almuerzo (no incluido)",
+        detalle: "Almuerzo (No incluida puede traer o e en el lugar se venderan ade,as de la zona contar con comercios cercanos)",
         duracion: "2h 30min"
       },
       {
         hora: "15:00",
         titulo: "Taller 1",
-        detalle: "Griselda Alba (Grupos por edades y ministerios)",
+        detalle: "Griselda Alba",
         duracion: "1h 30min"
       },
       {
         hora: "16:30",
         titulo: "Taller 2",
-        detalle: "Valentino Nicolás (Grupos por interés y ministerios)",
+        detalle: "Valentino Nicolás",
         duracion: "1h"
       },
       {
         hora: "17:30",
         titulo: "Break 2",
-        detalle: "Merienda liviana (incluida)",
+        detalle: "",
         duracion: "1h 30min"
       },
       {
         hora: "19:30",
-        titulo: "Plenaria final + Santa Cena",
-        detalle: "Agustín Schiro (Adoración y Santa Cena)",
+        titulo: "Plenaria final - Agustín Schiro",
+        detalle: "",
         duracion: "2h 30min"
       },
       {
@@ -194,7 +194,19 @@ export function CronogramaEventos() {
   const [scrollY, setScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
-
+  const [isAnimating, setIsAnimating] = useState(false);
+   // Función para cambiar día con animación
+   const changeDay = (newDay: number) => {
+    if (newDay === activeDay || isAnimating) return; // evitar clicks rápidos
+    setIsAnimating(true);
+    setTimeout(() => {
+      setActiveDay(newDay);
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 300); // duración fade-in
+    }, 300); // duración fade-out
+  };
+  
   // Efecto para manejar el parallax y la visibilidad del section
   useEffect(() => {
     const handleScroll = () => {
@@ -226,6 +238,10 @@ export function CronogramaEventos() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Navegación entre días para móvil
+  const nextDay = () => changeDay((activeDay + 1) % cronograma.length);
+  const prevDay = () => changeDay((activeDay - 1 + cronograma.length) % cronograma.length)
 
   return (
     <section
@@ -268,17 +284,50 @@ export function CronogramaEventos() {
             </p>
           </div>
 
-          {/* Pestañas de días - Solo en desktop */}
-          {!isMobile && (
+          {/* Selector de fecha para móvil */}
+          {isMobile ? (
+            <div className="flex items-center justify-center mb-6 px-4">
+              <button 
+                onClick={prevDay}
+                className="p-2 text-white hover:bg-white/10 rounded-full"
+                aria-label="Día anterior"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </button>
+              
+              <div className="mx-4 text-center">
+                <div className="text-white font-medium text-lg">
+                  {cronograma[activeDay].dia}
+                </div>
+                <div className="text-sm text-white/70">
+                  {cronograma[activeDay].fechaCompleta}
+                </div>
+              </div>
+              
+              <button 
+                onClick={nextDay}
+                className="p-2 text-white hover:bg-white/10 rounded-full"
+                aria-label="Siguiente día"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
+            </div>
+          ) : (
+            // Pestañas de días para desktop
             <div className="flex justify-center mb-8 max-w-4xl mx-auto border-blue-100">
               {cronograma.map((dia, index) => (
                 <button
                   key={index}
                   onClick={() => setActiveDay(index)}
-                  className={`px-6 py-3 font-medium text-sm md:text-base transition-colors relative ${activeDay === index
+                  className={`px-6 py-3 font-medium text-sm md:text-base transition-colors relative ${
+                    activeDay === index
                       ? "text-white font-semibold"
                       : "text-neutral-50 hover:text-neutral-100"
-                    }`}
+                  }`}
                 >
                   {dia.dia}
                   {activeDay === index && (
@@ -328,7 +377,7 @@ export function CronogramaEventos() {
                     // Búsqueda exacta por clave en lugar de includes()
                     const Icono =
                       iconosBloque[bloque.titulo as TituloActividad] ?? (
-                        <Clock className="text-blue-400" size={20} />
+                        <Clock className="text-orange-500" size={20} />
                       );
 
                     return (

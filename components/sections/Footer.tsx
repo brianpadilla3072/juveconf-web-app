@@ -14,14 +14,14 @@ export function Footer() {
   useEffect(() => {
     const handleScroll = () => {
       if (!footerRef.current) return;
-      
-          // Get the scroll position
+
+      // Get the scroll position
       const scrollPosition = window.scrollY + window.innerHeight;
       // Get the footer position
       const footerTop = footerRef.current.offsetTop;
       // Calculate how much of the footer is visible
       const footerVisible = scrollPosition - footerTop;
-      
+
       // Only apply parallax when footer is in view
       if (footerVisible > 0) {
         // Smooth parallax effect (slower than scroll)
@@ -44,8 +44,8 @@ export function Footer() {
       ref={footerRef}
       className="relative overflow-hidden"
     >
-       {/* Fondo con efecto de paralaje */}
-      <div 
+      {/* Fondo con efecto de paralaje */}
+      <div
         className="absolute inset-0"
         style={{
           background: `url(${heroBackground.src})`,
@@ -60,9 +60,9 @@ export function Footer() {
           filter: 'brightness(0.6)'
         }}
       />
-      
+
       {/* Overlay oscuro */}
-      <div 
+      <div
         className="absolute inset-0"
         style={{
           background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.52) 0%, rgba(13, 17, 27, 0.4) 100%)',
@@ -72,9 +72,9 @@ export function Footer() {
           opacity: 0.95
         }}
       />
-      
-  
-      
+
+
+
       {/* Contenido del footer */}
       <div className="relative z-50 py-16 text-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
@@ -82,9 +82,9 @@ export function Footer() {
             {/* Sección de logo y descripción */}
             <div className="space-y-6">
               <div className="flex items-center space-x-3">
-                <img 
-                  src={logo.src} 
-                  alt="Logo Consagrados a Jesús" 
+                <img
+                  src={logo.src}
+                  alt="Logo Consagrados a Jesús"
                   className="w-10 h-10 object-contain"
                 />
                 <h3 className="text-1xl font-bold bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
@@ -92,7 +92,7 @@ export function Footer() {
                 </h3>
               </div>
               <p className="text-gray-300 leading-relaxed">
-              Donde la novia se prepara, el cuerpo se edifica, la cabeza <span className="font-bold text-orange-400">Cristo</span> es glorificada, y cada creyente es enviado a echar raíces en su comunidad.              </p>
+                Donde la novia se prepara, el cuerpo se edifica, la cabeza <span className="font-bold text-orange-400">Cristo</span> es glorificada, y cada creyente es enviado a echar raíces en su comunidad.              </p>
               <div className="flex space-x-4 pt-2">
                 {/* <a 
                   href="#" 
@@ -104,8 +104,8 @@ export function Footer() {
                     <Facebook className="w-5 h-5" />
                   </div>
                 </a> */}
-                <a 
-                  href="https://www.instagram.com/consagradosa_jesus/" 
+                <a
+                  href="https://www.instagram.com/consagradosa_jesus/"
                   className="text-gray-400 hover:text-orange-400 transition-colors duration-300"
                   aria-label="Instagram"
                 >
@@ -126,7 +126,7 @@ export function Footer() {
                 </a> */}
               </div>
             </div>
-            
+
             {/* Enlaces rápidos */}
             <div>
               <h3 className="text-lg font-semibold text-orange-400 mb-6 pb-2 border-b border-gray-700/50">
@@ -139,7 +139,7 @@ export function Footer() {
                   { name: 'Nuestro Origen', href: '/#nuestro-origen' },
                 ].map((item) => (
                   <li key={item.name}>
-                    <Link 
+                    <Link
                       href={item.href}
                       className="text-gray-300 hover:text-orange-400 transition-colors duration-300 flex items-center group"
                     >
@@ -150,7 +150,7 @@ export function Footer() {
                 ))}
               </ul>
             </div>
-            
+
             {/* Información de contacto */}
             <div>
               <h3 className="text-lg font-semibold text-orange-400 mb-6 pb-2 border-b border-gray-700/50">
@@ -163,7 +163,7 @@ export function Footer() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <span className="ml-3 text-gray-300">info@consagradosajesus.com</span>
+                  <span className="ml-3 text-gray-300">equipo@consagradosajesus.com</span>
                 </li>
                 <li className="flex items-start">
                   <div className="flex-shrink-0 mt-1">
@@ -171,7 +171,12 @@ export function Footer() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
                   </div>
-                  <span className="ml-3 text-gray-300">(54) 9 11 1234-5678</span>
+                  <span className="ml-3 text-gray-300">
+                    <a
+                      href="https://wa.me/5492914326563" className="text-orange-500 hover:text-orange-400"
+                    >
+                      +54 9 291 432 6563                  </a>
+                  </span>
                 </li>
                 <li className="flex items-start">
                   <div className="flex-shrink-0 mt-1">
@@ -183,7 +188,7 @@ export function Footer() {
                   <span className="ml-3 text-gray-300">Bahía Blanca, Buenos Aires, Argentina</span>
                 </li>
               </ul>
-              
+
               {/* Boletín informativo */}
               {/* <div className="mt-8">
                 <h4 className="text-sm font-medium text-gray-300 mb-3">Suscríbete a nuestro boletín</h4>
@@ -202,7 +207,7 @@ export function Footer() {
               </div> */}
             </div>
           </div>
-          
+
           {/* Derechos de autor */}
           {/* <div className="mt-16 pt-8 border-t border-gray-800">
             <div className="flex flex-col md:flex-row justify-between items-center">
