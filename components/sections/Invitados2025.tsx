@@ -9,7 +9,7 @@ import agustin from "../../public/images/invitados/AgustínSchiro.jpg";
 
 // Background image configuration
 const invitadosBackground = {
-  src: "/images/hero/hero-background.avif",
+  src: "/images/hero/hero-background.jpg",
   width: 1920,
   height: 1080,
 };
