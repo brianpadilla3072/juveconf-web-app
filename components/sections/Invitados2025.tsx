@@ -3,10 +3,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import griselga from "../../public/images/invitados/GriseldaAlba.jpg";
+import valentino from "../../public/images/invitados/ValentinoNicolásTorino.jpg";
+import agustin from "../../public/images/invitados/AgustínSchiro.jpg";
 
 // Background image configuration
 const invitadosBackground = {
-  src: "/images/hero/hero-background.jpg",
+  src: "/images/hero/hero-background.avif",
   width: 1920,
   height: 1080,
 };
@@ -17,19 +20,19 @@ const invitados = [
     nombre: "Griselda Alba",
     rol: "Pastora en Ministerio Crecer",
     lugar: "San Luis, Argentina",
-    foto: "https://randomuser.me/api/portraits/women/44.jpg"
+    foto: griselga.src
   },
   {
-    nombre: "Valentino Nicolás",
-    rol: "Líder de jóvenes en Ministerio",
-    lugar: "Tandil, Argentina",
-    foto: "https://randomuser.me/api/portraits/men/32.jpg"
+    nombre: "Valentino Nicolás Torino",
+    rol: "Asociación Iglesia Evangélica Misionera",
+    lugar: "Iglesia del Camino Tandil, Argentina",
+    foto: valentino.src
   },
   {
     nombre: "Agustín Schiro",
     rol: "Ministerio 'Toma tu lugar'",
     lugar: "Córdoba, Argentina",
-    foto: "https://randomuser.me/api/portraits/men/86.jpg"
+    foto: agustin.src
   }
 ];
 

@@ -81,7 +81,7 @@ export function NuestroOrigen() {
 
         <div className="prose prose-lg max-w-none text-white/80">
           <p className="text-lg leading-relaxed mb-6">
-            <span className="text-orange-400 font-semibold">CAJ</span> se inició comenzó en el año 2022 como una alternativa a las fiestas de primavera que se realizan en Monte Hermoso. Pero Dios tenía otros planes. Ese mismo año, Él nos hizo entender que esto no nos pertenecía, sino que había nacido de Su corazón. Transformó nuestra visión y nos condujo a convertirnos en un congreso interdenominacional, con el propósito de fomentar la comunión del cuerpo de Cristo en nuestra ciudad.
+            <span className="text-orange-400 font-semibold">CAJ</span> comenzó en el año 2022 como una alternativa a las fiestas de primavera que se realizan en Monte Hermoso. Pero Dios tenía otros planes. Ese mismo año, Él nos hizo entender que esto no nos pertenecía, sino que había nacido de Su corazón. Transformó nuestra visión y nos condujo a convertirnos en un congreso interdenominacional, con el propósito de fomentar la comunión del cuerpo de Cristo en nuestra ciudad.
           </p>
           <p className="text-lg leading-relaxed mb-8">
           Actualmente, contamos con el apoyo de distintos pastores de congregaciones de Bahía Blanca, y con un equipo de trabajo totalmente comprometido a obedecer lo que Dios está deseando.
