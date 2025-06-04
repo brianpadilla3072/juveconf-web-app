@@ -151,7 +151,7 @@ const cronograma = [
       {
         hora: "12:30",
         titulo: "Break",
-        detalle: "Almuerzo (No incluida puede traer o e en el lugar se venderan ade,as de la zona contar con comercios cercanos)",
+        detalle: "Almuerzo (No incluida puede traer o e en el lugar se venderan, ademas la zona contar con comercios cercanos)",
         duracion: "2h 30min"
       },
       {
