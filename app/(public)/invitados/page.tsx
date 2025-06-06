@@ -25,29 +25,14 @@ const invitadosPorAnio = [
       },
     ],
   },
-  {
-    anio: 2024,
-    invitados: [
-      {
-        nombre: "Juan Pérez",
-        rol: "Evangelista",
-        ciudad: "Buenos Aires, Argentina",
-        foto: "https://randomuser.me/api/portraits/men/11.jpg",
-      },
-      {
-        nombre: "Lucía Gómez",
-        rol: "Conferencista",
-        ciudad: "Rosario, Argentina",
-        foto: "https://randomuser.me/api/portraits/women/22.jpg",
-      },
-    ],
-  },
+  
+  
 ];
 
 export default function InvitadosPage() {
   return (
     <section className="pt-24 pb-12 px-4 md:px-8 w-full bg-gradient-to-b from-white to-blue-50 min-h-screen flex flex-col items-center">
-      <div className="w-full max-w-7xl">
+      <div className="w-full max-w-7xl mb-16">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-4">Nuestros Invitados</h1>
           <div className="h-1.5 w-24 bg-gradient-to-r from-blue-600 to-orange-500 mx-auto mb-6 rounded-full"></div>
@@ -56,20 +41,21 @@ export default function InvitadosPage() {
           </p>
         </div>
       </div>
-      
-      <div className="w-full flex justify-center mt-8">
-        <div className="w-full max-w-7xl space-y-20">
+      <br />
+      <div className="w-full mt-16 pt-16 flex justify-center"  >
+        <div className="w-full max-w-7xl space-y-32" >
         {invitadosPorAnio.map((anio) => (
-          <div key={anio.anio} className="mb-16">
-            <div className="relative mb-10">
-              <h2 className="relative z-10 text-3xl md:text-4xl font-bold text-center mt-12 mb-8">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-orange-500 mb-2">
+          <div key={anio.anio} className="py-16 first:pt-0 last:pb-0">
+            <div className="relative mb-24">
+              <h2 className="relative z-10 text-4xl md:text-5xl font-bold text-center mb-16">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-orange-500">
                   CAJ {anio.anio}
                 </span>
               </h2>
             </div>
             
-            <div className="flex gap-6 md:gap-8 justify-center  px-10">
+            <br />
+            <div className="flex gap-10 md:gap-12 justify-center px-10 mt-15 pt-15" >
               {anio.invitados.map((inv) => (
                 <div
                   key={inv.nombre}

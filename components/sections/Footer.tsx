@@ -76,7 +76,7 @@ export function Footer() {
 
 
       {/* Contenido del footer */}
-      <div className="relative z-50 py-16 text-white">
+      <div className="relative z-40 py-16 text-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {/* Sección de logo y descripción */}

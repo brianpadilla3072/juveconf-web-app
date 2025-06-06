@@ -118,6 +118,7 @@ export function Invitados2025() {
           </div>
 
           {/* Componente Carousel */}
+          <br />
           <InvitadosCarousel />
         </div>
       </div>
