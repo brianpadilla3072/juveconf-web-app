@@ -1,4 +1,17 @@
 import Cookies from 'js-cookie';
+import api from './axios.config';
+
+type User = {
+  id: string;
+  email: string;
+  name: string;
+  givenName: string;
+  familyName: string;
+  dni: string;
+  role: string;
+  provider: string;
+  emailVerified: boolean;
+};
 
 // Usamos localStorage para almacenar el token JWT
 const TOKEN_KEY = 'auth_token';
@@ -70,11 +83,27 @@ export const AuthService = {
 
   // Verificar si el token está próximo a expirar
   isTokenExpiringSoon(thresholdMinutes = 5): boolean {
-    const user = this.getUserFromToken();
-    if (!user || !user.exp) return true;
-    
-    const now = Math.floor(Date.now() / 1000);
-    const expiresIn = user.exp - now;
-    return expiresIn < (thresholdMinutes * 60);
+    const token = this.getToken();
+    if (!token) return false;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const exp = payload.exp * 1000; // Convertir a milisegundos
+      const now = Date.now();
+      return (exp - now) < (thresholdMinutes * 60 * 1000);
+    } catch (error) {
+      return false;
+    }
+  },
+
+  // Actualizar perfil del usuario
+  async updateProfile(userData: Partial<User>): Promise<User> {
+    try {
+      const response = await api.patch('/auth/profile', userData);
+      return response.data;
+    } catch (error) {
+      console.error('Error al actualizar el perfil:', error);
+      throw error;
+    }
   },
 };

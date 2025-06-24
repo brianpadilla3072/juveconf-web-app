@@ -24,6 +24,7 @@ type AuthContextType = {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<void>;
+  updateProfile: (userData: Partial<Omit<User, 'id' | 'email' | 'role' | 'provider' | 'emailVerified'>>) => Promise<User>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -81,6 +82,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/login');
   };
 
+  const updateProfile = async (userData: Partial<Omit<User, 'id' | 'email' | 'role' | 'provider' | 'emailVerified'>>): Promise<User> => {
+    try {
+      const updatedUser = await AuthService.updateProfile(userData);
+      setUser(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      console.error('Error al actualizar el perfil:', error);
+      throw error;
+    }
+  };
+
   const value = {
     user,
     isAuthenticated: !!user,
@@ -88,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     logout,
     checkAuth,
+    updateProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
