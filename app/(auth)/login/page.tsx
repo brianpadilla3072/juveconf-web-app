@@ -1,26 +1,41 @@
 "use client"
-import type React from "react"
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Flame, Mail, Lock } from 'lucide-react'
+import { Flame, Mail, Lock, Loader2 } from 'lucide-react'
 import Link from "next/link"
-import { redirect } from "next/navigation"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function LoginPage() {
   const router = useRouter()
-
+  const { login } = useAuth()
+  const [isLoading, setIsLoading] = useState(false)
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
   })
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
-    // Aquí iría la lógica de autenticación
-    router.push("/app")
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    
+    try {
+      await login(loginData.email, loginData.password)
+      toast.success('Inicio de sesión exitoso')
+      router.push('/app')
+    } catch (error: any) {
+      console.error('Error en el inicio de sesión:', error)
+      const errorMessage = error.response?.data?.message || 
+                         error.message || 
+                         'Error al iniciar sesión'
+      toast.error(errorMessage)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -74,8 +89,19 @@ export default function LoginPage() {
                   </Link>
                 </div>
 
-                <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-500 text-white">
-                  Iniciar Sesión
+                <Button 
+                  type="submit" 
+                  className="w-full bg-orange-500 hover:bg-orange-500 text-white"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Iniciando sesión...
+                    </>
+                  ) : (
+                    'Iniciar Sesión'
+                  )}
                 </Button>
 
                 <div className="text-center text-sm text-gray-600">

@@ -2,8 +2,7 @@
 import { ClientLoaderWrapper } from "./ClientLoaderWrapper";
 import { Module, useNavigationStore } from "../../store/navigationStore";
 import { useSyncActiveModule } from "@/hooks/useSyncActiveModule";
-import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Flame,
   Home,
@@ -16,10 +15,25 @@ import {
   Menu,
   Bell,
   X,
+  User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { NavItem } from "@/components/app/navigation";
 import { SyncModuleProvider } from "@/components/app/SyncModuleProvider";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
+
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export default function DashboardLayout({
   children,
@@ -44,8 +58,16 @@ export default function DashboardLayout({
     setSidebarOpen(!sidebarOpen);
   };
 
-  const handleLogout = () => {
-    router.push("/login");
+  const { user, logout, isLoading: isAuthLoading } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Sesión cerrada correctamente');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+      toast.error('Error al cerrar la sesión');
+    }
   };
 
   // Utilidad para capitalizar el módulo activo
@@ -56,6 +78,7 @@ export default function DashboardLayout({
     <ClientLoaderWrapper>
       <SyncModuleProvider>
             <div className="min-h-screen bg-gray-50">
+        <ProtectedRoute>
         {sidebarOpen && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
@@ -158,13 +181,58 @@ export default function DashboardLayout({
             </ul>
 
             <div className="pt-8 mt-8 border-t">
-              <button
-                onClick={handleLogout}
-                className="flex items-center w-full p-3 text-orange-500 rounded-lg hover:bg-orange-50"
-              >
-                <LogOut className="h-5 w-5 mr-3" />
-                <span className="font-medium">Cerrar sesión</span>
-              </button>
+              <div className="flex items-center gap-4">
+                <button className="p-2 rounded-full hover:bg-gray-100">
+                  <Bell className="h-5 w-5 text-gray-600" />
+                </button>
+                
+                {isAuthLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                ) : user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="flex items-center gap-2 hover:bg-gray-100 rounded-full p-1 pr-3 transition-colors">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src="" alt={user.name} />
+                          <AvatarFallback className="bg-orange-100 text-orange-600">
+                            {user.name ? user.name.charAt(0).toUpperCase() : <User className="h-4 w-4" />}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium text-gray-700">
+                          {user.givenName || 'Usuario'}
+                        </span>
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuLabel>
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium">{user.name || 'Usuario'}</p>
+                          <p className="text-xs text-gray-500">{user.email}</p>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => router.push('/app/profile')}>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Perfil</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Cerrar sesión</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <button
+                    onClick={() => router.push('/login')}
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-orange-600 hover:bg-orange-50 rounded-md transition-colors"
+                  >
+                    Iniciar sesión
+                  </button>
+                )}
+              </div>
             </div>
           </nav>
         </aside>
@@ -206,6 +274,7 @@ export default function DashboardLayout({
             {children}
           </main>
         </div>
+        </ProtectedRoute>
       </div>
     </SyncModuleProvider>
     </ClientLoaderWrapper>

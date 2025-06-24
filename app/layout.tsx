@@ -1,6 +1,7 @@
 import './globals.css'
 import '@mantine/core/styles.css';
 import { MantineProvider } from '@mantine/core';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 export const metadata = {
   title: 'Consagrados a Jesus',
@@ -18,7 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <MantineProvider>
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
         </MantineProvider>
       </body>
     </html>
