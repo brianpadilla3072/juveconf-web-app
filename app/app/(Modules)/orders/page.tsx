@@ -1,10 +1,10 @@
 "use client"
 
-import { Table, Title, Card, Text, Container, rem, Box, Button, Modal, Group, Divider, Badge, Stack, ActionIcon } from "@mantine/core"
-import { User, Mail, CreditCard, ShoppingCart, Eye, Users, Tag } from "lucide-react"
+import { Table, Title, Card, Text, Container, rem, Box, Button, Modal, Group, Divider, Badge, Stack, ActionIcon, TextInput } from "@mantine/core"
+import { User, Mail, CreditCard, ShoppingCart, Eye, Users, Tag, Search } from "lucide-react"
 import { useDisclosure } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import React from "react"
+import React, { useMemo, useState } from "react"
 
 type Guest = {
   id: number
@@ -26,12 +26,25 @@ type Order = {
 }
 
 export default function OrdersModule() {
-  // Sample data - replace with your actual data source
+  // State
   const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null);
   const [orders, setOrders] = React.useState<Order[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [opened, { open, close }] = useDisclosure(false);
   const [openedApprove, { open: openApprove, close: closeApprove }] = useDisclosure(false);
   const [openedDelete, { open: openDelete, close: closeDelete }] = useDisclosure(false);
+  
+  // Filter orders based on search query
+  const filteredOrders = useMemo(() => {
+    if (!searchQuery.trim()) return orders;
+    
+    const query = searchQuery.toLowerCase().trim();
+    return orders.filter(order => 
+      order.nombre.toLowerCase().includes(query) ||
+      order.apellido.toLowerCase().includes(query) ||
+      order.cuil.toLowerCase().includes(query)
+    );
+  }, [orders, searchQuery]);
 
   // Load initial data
   React.useEffect(() => {
@@ -116,15 +129,12 @@ export default function OrdersModule() {
       width: '100%',
       maxWidth: '100%',
       margin: '0 auto',
-      padding: '1rem',
       '@media (min-width: 768px)': {
-        padding: '1.5rem',
       },
     },
     tableHeader: {
       fontSize: rem(12),
       fontWeight: 600,
-      padding: '0.25rem 0.5rem',
       whiteSpace: 'nowrap',
       '@media (max-width: 768px)': {
         display: 'none',
@@ -160,7 +170,69 @@ export default function OrdersModule() {
     },
   };
 
-  const rows = orders.map((order) => (
+  // Search input component
+  const searchInput = (
+    <TextInput
+      placeholder="Buscar por nombre, apellido o CUIL..."
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.currentTarget.value)}
+      leftSection={<Search size={16} />}
+      mb="md"
+      style={{ maxWidth: 500 }}
+    />
+  );
+
+  // Mobile card view
+  const mobileCard = (order: Order) => (
+    <Card 
+      key={order.id} 
+      withBorder 
+      p="sm" 
+      mb="sm"
+      style={{ cursor: 'pointer' }}
+      onClick={() => handleViewDetails(order)}
+    >
+      <Group justify="space-between" mb="xs" wrap="nowrap">
+        <Group gap="xs">
+          <User size={16} />
+          <Text fw={500} size="sm">{order.nombre} {order.apellido}</Text>
+        </Group>
+        <ActionIcon 
+          variant="subtle" 
+          color="blue" 
+          onClick={(e) => {
+            e.stopPropagation();
+            handleViewDetails(order);
+          }}
+          size="sm"
+        >
+          <Eye size={16} />
+        </ActionIcon>
+      </Group>
+      
+      <Group gap="xs" mb={4}>
+        <Mail size={14} style={{ minWidth: rem(16) }} />
+        <Text size="xs" c="dimmed" truncate>{order.email}</Text>
+      </Group>
+      
+      <Group gap="xs" mb={4}>
+        <CreditCard size={14} style={{ minWidth: rem(16) }} />
+        <Text size="xs" c="dimmed">{order.cuil}</Text>
+      </Group>
+      
+      <Group justify="space-between" mt="sm" wrap="nowrap">
+        <Badge color="blue" variant="light" size="sm">
+          {order.combo}
+        </Badge>
+        <Text size="sm" fw={500} c="green">
+          ${order.precio.toLocaleString('es-AR')}
+        </Text>
+      </Group>
+    </Card>
+  );
+
+  // Desktop table view
+  const rows = filteredOrders.map((order) => (
     <Table.Tr key={order.id} style={{ transition: 'background-color 0.2s' }}>
       <Table.Td style={responsiveStyles.tableCell}>
         <ActionIcon 
@@ -324,21 +396,49 @@ export default function OrdersModule() {
           </Text>
         </Box>
         
-        <Table.ScrollContainer minWidth={800}>
-          <Table verticalSpacing="sm" highlightOnHover>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th style={{ ...responsiveStyles.tableHeader, width: '1rem' }}>Acciones</Table.Th>
-                <Table.Th style={responsiveStyles.tableHeader}>Nombre</Table.Th>
-                <Table.Th style={responsiveStyles.tableHeader}>Apellido</Table.Th>
-                <Table.Th style={responsiveStyles.tableHeader}>Email</Table.Th>
-                <Table.Th style={responsiveStyles.tableHeader}>CUIL</Table.Th>
-                <Table.Th style={responsiveStyles.tableHeader}>Combo</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
-        </Table.ScrollContainer>
+        {/* Search Input */}
+        <Box p="md" pb={0}>
+          <TextInput
+            placeholder="Buscar por nombre, apellido o CUIL..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.currentTarget.value)}
+            leftSection={<Search size={16} />}
+            mb="md"
+            style={{ maxWidth: 500 }}
+          />
+        </Box>
+        
+        {/* Mobile View */}
+        <Box display={{ base: 'block', md: 'none' }} p="md" pt={0}>
+          {filteredOrders.length === 0 ? (
+            <Text c="dimmed" ta="center" py="md">No se encontraron órdenes</Text>
+          ) : (
+            filteredOrders.map(order => mobileCard(order))
+          )}
+        </Box>
+        
+        {/* Desktop View */}
+        <Box display={{ base: 'none', md: 'block' }} p="md" pt={0}>
+          {filteredOrders.length === 0 ? (
+            <Text c="dimmed" ta="center" py="md">No se encontraron órdenes</Text>
+          ) : (
+            <Table.ScrollContainer minWidth={800}>
+              <Table verticalSpacing="sm" highlightOnHover>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th style={{ ...responsiveStyles.tableHeader, width: '1rem' }}>Acciones</Table.Th>
+                    <Table.Th style={responsiveStyles.tableHeader}>Nombre</Table.Th>
+                    <Table.Th style={responsiveStyles.tableHeader}>Apellido</Table.Th>
+                    <Table.Th style={responsiveStyles.tableHeader}>Email</Table.Th>
+                    <Table.Th style={responsiveStyles.tableHeader}>CUIL</Table.Th>
+                    <Table.Th style={responsiveStyles.tableHeader}>Combo</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
+          )}
+        </Box>
       </Card>
       
       <OrderDetailsModal />
