@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { Calendar, Package, ShoppingCart, Users } from "lucide-react"
 import { useOrdersInReview } from "@/hooks/Orders/useOrdersInReview"
+import { ComingSoon } from "@/app/components/ComingSoon/ComingSoon"
 
 export default function Dashboard() {
   const [selectedMenu, setSelectedMenu] = useState("inicio")
@@ -19,7 +20,7 @@ export default function Dashboard() {
   return (
     <>
 
-      <div className="mb-8">
+      {/* <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Resumesn</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -212,8 +213,9 @@ export default function Dashboard() {
             Ver todas las actividades
           </button>
         </div>
-      </div>
+      </div> */}
 
+      <ComingSoon moduleName="la sección de inicio" />
 
 
 

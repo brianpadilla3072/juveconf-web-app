@@ -4,7 +4,6 @@ import { Module, useNavigationStore } from "../../store/navigationStore";
 import { useSyncActiveModule } from "@/hooks/useSyncActiveModule";
 import { useState } from "react";
 import {
-  Flame,
   Home,
   Calendar,
   Package,
@@ -18,6 +17,7 @@ import { NavItem } from "@/components/app/navigation";
 import { SyncModuleProvider } from "@/components/app/SyncModuleProvider";
 import { UserMenu } from "@/components/app/UserMenu";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { Logo } from "../components/Logo/Logo";
 
 export default function DashboardLayout({
   children,
@@ -62,7 +62,7 @@ export default function DashboardLayout({
         >
           <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center space-x-2">
-              <Flame className="h-8 w-8 text-orange-500" />
+              <Logo size={40} />
               <span className="font-bold text-xl text-orange-500">
                 Consagrados
               </span>
@@ -172,9 +172,9 @@ export default function DashboardLayout({
               </div>
 
               <div className="flex items-center space-x-4">
-                <button className="relative p-1 rounded-full hover:bg-gray-100">
+                <button className="relative p-1 rounded-full hover:bg-gray-100 opacity-50 cursor-not-allowed" disabled>
                   <svg
-                    className="h-6 w-6 text-gray-500"
+                    className="h-6 w-6 text-gray-400"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
                     fill="none"
@@ -186,7 +186,7 @@ export default function DashboardLayout({
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                     <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                   </svg>
-                  <span className="absolute top-0 right-0 w-4 h-4 bg-orange-500 rounded-full text-xs text-white flex items-center justify-center">
+                  <span className="absolute top-0 right-0 w-4 h-4 bg-gray-400 rounded-full text-xs text-white flex items-center justify-center">
                     3
                   </span>
                 </button>

@@ -1,14 +1,14 @@
 "use client"
 
 import type React from "react"
-
+import { ComingSoon } from "../../../../app/components/ComingSoon/ComingSoon"
 
 export default function EventsModule() {
 
 
   return (
     <>
-        <h1>eventos</h1>
+        <ComingSoon moduleName="la sección de eventos" />
     </>
   )
 }

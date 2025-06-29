@@ -6,8 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Flame, User, Lock, Mail } from "lucide-react"
+import { User, Lock, Mail } from "lucide-react"
 import Link from "next/link"
+import { Logo } from "../../components/Logo/Logo"
 
 export default function RegisterPage() {
   const [registerData, setRegisterData] = useState({
@@ -134,7 +135,7 @@ export default function RegisterPage() {
 
           <div className="mt-8 text-center">
             <div className="flex items-center justify-center gap-2 text-gray-600">
-              <Flame className="h-5 w-5 text-orange-500" />
+              <Logo size={20} />
               <span>Enciende tu fe con nosotros</span>
             </div>
           </div>
