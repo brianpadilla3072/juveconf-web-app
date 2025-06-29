@@ -4,8 +4,10 @@ import { Table, Title, Card, Text, Container, Box, Button, Modal, Group, Badge, 
 import { Eye, Search, RotateCw, ChevronRight } from "lucide-react"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-import React, { useMemo, useState } from "react"
 import { useOrdersInReview } from "@/hooks/Orders/useOrdersInReview"
+import useApproveOrder from "@/hooks/Orders/useApproveOrder"
+import { useRouter } from "next/navigation"
+import React, { useMemo, useState, useEffect } from "react"
 
 // Remove the old Order type since we're importing it from the hook
 type Order = {
@@ -42,11 +44,20 @@ const formatDate = (dateString: string) => {
 
 export default function OrdersModule() {
   // State
-  const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [opened, { open, close }] = useDisclosure(false);
   const [openedApprove, { open: openApprove, close: closeApprove }] = useDisclosure(false);
   const [openedDelete, { open: openDelete, close: closeDelete }] = useDisclosure(false);
+  
+  // Approve order hook
+  const { 
+    approveOrder, 
+    isLoading: isApproving, 
+    error: approveError, 
+    isSuccess: approveSuccess,
+    reset: resetApproveState 
+  } = useApproveOrder();
   
   // Use the orders hook
   const { orders, loading, error, refetch } = useOrdersInReview();
@@ -378,25 +389,49 @@ export default function OrdersModule() {
       {/* Approve Confirmation Modal */}
       <Modal 
         opened={openedApprove} 
-        onClose={closeApprove} 
+        onClose={() => {
+          closeApprove();
+          resetApproveState();
+        }}
         title="Confirmar Aprobación"
       >
-        <Text>¿Estás seguro de que deseas aprobar esta orden?</Text>
+        <Stack gap="md">
+          <Text>¿Estás seguro de que deseas aprobar esta orden?</Text>
+          
+          {approveError && (
+            <Text c="red" size="sm">
+              {approveError}
+            </Text>
+          )}
+        </Stack>
+        
         <Group justify="flex-end" mt="md">
           <Button variant="default" onClick={closeApprove}>
             Cancelar
           </Button>
           <Button 
             color="green"
-            onClick={() => {
-              // TODO: Implement approve logic
-              notifications.show({
-                title: 'Orden aprobada',
-                message: 'La orden ha sido aprobada correctamente',
-                color: 'green'
-              });
-              closeApprove();
-              refetch();
+            loading={isApproving}
+            onClick={async () => {
+              if (!selectedOrder) return;
+              
+              const { success, error } = await approveOrder(selectedOrder.id);
+              
+              if (success) {
+                notifications.show({
+                  title: '¡Éxito!',
+                  message: 'La orden ha sido aprobada correctamente',
+                  color: 'green',
+                });
+                closeApprove();
+                refetch();
+              } else {
+                notifications.show({
+                  title: 'Error',
+                  message: error || 'Ocurrió un error al aprobar la orden',
+                  color: 'red',
+                });
+              }
             }}
           >
             Confirmar
