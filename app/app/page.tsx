@@ -1,15 +1,23 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Calendar, Package, ShoppingCart, Users } from "lucide-react"
+import { useOrdersInReview } from "@/hooks/Orders/useOrdersInReview"
 
 export default function Dashboard() {
   const [selectedMenu, setSelectedMenu] = useState("inicio")
+  const { orders, loading, error } = useOrdersInReview()
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(0)
+  const [previousPendingCount, setPreviousPendingCount] = useState(0)
 
-
+  useEffect(() => {
+    if (orders.length > 0) {
+      setPreviousPendingCount(pendingOrdersCount)
+      setPendingOrdersCount(orders.length)
+    }
+  }, [orders])
 
   return (
     <>
-
 
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Resumesn</h2>
@@ -33,8 +41,15 @@ export default function Dashboard() {
                 <ShoppingCart className="h-5 w-5 text-amber-500" />
               </div>
             </div>
-            <p className="text-3xl font-bold">12</p>
-            <p className="text-sm text-red-500 mt-2">+5 desde ayer</p>
+            <p className="text-3xl font-bold">
+              {loading ? '...' : pendingOrdersCount}
+            </p>
+            <p className={`text-sm ${pendingOrdersCount > previousPendingCount ? 'text-red-500' : 'text-green-500'} mt-2`}>
+              {loading ? 'Cargando...' : 
+               pendingOrdersCount > previousPendingCount ? 
+               `+${pendingOrdersCount - previousPendingCount} desde la última actualización` : 
+               'Sin cambios desde la última actualización'}
+            </p>
           </div>
 
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
