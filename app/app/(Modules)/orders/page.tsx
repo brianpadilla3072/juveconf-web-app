@@ -165,34 +165,18 @@ export default function OrdersModule() {
             <Table verticalSpacing="sm">
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>ID</Table.Th>
+                  <Table.Th>Acciones</Table.Th>
                   <Table.Th>Email</Table.Th>
                   <Table.Th>CUIL</Table.Th>
                   <Table.Th>Evento</Table.Th>
                   <Table.Th>Total</Table.Th>
                   <Table.Th>Fecha</Table.Th>
                   <Table.Th>Estado</Table.Th>
-                  <Table.Th>Acciones</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
                 {filteredOrders.map((order) => (
                   <Table.Tr key={order.id}>
-                    <Table.Td>{order.id.slice(0, 8)}...</Table.Td>
-                    <Table.Td>{order.email}</Table.Td>
-                    <Table.Td>{order.cuil}</Table.Td>
-                    <Table.Td>{order.event.topic}</Table.Td>
-                    <Table.Td>${order.total}</Table.Td>
-                    <Table.Td>{formatDate(order.createdAt)}</Table.Td>
-                    <Table.Td>
-                      <Badge color={
-                        order.status === 'REVIEW' ? 'yellow' : 
-                        order.status === 'APPROVED' ? 'green' : 'red'
-                      }>
-                        {order.status === 'REVIEW' ? 'En Revisión' : 
-                         order.status === 'APPROVED' ? 'Aprobado' : 'Rechazado'}
-                      </Badge>
-                    </Table.Td>
                     <Table.Td>
                       <Group gap={4}>
                         <ActionIcon 
@@ -206,6 +190,20 @@ export default function OrdersModule() {
                           <Eye size={16} />
                         </ActionIcon>
                       </Group>
+                    </Table.Td>
+                    <Table.Td>{order.email}</Table.Td>
+                    <Table.Td>{order.cuil}</Table.Td>
+                    <Table.Td>{order.event.topic}</Table.Td>
+                    <Table.Td>${order.total}</Table.Td>
+                    <Table.Td>{formatDate(order.createdAt)}</Table.Td>
+                    <Table.Td>
+                      <Badge color={
+                        order.status === 'REVIEW' ? 'yellow' : 
+                        order.status === 'APPROVED' ? 'green' : 'red'
+                      }>
+                        {order.status === 'REVIEW' ? 'En Revisión' : 
+                         order.status === 'APPROVED' ? 'Aprobado' : 'Rechazado'}
+                      </Badge>
                     </Table.Td>
                   </Table.Tr>
                 ))}
