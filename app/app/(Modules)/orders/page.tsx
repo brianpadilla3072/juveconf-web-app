@@ -1,8 +1,8 @@
 "use client"
 
-import { Table, Title, Card, Text, Container, Box, Button, Modal, Group, Badge, Stack, ActionIcon, TextInput, LoadingOverlay } from "@mantine/core"
-import { Eye, Search, RotateCw } from "lucide-react"
-import { useDisclosure } from "@mantine/hooks"
+import { Table, Title, Card, Text, Container, Box, Button, Modal, Group, Badge, Stack, ActionIcon, TextInput, LoadingOverlay, SimpleGrid, useMantineTheme, rem, Divider } from "@mantine/core"
+import { Eye, Search, RotateCw, ChevronRight } from "lucide-react"
+import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import React, { useMemo, useState } from "react"
 import { useOrdersInReview } from "@/hooks/Orders/useOrdersInReview"
@@ -29,6 +29,17 @@ type Order = {
   createdAt: string;
 };
 
+// Format date helper function
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
 export default function OrdersModule() {
   // State
   const [selectedOrder, setSelectedOrder] = React.useState<Order | null>(null);
@@ -45,11 +56,25 @@ export default function OrdersModule() {
     if (!searchQuery.trim()) return orders;
     
     const query = searchQuery.toLowerCase().trim();
-    return orders.filter(order => 
-      order.email.toLowerCase().includes(query) ||
-      order.cuil.toLowerCase().includes(query) ||
-      order.event.topic.toLowerCase().includes(query)
-    );
+    return orders.filter(order => {
+      // Check multiple fields for matches
+      const searchFields = [
+        order.id,
+        order.email,
+        order.cuil,
+        order.event.topic,
+        order.combos.map(combo => combo.name).join(' '),
+        order.total.toString(),
+        formatDate(order.createdAt),
+        order.status === 'REVIEW' ? 'en revision' : 
+        order.status === 'APPROVED' ? 'aprobado' : 'rechazado'
+      ];
+
+      // Check if any field includes the search query
+      return searchFields.some(field => 
+        field.toLowerCase().includes(query)
+      );
+    });
   }, [orders, searchQuery]);
 
   // Handle refresh
@@ -61,7 +86,7 @@ export default function OrdersModule() {
   if (loading) {
     return (
       <Container size="xl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <LoadingOverlay visible={true} overlayBlur={2} />
+        <LoadingOverlay visible={true} />
         <Text>Cargando órdenes...</Text>
       </Container>
     );
@@ -79,16 +104,7 @@ export default function OrdersModule() {
     );
   }
 
-  // Format date
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-AR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const theme = useMantineTheme();
 
   return (
     <Container size="xl" py="xl">
@@ -103,10 +119,23 @@ export default function OrdersModule() {
             </div>
             <Group>
               <TextInput
-                placeholder="Buscar por email o CUIL..."
+                placeholder="Buscar por ID, email, CUIL, evento, etc..."
                 leftSection={<Search size={16} />}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.currentTarget.value)}
+                style={{ minWidth: '250px' }}
+                rightSection={
+                  searchQuery ? (
+                    <ActionIcon 
+                      variant="transparent" 
+                      onClick={() => setSearchQuery('')}
+                      size="sm"
+                      color="gray"
+                    >
+                      ✕
+                    </ActionIcon>
+                  ) : null
+                }
               />
               <Button 
                 leftSection={<RotateCw size={16} />} 
@@ -119,61 +148,136 @@ export default function OrdersModule() {
           </Group>
         </Card.Section>
 
-        <Table.ScrollContainer minWidth={800}>
-          <Table verticalSpacing="sm">
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>ID</Table.Th>
-                <Table.Th>Email</Table.Th>
-                <Table.Th>CUIL</Table.Th>
-                <Table.Th>Evento</Table.Th>
-                <Table.Th>Combo</Table.Th>
-                <Table.Th>Total</Table.Th>
-                <Table.Th>Fecha</Table.Th>
-                <Table.Th>Estado</Table.Th>
-                <Table.Th>Acciones</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {filteredOrders.map((order) => (
-                <Table.Tr key={order.id}>
-                  <Table.Td>{order.id.slice(0, 8)}...</Table.Td>
-                  <Table.Td>{order.email}</Table.Td>
-                  <Table.Td>{order.cuil}</Table.Td>
-                  <Table.Td>{order.event.topic}</Table.Td>
-                  <Table.Td>
-                    {order.combos.map(combo => combo.name).join(', ')}
-                  </Table.Td>
-                  <Table.Td>${order.total}</Table.Td>
-                  <Table.Td>{formatDate(order.createdAt)}</Table.Td>
-                  <Table.Td>
-                    <Badge color={
-                      order.status === 'REVIEW' ? 'yellow' : 
-                      order.status === 'APPROVED' ? 'green' : 'red'
-                    }>
+        {/* Desktop Table View */}
+        <Box visibleFrom="md">
+          <Table.ScrollContainer minWidth={800}>
+            <Table verticalSpacing="sm">
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>ID</Table.Th>
+                  <Table.Th>Email</Table.Th>
+                  <Table.Th>CUIL</Table.Th>
+                  <Table.Th>Evento</Table.Th>
+                  <Table.Th>Total</Table.Th>
+                  <Table.Th>Fecha</Table.Th>
+                  <Table.Th>Estado</Table.Th>
+                  <Table.Th>Acciones</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {filteredOrders.map((order) => (
+                  <Table.Tr key={order.id}>
+                    <Table.Td>{order.id.slice(0, 8)}...</Table.Td>
+                    <Table.Td>{order.email}</Table.Td>
+                    <Table.Td>{order.cuil}</Table.Td>
+                    <Table.Td>{order.event.topic}</Table.Td>
+                    <Table.Td>${order.total}</Table.Td>
+                    <Table.Td>{formatDate(order.createdAt)}</Table.Td>
+                    <Table.Td>
+                      <Badge color={
+                        order.status === 'REVIEW' ? 'yellow' : 
+                        order.status === 'APPROVED' ? 'green' : 'red'
+                      }>
+                        {order.status === 'REVIEW' ? 'En Revisión' : 
+                         order.status === 'APPROVED' ? 'Aprobado' : 'Rechazado'}
+                      </Badge>
+                    </Table.Td>
+                    <Table.Td>
+                      <Group gap={4}>
+                        <ActionIcon 
+                          variant="light" 
+                          color="blue"
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            open();
+                          }}
+                        >
+                          <Eye size={16} />
+                        </ActionIcon>
+                      </Group>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </Table.ScrollContainer>
+        </Box>
+
+        {/* Mobile Card View */}
+        <Box hiddenFrom="md" p="md">
+          <SimpleGrid cols={{ base: 1 }} spacing="md">
+            {filteredOrders.map((order) => (
+              <Card key={order.id} withBorder shadow="sm" radius="md">
+                <Stack gap="xs">
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text fw={500} size="sm" lineClamp={1}>ID: {order.id.slice(0, 8)}...</Text>
+                    <Badge 
+                      size="sm"
+                      color={
+                        order.status === 'REVIEW' ? 'yellow' : 
+                        order.status === 'APPROVED' ? 'green' : 'red'
+                      }
+                    >
                       {order.status === 'REVIEW' ? 'En Revisión' : 
                        order.status === 'APPROVED' ? 'Aprobado' : 'Rechazado'}
                     </Badge>
-                  </Table.Td>
-                  <Table.Td>
-                    <Group gap={4}>
-                      <ActionIcon 
-                        variant="light" 
-                        color="blue"
-                        onClick={() => {
-                          setSelectedOrder(order);
-                          open();
-                        }}
-                      >
-                        <Eye size={16} />
-                      </ActionIcon>
-                    </Group>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-        </Table.ScrollContainer>
+                  </Group>
+                  
+                  <Divider my="xs" />
+                  
+                  <Group gap="xs" align="flex-start">
+                    <Box style={{ flex: 1, minWidth: 0 }}>
+                      <Text size="xs" c="dimmed">Email</Text>
+                      <Text size="sm" lineClamp={1} style={{ wordBreak: 'break-word' }}>{order.email}</Text>
+                    </Box>
+                  </Group>
+                  
+                  <Group gap="xs" align="flex-start">
+                    <Box style={{ flex: 1, minWidth: 0 }}>
+                      <Text size="xs" c="dimmed">CUIL</Text>
+                      <Text size="sm">{order.cuil}</Text>
+                    </Box>
+                  </Group>
+                  
+                  <Group gap="xs" align="flex-start">
+                    <Box style={{ flex: 1, minWidth: 0 }}>
+                      <Text size="xs" c="dimmed">Evento</Text>
+                      <Text size="sm" lineClamp={1}>{order.event.topic}</Text>
+                    </Box>
+                  </Group>
+                  
+                  <Group gap="xs" align="flex-start">
+                    <Box style={{ flex: 1, minWidth: 0 }}>
+                      <Text size="xs" c="dimmed">Combo</Text>
+                      <Text size="sm" lineClamp={2}>
+                        {order.combos.map(combo => combo.name).join(', ')}
+                      </Text>
+                    </Box>
+                  </Group>
+                  
+                  <Group justify="space-between" mt="sm">
+                    <div>
+                      <Text size="xs" c="dimmed">Total</Text>
+                      <Text fw={600} size="md">${order.total}</Text>
+                    </div>
+                    <Button 
+                      variant="light" 
+                      size="sm"
+                      rightSection={<ChevronRight size={14} />}
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        open();
+                      }}
+                      style={{ minWidth: '120px' }}
+                    >
+                      Ver detalles
+                    </Button>
+                  </Group>
+                </Stack>
+              </Card>
+            ))}
+          </SimpleGrid>
+        </Box>
 
         {filteredOrders.length === 0 && (
           <Box p="lg" ta="center">
