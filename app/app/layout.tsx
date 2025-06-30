@@ -2,31 +2,28 @@
 import { ClientLoaderWrapper } from "./ClientLoaderWrapper";
 import { Module, useNavigationStore } from "../../store/navigationStore";
 import { useSyncActiveModule } from "@/hooks/useSyncActiveModule";
-import type React from "react";
 import { useState } from "react";
 import {
-  Flame,
   Home,
   Calendar,
   Package,
   ShoppingCart,
   Users,
   Settings,
-  LogOut,
   Menu,
-  Bell,
   X,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { NavItem } from "@/components/app/navigation";
 import { SyncModuleProvider } from "@/components/app/SyncModuleProvider";
+import { UserMenu } from "@/components/app/UserMenu";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { Logo } from "../components/Logo/Logo";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
   useSyncActiveModule(); // sincroniza con pathname actual
   const activeModule = useNavigationStore((s) => s.activeModule);
   const moduleLabels: Record<Module, string> = {
@@ -37,39 +34,35 @@ export default function DashboardLayout({
     payments: 'Pagos',
     users: 'Usuarios',
     settings: 'Configuración',
-  }
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  };
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+    setIsSidebarOpen(!isSidebarOpen);
   };
-
-  const handleLogout = () => {
-    router.push("/login");
-  };
-
-  // Utilidad para capitalizar el módulo activo
-  const getCapitalizedModule = (mod: string) =>
-    mod.charAt(0).toUpperCase() + mod.slice(1);
 
   return (
     <ClientLoaderWrapper>
       <SyncModuleProvider>
             <div className="min-h-screen bg-gray-50">
-        {sidebarOpen && (
+        <ProtectedRoute>
+        {isSidebarOpen && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
             onClick={toggleSidebar}
+            aria-hidden="true"
           />
         )}
 
         <aside
-          className={`fixed top-0 left-0 z-30 w-64 h-full bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
-            } md:translate-x-0`}
+          className={`fixed top-0 left-0 z-30 w-64 h-full bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0`}
+          aria-label="Menú lateral"
         >
           <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center space-x-2">
-              <Flame className="h-8 w-8 text-orange-500" />
+              <Logo size={40} />
               <span className="font-bold text-xl text-orange-500">
                 Consagrados
               </span>
@@ -158,13 +151,7 @@ export default function DashboardLayout({
             </ul>
 
             <div className="pt-8 mt-8 border-t">
-              <button
-                onClick={handleLogout}
-                className="flex items-center w-full p-3 text-orange-500 rounded-lg hover:bg-orange-50"
-              >
-                <LogOut className="h-5 w-5 mr-3" />
-                <span className="font-medium">Cerrar sesión</span>
-              </button>
+              {/* Menú de usuario removido del menú lateral */}
             </div>
           </nav>
         </aside>
@@ -180,24 +167,30 @@ export default function DashboardLayout({
                   <Menu className="h-6 w-6 text-gray-500" />
                 </button>
                 <h1 className="text-xl font-bold text-gray-800">
-                {moduleLabels[activeModule]}
+                  {moduleLabels[activeModule]}
                 </h1>
               </div>
 
               <div className="flex items-center space-x-4">
-                <button className="relative p-1 rounded-full hover:bg-gray-100">
-                  <Bell className="h-6 w-6 text-gray-500" />
-                  <span className="absolute top-0 right-0 w-4 h-4 bg-orange-500 rounded-full text-xs text-white flex items-center justify-center">
+                <button className="relative p-1 rounded-full hover:bg-gray-100 opacity-50 cursor-not-allowed" disabled>
+                  <svg
+                    className="h-6 w-6 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                  </svg>
+                  <span className="absolute top-0 right-0 w-4 h-4 bg-gray-400 rounded-full text-xs text-white flex items-center justify-center">
                     3
                   </span>
                 </button>
-
-                <div className="flex items-center space-x-2">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 flex items-center justify-center text-white font-bold">
-                    J
-                  </div>
-                  <span className="hidden md:block font-medium">Juan Pérez</span>
-                </div>
+                <UserMenu />
               </div>
             </div>
           </header>
@@ -206,6 +199,7 @@ export default function DashboardLayout({
             {children}
           </main>
         </div>
+        </ProtectedRoute>
       </div>
     </SyncModuleProvider>
     </ClientLoaderWrapper>

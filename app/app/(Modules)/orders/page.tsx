@@ -1,14 +1,470 @@
 "use client"
 
-import type React from "react"
+import { Table, Title, Card, Text, Container, Box, Button, Modal, Group, Badge, Stack, ActionIcon, TextInput, LoadingOverlay, SimpleGrid, useMantineTheme, rem, Divider } from "@mantine/core"
+import { Eye, Search, RotateCw, ChevronRight } from "lucide-react"
+import { useDisclosure, useMediaQuery } from "@mantine/hooks"
+import { notifications } from "@mantine/notifications"
+import { useOrdersInReview } from "@/hooks/Orders/useOrdersInReview"
+import useApproveOrder from "@/hooks/Orders/useApproveOrder"
+import { useRouter } from "next/navigation"
+import React, { useMemo, useState, useEffect } from "react"
 
+// Remove the old Order type since we're importing it from the hook
+type Order = {
+  id: string;
+  email: string;
+  cuil: string;
+  total: number;
+  status: string;
+  paymentType: string;
+  event: {
+    topic: string;
+  };
+  combos: Array<{
+    name: string;
+    price: number;
+  }>;
+  invitees: Array<{
+    name: string;
+    cuil: string;
+  }>;
+  createdAt: string;
+};
+
+// Format date helper function
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
 
 export default function OrdersModule() {
+  // State
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [opened, { open, close }] = useDisclosure(false);
+  const [openedApprove, { open: openApprove, close: closeApprove }] = useDisclosure(false);
+  const [openedDelete, { open: openDelete, close: closeDelete }] = useDisclosure(false);
+  
+  // Approve order hook
+  const { 
+    approveOrder, 
+    isLoading: isApproving, 
+    error: approveError, 
+    isSuccess: approveSuccess,
+    reset: resetApproveState 
+  } = useApproveOrder();
+  
+  // Use the orders hook
+  const { orders, loading, error, refetch } = useOrdersInReview();
+  
+  // Filter orders based on search query
+  const filteredOrders = useMemo(() => {
+    if (!searchQuery.trim()) return orders;
+    
+    const query = searchQuery.toLowerCase().trim();
+    return orders.filter(order => {
+      // Check multiple fields for matches
+      const searchFields = [
+        order.id,
+        order.email,
+        order.cuil,
+        order.event.topic,
+        order.combos.map(combo => combo.name).join(' '),
+        order.total.toString(),
+        formatDate(order.createdAt),
+        order.status === 'REVIEW' ? 'en revision' : 
+        order.status === 'APPROVED' ? 'aprobado' : 'rechazado'
+      ];
 
+      // Check if any field includes the search query
+      return searchFields.some(field => 
+        field.toLowerCase().includes(query)
+      );
+    });
+  }, [orders, searchQuery]);
+
+  // Handle refresh
+  const handleRefresh = () => {
+    refetch();
+  };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <Container size="xl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <LoadingOverlay visible={true} />
+        <Text>Cargando órdenes...</Text>
+      </Container>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <Container size="xl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem' }}>
+        <Text c="red">Error al cargar las órdenes: {error}</Text>
+        <Button onClick={handleRefresh} leftSection={<RotateCw size={16} />}>
+          Reintentar
+        </Button>
+      </Container>
+    );
+  }
+
+  const theme = useMantineTheme();
 
   return (
-    <>
-        <h1>ordenes</h1>
-    </>
-  )
+    <Container size="xl" py="xl">
+      <Title order={1} mb="xl">Gestión de Órdenes</Title>
+      
+      <Card withBorder shadow="sm" radius="md">
+        <Card.Section withBorder p="md">
+          <Group justify="space-between">
+            <div>
+              <Title order={2} size="h4">Órdenes en Revisión</Title>
+              <Text c="dimmed" size="sm">Revisa y gestiona las órdenes pendientes</Text>
+            </div>
+            <Group>
+              <TextInput
+                placeholder="Buscar por ID, email, CUIL, evento, etc..."
+                leftSection={<Search size={16} />}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.currentTarget.value)}
+                style={{ minWidth: '250px' }}
+                rightSection={
+                  searchQuery ? (
+                    <ActionIcon 
+                      variant="transparent" 
+                      onClick={() => setSearchQuery('')}
+                      size="sm"
+                      color="gray"
+                    >
+                      ✕
+                    </ActionIcon>
+                  ) : null
+                }
+              />
+              <Button 
+                leftSection={<RotateCw size={16} />} 
+                variant="light"
+                onClick={handleRefresh}
+              >
+                Actualizar
+              </Button>
+            </Group>
+          </Group>
+        </Card.Section>
+
+        {/* Desktop Table View */}
+        <Box visibleFrom="md">
+          <Table.ScrollContainer minWidth={800}>
+            <Table verticalSpacing="sm">
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Acciones</Table.Th>
+                  <Table.Th>Email</Table.Th>
+                  <Table.Th>CUIL</Table.Th>
+                  <Table.Th>Evento</Table.Th>
+                  <Table.Th>Total</Table.Th>
+                  <Table.Th>Fecha</Table.Th>
+                  <Table.Th>Estado</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {filteredOrders.map((order) => (
+                  <Table.Tr key={order.id}>
+                    <Table.Td>
+                      <Group gap={4}>
+                        <ActionIcon 
+                          variant="light" 
+                          color="blue"
+                          onClick={() => {
+                            setSelectedOrder(order);
+                            open();
+                          }}
+                        >
+                          <Eye size={16} />
+                        </ActionIcon>
+                      </Group>
+                    </Table.Td>
+                    <Table.Td>{order.email}</Table.Td>
+                    <Table.Td>{order.cuil}</Table.Td>
+                    <Table.Td>{order.event.topic}</Table.Td>
+                    <Table.Td>${order.total}</Table.Td>
+                    <Table.Td>{formatDate(order.createdAt)}</Table.Td>
+                    <Table.Td>
+                      <Badge color={
+                        order.status === 'REVIEW' ? 'yellow' : 
+                        order.status === 'APPROVED' ? 'green' : 'red'
+                      }>
+                        {order.status === 'REVIEW' ? 'En Revisión' : 
+                         order.status === 'APPROVED' ? 'Aprobado' : 'Rechazado'}
+                      </Badge>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </Table.ScrollContainer>
+        </Box>
+
+        {/* Mobile Card View */}
+        <Box hiddenFrom="md" p="md">
+          <SimpleGrid cols={{ base: 1 }} spacing="md">
+            {filteredOrders.map((order) => (
+              <Card key={order.id} withBorder shadow="sm" radius="md">
+                <Stack gap="xs">
+                  <Group justify="space-between" wrap="nowrap">
+                    <Text fw={500} size="sm" lineClamp={1}>ID: {order.id.slice(0, 8)}...</Text>
+                    <Badge 
+                      size="sm"
+                      color={
+                        order.status === 'REVIEW' ? 'yellow' : 
+                        order.status === 'APPROVED' ? 'green' : 'red'
+                      }
+                    >
+                      {order.status === 'REVIEW' ? 'En Revisión' : 
+                       order.status === 'APPROVED' ? 'Aprobado' : 'Rechazado'}
+                    </Badge>
+                  </Group>
+                  
+                  <Divider my="xs" />
+                  
+                  <Group gap="xs" align="flex-start">
+                    <Box style={{ flex: 1, minWidth: 0 }}>
+                      <Text size="xs" c="dimmed">Email</Text>
+                      <Text size="sm" lineClamp={1} style={{ wordBreak: 'break-word' }}>{order.email}</Text>
+                    </Box>
+                  </Group>
+                  
+                  <Group gap="xs" align="flex-start">
+                    <Box style={{ flex: 1, minWidth: 0 }}>
+                      <Text size="xs" c="dimmed">CUIL</Text>
+                      <Text size="sm">{order.cuil}</Text>
+                    </Box>
+                  </Group>
+                  
+                  <Group gap="xs" align="flex-start">
+                    <Box style={{ flex: 1, minWidth: 0 }}>
+                      <Text size="xs" c="dimmed">Evento</Text>
+                      <Text size="sm" lineClamp={1}>{order.event.topic}</Text>
+                    </Box>
+                  </Group>
+                  
+                  <Group gap="xs" align="flex-start">
+                    <Box style={{ flex: 1, minWidth: 0 }}>
+                      <Text size="xs" c="dimmed">Combo</Text>
+                      <Text size="sm" lineClamp={2}>
+                        {order.combos.map(combo => combo.name).join(', ')}
+                      </Text>
+                    </Box>
+                  </Group>
+                  
+                  <Group justify="space-between" mt="sm">
+                    <div>
+                      <Text size="xs" c="dimmed">Total</Text>
+                      <Text fw={600} size="md">${order.total}</Text>
+                    </div>
+                    <Button 
+                      variant="light" 
+                      size="sm"
+                      rightSection={<ChevronRight size={14} />}
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        open();
+                      }}
+                      style={{ minWidth: '120px' }}
+                    >
+                      Ver detalles
+                    </Button>
+                  </Group>
+                </Stack>
+              </Card>
+            ))}
+          </SimpleGrid>
+        </Box>
+
+        {filteredOrders.length === 0 && (
+          <Box p="lg" ta="center">
+            <Text c="dimmed">No se encontraron órdenes</Text>
+          </Box>
+        )}
+      </Card>
+
+      {/* Order Details Modal */}
+      <Modal 
+        opened={opened} 
+        onClose={close} 
+        title="Detalles de la Orden"
+        size="lg"
+      >
+        {selectedOrder && (
+          <Stack>
+            <div>
+              <Text fw={500}>ID:</Text>
+              <Text>{selectedOrder.id}</Text>
+            </div>
+            <div>
+              <Text fw={500}>Email:</Text>
+              <Text>{selectedOrder.email}</Text>
+            </div>
+            <div>
+              <Text fw={500}>CUIL:</Text>
+              <Text>{selectedOrder.cuil}</Text>
+            </div>
+            <div>
+              <Text fw={500}>Evento:</Text>
+              <Text>{selectedOrder.event.topic}</Text>
+            </div>
+            <div>
+              <Text fw={500}>Combos:</Text>
+              {selectedOrder.combos.map((combo, index) => (
+                <Text key={index}>
+                  {combo.name} - ${combo.price}
+                </Text>
+              ))}
+            </div>
+            <div>
+              <Text fw={500}>Invitados:</Text>
+              {selectedOrder.invitees.length > 0 ? (
+                <Table>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>Nombre</Table.Th>
+                      <Table.Th>CUIL</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {selectedOrder.invitees.map((invitee, index) => (
+                      <Table.Tr key={index}>
+                        <Table.Td>{invitee.name}</Table.Td>
+                        <Table.Td>{invitee.cuil}</Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                </Table>
+              ) : (
+                <Text>No hay invitados</Text>
+              )}
+            </div>
+            <div>
+              <Text fw={500}>Total:</Text>
+              <Text>${selectedOrder.total}</Text>
+            </div>
+            <div>
+              <Text fw={500}>Fecha:</Text>
+              <Text>{formatDate(selectedOrder.createdAt)}</Text>
+            </div>
+            <Group justify="flex-end" mt="md">
+              <Button 
+                variant="light" 
+                color="red"
+                onClick={() => {
+                  close();
+                  openDelete();
+                }}
+              >
+                Rechazar
+              </Button>
+              <Button 
+                color="green"
+                onClick={() => {
+                  close();
+                  openApprove();
+                }}
+              >
+                Aprobar
+              </Button>
+            </Group>
+          </Stack>
+        )}
+      </Modal>
+
+      {/* Approve Confirmation Modal */}
+      <Modal 
+        opened={openedApprove} 
+        onClose={() => {
+          closeApprove();
+          resetApproveState();
+        }}
+        title="Confirmar Aprobación"
+      >
+        <Stack gap="md">
+          <Text>¿Estás seguro de que deseas aprobar esta orden?</Text>
+          
+          {approveError && (
+            <Text c="red" size="sm">
+              {approveError}
+            </Text>
+          )}
+        </Stack>
+        
+        <Group justify="flex-end" mt="md">
+          <Button variant="default" onClick={closeApprove}>
+            Cancelar
+          </Button>
+          <Button 
+            color="green"
+            loading={isApproving}
+            onClick={async () => {
+              if (!selectedOrder) return;
+              
+              const { success, error } = await approveOrder(selectedOrder.id);
+              
+              if (success) {
+                notifications.show({
+                  title: '¡Éxito!',
+                  message: 'La orden ha sido aprobada correctamente',
+                  color: 'green',
+                });
+                closeApprove();
+                refetch();
+              } else {
+                notifications.show({
+                  title: 'Error',
+                  message: error || 'Ocurrió un error al aprobar la orden',
+                  color: 'red',
+                });
+              }
+            }}
+          >
+            Confirmar
+          </Button>
+        </Group>
+      </Modal>
+
+      {/* Reject Confirmation Modal */}
+      <Modal 
+        opened={openedDelete} 
+        onClose={closeDelete} 
+        title="Confirmar Rechazo"
+      >
+        <Text>¿Estás seguro de que deseas rechazar esta orden?</Text>
+        <Group justify="flex-end" mt="md">
+          <Button variant="default" onClick={closeDelete}>
+            Cancelar
+          </Button>
+          <Button 
+            color="red"
+            onClick={() => {
+              // TODO: Implement reject logic
+              notifications.show({
+                title: 'Orden rechazada',
+                message: 'La orden ha sido rechazada',
+                color: 'red'
+              });
+              closeDelete();
+              refetch();
+            }}
+          >
+            Confirmar
+          </Button>
+        </Group>
+      </Modal>
+    </Container>
+  );
 }

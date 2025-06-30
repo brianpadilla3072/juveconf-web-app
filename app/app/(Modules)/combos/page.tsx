@@ -1,14 +1,12 @@
 "use client"
 
-import type React from "react"
-
+import { Container } from "@mantine/core"
+import { ComingSoon } from "../../../../app/components/ComingSoon/ComingSoon"
 
 export default function CombosModule() {
-
-
   return (
-    <>
-        <h1>combos</h1>
-    </>
+    <Container size="lg" py="xl">
+      <ComingSoon moduleName="la sección de combos" />
+    </Container>
   )
 }
