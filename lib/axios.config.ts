@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 
 // Crear instancia de axios
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3072',
+  baseURL: process.env.SERVER_API || 'http://localhost:3072',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -50,7 +50,7 @@ api.interceptors.response.use(
       try {
         // Intentar refrescar el token
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3072'}/auth/refresh-token`,
+          `${process.env.NET_PUBAPI_URL || 'https://api.consagradosajesus.com'}/auth/refresh-token`,
           {},
           {
             headers: {
