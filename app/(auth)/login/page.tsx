@@ -1,5 +1,6 @@
 "use client"
-import { useState } from "react"
+
+import React, { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,8 +11,9 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/AuthContext"
 import { Logo } from "../../components/Logo/Logo"
+import heroBackground from '../../../public/images/hero/hero-background.jpg';
 
-export default function LoginPage() {
+function LoginPage() {
   const router = useRouter()
   const { login } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
@@ -42,41 +44,39 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-yellow-50">
-      <div className="container mx-auto px-4 py-8 md:py-12">
-        <div className="max-w-md mx-auto">
-          
+    <div className="w-full min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <Card className="border-0 shadow-xl">
+          <CardHeader className="bg-white-500 text-white">
+            <CardTitle className="text-3xl font-bold text-orange-500 mb-4 text-center">Iniciar Sesión</CardTitle>
+            <CardDescription className="text-white/90 text-center text-gray-700">
+              Ingresa tus datos para acceder a tu cuenta
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-6">
+            <form onSubmit={handleLoginSubmit} className="space-y-4 md:space-y-6">
+              <div className="space-y-1.5">
+                <Label htmlFor="login-email" className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-orange-500" />
+                  Correo Electrónico
+                </Label>
+                <Input
+                  id="login-email"
+                  type="email"
+                  placeholder="ejemplo@dominio.com"
+                  value={loginData.email}
+                  onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                  required
+                  className="text-base py-2 h-auto"
+                />
+              </div>
 
-          <Card className="border-0 shadow-xl">
-            <CardHeader className="bg-white-500 text-white">
-              <CardTitle className="text-3xl font-bold text-orange-500 mb-4 text-center">Iniciar Sesión</CardTitle>
-              <CardDescription className="text-white/90 text-center text-gray-700">
-                Ingresa tus datos para acceder a tu cuenta
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-6">
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="login-email" className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-orange-500" />
-                    Correo Electrónico
-                  </Label>
-                  <Input
-                    id="login-email"
-                    type="email"
-                    placeholder="ejemplo@dominio.com"
-                    value={loginData.email}
-                    onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="login-password" className="flex items-center gap-2">
-                    <Lock className="h-4 w-4 text-orange-500" />
-                    Contraseña
-                  </Label>
-                  <div className="relative">
+              <div className="space-y-1.5">
+                <Label htmlFor="login-password" className="flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-orange-500" />
+                  Contraseña
+                </Label>
+                <div className="relative">
                     <Input
                       id="login-password"
                       type={showPassword ? "text" : "password"}
@@ -85,13 +85,13 @@ export default function LoginPage() {
                       onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                       className="pr-10"
                       required
-                    />
+                      />
                     <button
                       type="button"
                       className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                       onClick={() => setShowPassword(!showPassword)}
                       tabIndex={-1}
-                    >
+                      >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
                       ) : (
@@ -104,15 +104,15 @@ export default function LoginPage() {
                 <div className="flex items-center justify-between">
                   {/* <div className="flex items-center space-x-2">
                     <Checkbox 
-                      id="remember-me" 
-                      checked={rememberMe}
-                      onCheckedChange={(checked) => setRememberMe(!!checked)}
+                    id="remember-me" 
+                    checked={rememberMe}
+                    onCheckedChange={(checked) => setRememberMe(!!checked)}
                     />
                     <label
-                      htmlFor="remember-me"
+                    htmlFor="remember-me"
                       className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
-                      Recordar usuario
+                    Recordar usuario
                     </label>
                   </div> */}
                   <Link href="/reset-password" className="text-sm text-orange-600 hover:text-orange-700">
@@ -122,7 +122,7 @@ export default function LoginPage() {
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-orange-500 hover:bg-orange-500 text-white"
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 h-auto text-base"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -144,15 +144,10 @@ export default function LoginPage() {
               </form>
             </CardContent>
           </Card>
-
-          <div className="mt-8 text-center">
-            <div className="flex items-center justify-center gap-2 text-gray-600">
-              <Logo size={20} />
-              <span>Enciende tu fe con nosotros</span>
-            </div>
-          </div>
         </div>
       </div>
-    </main>
+   
   )
 }
+
+export default LoginPage

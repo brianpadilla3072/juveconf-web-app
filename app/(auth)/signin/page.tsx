@@ -10,7 +10,7 @@ import { User, Lock, Mail } from "lucide-react"
 import Link from "next/link"
 import { Logo } from "../../components/Logo/Logo"
 
-export default function RegisterPage() {
+function RegisterPage() {
   const [registerData, setRegisterData] = useState({
     name: "",
     email: "",
@@ -30,12 +30,9 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen bg-yellow-50">
-      <div className="container mx-auto px-4 py-8 md:py-12">
-        <div className="max-w-md mx-auto">
-         
-
-          <Card className="border-0 shadow-xl">
+    <div className="w-full min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <Card className="border-0 shadow-xl">
             <CardHeader className="bg-white-500 text-white">
               <CardTitle className="text-center text-3xl font-bold text-orange-500 mb-4">Crear Cuenta</CardTitle>
               <CardDescription className="text-white/90 text-center text-gray-700">
@@ -43,8 +40,8 @@ export default function RegisterPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
-              <form onSubmit={handleRegisterSubmit} className="space-y-4">
-                <div className="space-y-2">
+              <form onSubmit={handleRegisterSubmit} className="space-y-4 md:space-y-6">
+                <div className="space-y-1.5">
                   <Label htmlFor="register-name" className="flex items-center gap-2">
                     <User className="h-4 w-4 text-orange-500" />
                     Nombre Completo
@@ -59,7 +56,7 @@ export default function RegisterPage() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <Label htmlFor="register-email" className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-orange-500" />
                     Correo Electrónico
@@ -74,7 +71,7 @@ export default function RegisterPage() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <Label htmlFor="register-password" className="flex items-center gap-2">
                     <Lock className="h-4 w-4 text-orange-500" />
                     Contraseña
@@ -89,7 +86,7 @@ export default function RegisterPage() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <Label htmlFor="register-confirm-password" className="flex items-center gap-2">
                     <Lock className="h-4 w-4 text-orange-500" />
                     Confirmar Contraseña
@@ -104,11 +101,11 @@ export default function RegisterPage() {
                   />
                 </div>
 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-start space-x-2">
                   <input
                     type="checkbox"
                     id="terms"
-                    className="rounded text-orange-500 focus:ring-orange-500"
+                    className="mt-1 rounded text-orange-500 focus:ring-orange-500"
                     required
                   />
                   <label htmlFor="terms" className="text-sm text-gray-600">
@@ -119,7 +116,7 @@ export default function RegisterPage() {
                   </label>
                 </div>
 
-                <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 text-white">
+                <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 h-auto text-base">
                   Crear Cuenta
                 </Button>
 
@@ -132,15 +129,7 @@ export default function RegisterPage() {
               </form>
             </CardContent>
           </Card>
-
-          <div className="mt-8 text-center">
-            <div className="flex items-center justify-center gap-2 text-gray-600">
-              <Logo size={20} />
-              <span>Enciende tu fe con nosotros</span>
-            </div>
-          </div>
         </div>
-      </div>
-    </main>
+    </div>
   )
 }
