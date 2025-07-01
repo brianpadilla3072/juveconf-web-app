@@ -5,7 +5,7 @@ const isDevelopment = process.env.NODE_ENV === "development";
 
 // Crear instancia de axios
 const api = axios.create({
-  baseURL: process.env.SERVER_API || "http://localhost:3072",
+  baseURL: process.env.SERVER_API || "https://api.consagradosajesus.com",
   headers: {
     "Content-Type": "application/json",
   },
