@@ -21,6 +21,9 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  env: {
+    SERVER_API: process.env.SERVER_API,
+  },
 }
 
 mergeConfig(nextConfig, userConfig)
