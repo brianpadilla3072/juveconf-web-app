@@ -628,3 +628,183 @@
 2025-08-11T09:27:45:  ⚠ Fast Refresh had to perform a full reload due to a runtime error.
 2025-08-11T09:30:34:  ⚠ Fast Refresh had to perform a full reload due to a runtime error.
 2025-08-11T09:32:01:  ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+2025-08-12T01:54:21:  ⨯ Failed to start server
+2025-08-12T01:54:21: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-12T01:54:21:     at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+2025-08-12T01:54:21:     at listenInCluster (node:net:1997:12)
+2025-08-12T01:54:21:     at Server.listen (node:net:2102:7)
+2025-08-12T01:54:21:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:280:16
+2025-08-12T01:54:21:     at new Promise (<anonymous>)
+2025-08-12T01:54:21:     at startServer (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:191:11)
+2025-08-12T01:54:21:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:52
+2025-08-12T01:54:21:     at Span.traceAsyncFn (/work/consagrados/consagradosajesus/node_modules/next/dist/trace/trace.js:154:26)
+2025-08-12T01:54:21:     at process.<anonymous> (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:35)
+2025-08-12T01:54:21:     at process.emit (node:events:518:28) {
+2025-08-12T01:54:21:   code: 'EADDRINUSE',
+2025-08-12T01:54:21:   errno: -98,
+2025-08-12T01:54:21:   syscall: 'listen',
+2025-08-12T01:54:21:   address: '::',
+2025-08-12T01:54:21:   port: 3000
+2025-08-12T01:54:21: }
+2025-08-12T01:54:22:  ⨯ Failed to start server
+2025-08-12T01:54:22: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-12T01:54:22:     at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+2025-08-12T01:54:22:     at listenInCluster (node:net:1997:12)
+2025-08-12T01:54:22:     at Server.listen (node:net:2102:7)
+2025-08-12T01:54:22:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:280:16
+2025-08-12T01:54:22:     at new Promise (<anonymous>)
+2025-08-12T01:54:22:     at startServer (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:191:11)
+2025-08-12T01:54:22:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:52
+2025-08-12T01:54:22:     at Span.traceAsyncFn (/work/consagrados/consagradosajesus/node_modules/next/dist/trace/trace.js:154:26)
+2025-08-12T01:54:22:     at process.<anonymous> (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:35)
+2025-08-12T01:54:22:     at process.emit (node:events:518:28) {
+2025-08-12T01:54:22:   code: 'EADDRINUSE',
+2025-08-12T01:54:22:   errno: -98,
+2025-08-12T01:54:22:   syscall: 'listen',
+2025-08-12T01:54:22:   address: '::',
+2025-08-12T01:54:22:   port: 3000
+2025-08-12T01:54:22: }
+2025-08-12T01:54:23:  ⨯ Failed to start server
+2025-08-12T01:54:23: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-12T01:54:23:     at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+2025-08-12T01:54:23:     at listenInCluster (node:net:1997:12)
+2025-08-12T01:54:23:     at Server.listen (node:net:2102:7)
+2025-08-12T01:54:23:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:280:16
+2025-08-12T01:54:23:     at new Promise (<anonymous>)
+2025-08-12T01:54:23:     at startServer (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:191:11)
+2025-08-12T01:54:23:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:52
+2025-08-12T01:54:23:     at Span.traceAsyncFn (/work/consagrados/consagradosajesus/node_modules/next/dist/trace/trace.js:154:26)
+2025-08-12T01:54:23:     at process.<anonymous> (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:35)
+2025-08-12T01:54:23:     at process.emit (node:events:518:28) {
+2025-08-12T01:54:23:   code: 'EADDRINUSE',
+2025-08-12T01:54:23:   errno: -98,
+2025-08-12T01:54:23:   syscall: 'listen',
+2025-08-12T01:54:23:   address: '::',
+2025-08-12T01:54:23:   port: 3000
+2025-08-12T01:54:23: }
+2025-08-12T01:54:23:  ⨯ Failed to start server
+2025-08-12T01:54:23: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-12T01:54:23:     at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+2025-08-12T01:54:23:     at listenInCluster (node:net:1997:12)
+2025-08-12T01:54:23:     at Server.listen (node:net:2102:7)
+2025-08-12T01:54:23:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:280:16
+2025-08-12T01:54:23:     at new Promise (<anonymous>)
+2025-08-12T01:54:23:     at startServer (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:191:11)
+2025-08-12T01:54:23:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:52
+2025-08-12T01:54:23:     at Span.traceAsyncFn (/work/consagrados/consagradosajesus/node_modules/next/dist/trace/trace.js:154:26)
+2025-08-12T01:54:23:     at process.<anonymous> (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:35)
+2025-08-12T01:54:23:     at process.emit (node:events:518:28) {
+2025-08-12T01:54:23:   code: 'EADDRINUSE',
+2025-08-12T01:54:23:   errno: -98,
+2025-08-12T01:54:23:   syscall: 'listen',
+2025-08-12T01:54:23:   address: '::',
+2025-08-12T01:54:23:   port: 3000
+2025-08-12T01:54:23: }
+2025-08-12T01:54:24:  ⨯ Failed to start server
+2025-08-12T01:54:24: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-12T01:54:24:     at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+2025-08-12T01:54:24:     at listenInCluster (node:net:1997:12)
+2025-08-12T01:54:24:     at Server.listen (node:net:2102:7)
+2025-08-12T01:54:24:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:280:16
+2025-08-12T01:54:24:     at new Promise (<anonymous>)
+2025-08-12T01:54:24:     at startServer (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:191:11)
+2025-08-12T01:54:24:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:52
+2025-08-12T01:54:24:     at Span.traceAsyncFn (/work/consagrados/consagradosajesus/node_modules/next/dist/trace/trace.js:154:26)
+2025-08-12T01:54:24:     at process.<anonymous> (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:35)
+2025-08-12T01:54:24:     at process.emit (node:events:518:28) {
+2025-08-12T01:54:24:   code: 'EADDRINUSE',
+2025-08-12T01:54:24:   errno: -98,
+2025-08-12T01:54:24:   syscall: 'listen',
+2025-08-12T01:54:24:   address: '::',
+2025-08-12T01:54:24:   port: 3000
+2025-08-12T01:54:24: }
+2025-08-12T01:54:24:  ⨯ Failed to start server
+2025-08-12T01:54:24: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-12T01:54:24:     at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+2025-08-12T01:54:24:     at listenInCluster (node:net:1997:12)
+2025-08-12T01:54:24:     at Server.listen (node:net:2102:7)
+2025-08-12T01:54:24:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:280:16
+2025-08-12T01:54:24:     at new Promise (<anonymous>)
+2025-08-12T01:54:24:     at startServer (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:191:11)
+2025-08-12T01:54:24:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:52
+2025-08-12T01:54:24:     at Span.traceAsyncFn (/work/consagrados/consagradosajesus/node_modules/next/dist/trace/trace.js:154:26)
+2025-08-12T01:54:24:     at process.<anonymous> (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:35)
+2025-08-12T01:54:24:     at process.emit (node:events:518:28) {
+2025-08-12T01:54:24:   code: 'EADDRINUSE',
+2025-08-12T01:54:24:   errno: -98,
+2025-08-12T01:54:24:   syscall: 'listen',
+2025-08-12T01:54:24:   address: '::',
+2025-08-12T01:54:24:   port: 3000
+2025-08-12T01:54:24: }
+2025-08-12T01:54:25:  ⨯ Failed to start server
+2025-08-12T01:54:25: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-12T01:54:25:     at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+2025-08-12T01:54:25:     at listenInCluster (node:net:1997:12)
+2025-08-12T01:54:25:     at Server.listen (node:net:2102:7)
+2025-08-12T01:54:25:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:280:16
+2025-08-12T01:54:25:     at new Promise (<anonymous>)
+2025-08-12T01:54:25:     at startServer (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:191:11)
+2025-08-12T01:54:25:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:52
+2025-08-12T01:54:25:     at Span.traceAsyncFn (/work/consagrados/consagradosajesus/node_modules/next/dist/trace/trace.js:154:26)
+2025-08-12T01:54:25:     at process.<anonymous> (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:35)
+2025-08-12T01:54:25:     at process.emit (node:events:518:28) {
+2025-08-12T01:54:25:   code: 'EADDRINUSE',
+2025-08-12T01:54:25:   errno: -98,
+2025-08-12T01:54:25:   syscall: 'listen',
+2025-08-12T01:54:25:   address: '::',
+2025-08-12T01:54:25:   port: 3000
+2025-08-12T01:54:25: }
+2025-08-12T01:54:25:  ⨯ Failed to start server
+2025-08-12T01:54:25: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-12T01:54:25:     at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+2025-08-12T01:54:25:     at listenInCluster (node:net:1997:12)
+2025-08-12T01:54:25:     at Server.listen (node:net:2102:7)
+2025-08-12T01:54:25:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:280:16
+2025-08-12T01:54:25:     at new Promise (<anonymous>)
+2025-08-12T01:54:25:     at startServer (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:191:11)
+2025-08-12T01:54:25:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:52
+2025-08-12T01:54:25:     at Span.traceAsyncFn (/work/consagrados/consagradosajesus/node_modules/next/dist/trace/trace.js:154:26)
+2025-08-12T01:54:25:     at process.<anonymous> (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:35)
+2025-08-12T01:54:25:     at process.emit (node:events:518:28) {
+2025-08-12T01:54:25:   code: 'EADDRINUSE',
+2025-08-12T01:54:25:   errno: -98,
+2025-08-12T01:54:25:   syscall: 'listen',
+2025-08-12T01:54:25:   address: '::',
+2025-08-12T01:54:25:   port: 3000
+2025-08-12T01:54:25: }
+2025-08-12T01:54:26:  ⨯ Failed to start server
+2025-08-12T01:54:26: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-12T01:54:26:     at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+2025-08-12T01:54:26:     at listenInCluster (node:net:1997:12)
+2025-08-12T01:54:26:     at Server.listen (node:net:2102:7)
+2025-08-12T01:54:26:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:280:16
+2025-08-12T01:54:26:     at new Promise (<anonymous>)
+2025-08-12T01:54:26:     at startServer (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:191:11)
+2025-08-12T01:54:26:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:52
+2025-08-12T01:54:26:     at Span.traceAsyncFn (/work/consagrados/consagradosajesus/node_modules/next/dist/trace/trace.js:154:26)
+2025-08-12T01:54:26:     at process.<anonymous> (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:35)
+2025-08-12T01:54:26:     at process.emit (node:events:518:28) {
+2025-08-12T01:54:26:   code: 'EADDRINUSE',
+2025-08-12T01:54:26:   errno: -98,
+2025-08-12T01:54:26:   syscall: 'listen',
+2025-08-12T01:54:26:   address: '::',
+2025-08-12T01:54:26:   port: 3000
+2025-08-12T01:54:26: }
+2025-08-12T01:54:26:  ⨯ Failed to start server
+2025-08-12T01:54:26: Error: listen EADDRINUSE: address already in use :::3000
+2025-08-12T01:54:26:     at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+2025-08-12T01:54:26:     at listenInCluster (node:net:1997:12)
+2025-08-12T01:54:26:     at Server.listen (node:net:2102:7)
+2025-08-12T01:54:26:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:280:16
+2025-08-12T01:54:26:     at new Promise (<anonymous>)
+2025-08-12T01:54:26:     at startServer (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:191:11)
+2025-08-12T01:54:26:     at /work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:52
+2025-08-12T01:54:26:     at Span.traceAsyncFn (/work/consagrados/consagradosajesus/node_modules/next/dist/trace/trace.js:154:26)
+2025-08-12T01:54:26:     at process.<anonymous> (/work/consagrados/consagradosajesus/node_modules/next/dist/server/lib/start-server.js:310:35)
+2025-08-12T01:54:26:     at process.emit (node:events:518:28) {
+2025-08-12T01:54:26:   code: 'EADDRINUSE',
+2025-08-12T01:54:26:   errno: -98,
+2025-08-12T01:54:26:   syscall: 'listen',
+2025-08-12T01:54:26:   address: '::',
+2025-08-12T01:54:26:   port: 3000
+2025-08-12T01:54:26: }

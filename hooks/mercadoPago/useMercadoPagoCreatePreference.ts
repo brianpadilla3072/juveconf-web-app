@@ -1,4 +1,4 @@
-import api from '@/config/axiosInstance';
+import api from '@/lib/axios.config';
 import { useState } from 'react';
 
 

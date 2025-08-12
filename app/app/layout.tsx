@@ -9,6 +9,7 @@ import {
   Package,
   ShoppingCart,
   Users,
+  UserCheck,
   Settings,
   Menu,
   X,
@@ -32,6 +33,7 @@ export default function DashboardLayout({
     combos: 'Combos',
     orders: 'Órdenes',
     payments: 'Pagos',
+    invitees: 'Invitados',
     users: 'Usuarios',
     settings: 'Configuración',
   };
@@ -130,6 +132,14 @@ export default function DashboardLayout({
                   }
                   label="Pagos"
                   moduleKey="payments"
+                />
+              </li>
+              <li>
+                <NavItem
+                  href="/app/invitados"
+                  icon={<UserCheck className="h-5 w-5" />}
+                  label="Invitados"
+                  moduleKey="invitees"
                 />
               </li>
               <li>

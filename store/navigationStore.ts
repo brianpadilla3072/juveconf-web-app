@@ -6,6 +6,7 @@ export type Module =
   | 'combos'
   | 'orders'
   | 'payments'
+  | 'invitees'
   | 'users'
   | 'settings'
 

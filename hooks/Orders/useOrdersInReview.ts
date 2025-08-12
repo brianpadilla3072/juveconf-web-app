@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import api from '@/config/axiosInstance';
+import api from '@/lib/axios.config';
 
 type Invitee = {
   name: string;
