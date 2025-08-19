@@ -13,6 +13,7 @@ import {
   Settings,
   Menu,
   X,
+  Mail,
 } from "lucide-react";
 import { NavItem } from "@/components/app/navigation";
 import { SyncModuleProvider } from "@/components/app/SyncModuleProvider";
@@ -34,6 +35,7 @@ export default function DashboardLayout({
     orders: 'Órdenes',
     payments: 'Pagos',
     invitees: 'Invitados',
+    emails: 'Emails',
     users: 'Usuarios',
     settings: 'Configuración',
   };
@@ -140,6 +142,14 @@ export default function DashboardLayout({
                   icon={<UserCheck className="h-5 w-5" />}
                   label="Invitados"
                   moduleKey="invitees"
+                />
+              </li>
+              <li>
+                <NavItem
+                  href="/app/emails"
+                  icon={<Mail className="h-5 w-5" />}
+                  label="Emails"
+                  moduleKey="emails"
                 />
               </li>
               <li>
