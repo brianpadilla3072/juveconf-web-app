@@ -6,6 +6,8 @@ import { useState } from "react";
 interface CreateInviteeData {
   name: string;
   cuil: string;
+  email?: string;
+  phone?: string;
   orderId: string;
   paymentId: string;
 }
@@ -13,6 +15,8 @@ interface CreateInviteeData {
 interface UpdateInviteeData {
   name?: string;
   cuil?: string;
+  email?: string;
+  phone?: string;
   attendedDay1?: boolean;
   attendedDay2?: boolean;
 }

@@ -6,6 +6,7 @@ import { useCreatePayment } from "@/hooks/payments/useCreatePayment"
 import { useUpdatePayment } from "@/hooks/payments/useUpdatePayment"
 import { useDeletePayment } from "@/hooks/payments/useDeletePayment"
 import { usePaymentsSummary } from "@/hooks/payments/usePaymentsSummary"
+import { useQueryOrders } from "@/hooks/Orders/useQueryOrders"
 import { Payment, CreatePaymentDto, UpdatePaymentDto } from "@/entities/Payment"
 import { useState } from "react"
 import { 
@@ -34,10 +35,16 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
-import { Trash2, Edit, Plus, CreditCard, DollarSign, TrendingUp, Activity, Search, RotateCcw, X } from "lucide-react"
+import { Trash2, Edit, Plus, CreditCard, DollarSign, TrendingUp, Activity, Search, RotateCcw, X, ExternalLink, MoreHorizontal } from "lucide-react"
 import { toast } from "sonner"
 
 export default function PaymentsModule() {
@@ -46,6 +53,7 @@ export default function PaymentsModule() {
   const { updatePayment, isLoading: isUpdating } = useUpdatePayment()
   const { deletePayment, isLoading: isDeleting } = useDeletePayment()
   const { summary, isLoading: isSummaryLoading } = usePaymentsSummary()
+  const { orders, loading: ordersLoading } = useQueryOrders()
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -123,7 +131,6 @@ export default function PaymentsModule() {
       orderId: payment.orderId,
       amount: payment.amount,
       type: payment.type,
-      payerName: payment.payerName,
       payerEmail: payment.payerEmail,
       payerDni: payment.payerDni,
       externalReference: payment.externalReference
@@ -254,14 +261,19 @@ export default function PaymentsModule() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="orderId">ID de Orden</Label>
-                <Input
-                  id="orderId"
-                  value={createForm.orderId}
-                  onChange={(e) => setCreateForm({...createForm, orderId: e.target.value})}
-                  placeholder="order-123"
-                  required
-                />
+                <Label htmlFor="orderId">Orden</Label>
+                <Select value={createForm.orderId} onValueChange={(value) => setCreateForm({...createForm, orderId: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar orden" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {orders.map((order) => (
+                      <SelectItem key={order.id} value={order.id}>
+                        {order.id} - {order.email} - {order.cuil}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="year">Año</Label>
@@ -374,12 +386,11 @@ export default function PaymentsModule() {
             <TableCaption>Gestión de pagos registrados</TableCaption>
             <TableHeader>
               <TableRow>
+                <TableHead>ID Pago</TableHead>
                 <TableHead>Pagador</TableHead>
-                <TableHead>Monto</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Orden</TableHead>
-                <TableHead>Referencia</TableHead>
+                <TableHead>ID Orden</TableHead>
                 <TableHead>Fecha</TableHead>
+                <TableHead>Monto</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -388,6 +399,9 @@ export default function PaymentsModule() {
                 const typeBadge = getPaymentTypeBadge(payment.type)
                 return (
                   <TableRow key={payment.id}>
+                    <TableCell className="font-mono text-sm">
+                      {payment.id}
+                    </TableCell>
                     <TableCell className="font-medium">
                       <div>
                         <div className="font-semibold">{payment.payerName}</div>
@@ -399,41 +413,34 @@ export default function PaymentsModule() {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="font-semibold text-green-600">
-                      {formatPrice(payment.amount)}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={typeBadge.variant} className={typeBadge.color}>
-                        {typeBadge.label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="font-mono text-xs">
+                    <TableCell className="font-mono text-sm">
                       {payment.orderId}
-                    </TableCell>
-                    <TableCell className="font-mono text-xs">
-                      {payment.externalReference || '-'}
                     </TableCell>
                     <TableCell>
                       {new Date(payment.createdAt).toLocaleDateString('es-ES')}
                     </TableCell>
+                    <TableCell className="font-semibold text-green-600">
+                      {formatPrice(payment.amount)}
+                    </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openEditDialog(payment)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeletePayment(payment)}
-                          disabled={isDeleting}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Abrir menú</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => window.open(`https://consagradosajesus.com/descargar-entrada/${payment.id}`, '_blank')}>
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                            Ver Entrada
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => openEditDialog(payment)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 )
@@ -470,20 +477,17 @@ export default function PaymentsModule() {
                       </div>
                       <div className="text-right">
                         <p className="text-xl font-bold text-green-600">{formatPrice(payment.amount)}</p>
-                        <Badge variant={typeBadge.variant} className={typeBadge.color}>
-                          {typeBadge.label}
-                        </Badge>
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-muted-foreground">Orden</p>
-                        <p className="font-mono text-xs break-all">{payment.orderId}</p>
+                        <p className="text-muted-foreground">ID Pago</p>
+                        <p className="font-mono text-xs break-all">{payment.id}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Referencia</p>
-                        <p className="font-mono text-xs">{payment.externalReference || '-'}</p>
+                        <p className="text-muted-foreground">ID Orden</p>
+                        <p className="font-mono text-sm">{payment.orderId}</p>
                       </div>
                     </div>
                     
@@ -495,23 +499,24 @@ export default function PaymentsModule() {
                     </div>
                     
                     <div className="flex justify-end gap-2 pt-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEditDialog(payment)}
-                      >
-                        <Edit className="w-4 h-4 mr-1" />
-                        Editar
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDeletePayment(payment)}
-                        disabled={isDeleting}
-                      >
-                        <Trash2 className="w-4 h-4 mr-1" />
-                        Eliminar
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Abrir menú</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => window.open(`https://consagradosajesus.com/descargar-entrada/${payment.id}`, '_blank')}>
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                            Ver Entrada
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => openEditDialog(payment)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
                 </CardContent>
@@ -528,14 +533,6 @@ export default function PaymentsModule() {
             <DialogTitle>Editar Pago</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleEditPayment} className="space-y-4">
-            <div>
-              <Label htmlFor="edit-payerName">Nombre del pagador</Label>
-              <Input
-                id="edit-payerName"
-                value={editForm.payerName || ""}
-                onChange={(e) => setEditForm({...editForm, payerName: e.target.value})}
-              />
-            </div>
             <div>
               <Label htmlFor="edit-payerEmail">Email del pagador</Label>
               <Input
@@ -563,6 +560,21 @@ export default function PaymentsModule() {
                 value={editForm.amount || ""}
                 onChange={(e) => setEditForm({...editForm, amount: parseFloat(e.target.value) || 0})}
               />
+            </div>
+            <div>
+              <Label htmlFor="edit-orderId">Orden</Label>
+              <Select value={editForm.orderId || ""} onValueChange={(value) => setEditForm({...editForm, orderId: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar orden" />
+                </SelectTrigger>
+                <SelectContent>
+                  {orders.map((order) => (
+                    <SelectItem key={order.id} value={order.id}>
+                      {order.id} - {order.email} - {order.cuil}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="edit-type">Tipo de pago</Label>

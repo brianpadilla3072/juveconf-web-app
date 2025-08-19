@@ -10,6 +10,8 @@ interface Invitee {
   id: string;
   name: string;
   cuil: string;
+  email?: string;
+  phone?: string;
   orderId: string;
   paymentId: string;
   attendedDay1: boolean | null;

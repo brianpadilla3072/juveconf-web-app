@@ -49,6 +49,8 @@ export default function InviteesPage() {
   const [formData, setFormData] = useState({
     name: '',
     cuil: '',
+    email: '',
+    phone: '',
     orderId: '',
     paymentId: ''
   });
@@ -66,7 +68,9 @@ export default function InviteesPage() {
   // Filtered invitees
   const filteredInvitees = invitees?.filter(invitee =>
     invitee.name.toLowerCase().includes(search.toLowerCase()) ||
-    invitee.cuil.includes(search)
+    invitee.cuil.includes(search) ||
+    (invitee.email && invitee.email.toLowerCase().includes(search.toLowerCase())) ||
+    (invitee.phone && invitee.phone.includes(search))
   ) || [];
 
   // Stats
@@ -78,7 +82,7 @@ export default function InviteesPage() {
     const result = await createInvitee(formData);
     if (result) {
       setIsCreateDialogOpen(false);
-      setFormData({ name: '', cuil: '', orderId: '', paymentId: '' });
+      setFormData({ name: '', cuil: '', email: '', phone: '', orderId: '', paymentId: '' });
       refetch(); // Refrescar la lista
     }
   };
@@ -88,6 +92,8 @@ export default function InviteesPage() {
     setFormData({
       name: invitee.name,
       cuil: invitee.cuil,
+      email: invitee.email || '',
+      phone: invitee.phone || '',
       orderId: invitee.orderId,
       paymentId: invitee.paymentId
     });
@@ -98,12 +104,14 @@ export default function InviteesPage() {
     if (editingInvitee) {
       const result = await updateInvitee(editingInvitee.id, { 
         name: formData.name, 
-        cuil: formData.cuil 
+        cuil: formData.cuil,
+        email: formData.email || undefined,
+        phone: formData.phone || undefined
       });
       if (result) {
         setIsEditDialogOpen(false);
         setEditingInvitee(null);
-        setFormData({ name: '', cuil: '', orderId: '', paymentId: '' });
+        setFormData({ name: '', cuil: '', email: '', phone: '', orderId: '', paymentId: '' });
         refetch(); // Refrescar la lista
       }
     }
@@ -169,6 +177,26 @@ export default function InviteesPage() {
                   value={formData.cuil}
                   onChange={(e) => setFormData(prev => ({ ...prev, cuil: e.target.value }))}
                   placeholder="CUIL del invitado"
+                />
+              </div>
+              <div>
+                <Label htmlFor="email">Email (opcional)</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="email@ejemplo.com"
+                />
+              </div>
+              <div>
+                <Label htmlFor="phone">Teléfono (opcional)</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  placeholder="+54 9 11 1234-5678"
                 />
               </div>
               <div>
@@ -253,7 +281,7 @@ export default function InviteesPage() {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por nombre o CUIL..."
+                placeholder="Buscar por nombre, CUIL, email o teléfono..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-10"
@@ -295,6 +323,8 @@ export default function InviteesPage() {
                 <TableRow>
                   <TableHead>Nombre</TableHead>
                   <TableHead>CUIL</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Teléfono</TableHead>
                   <TableHead>Email Pago</TableHead>
                   <TableHead>Monto</TableHead>
                   <TableHead className="text-center">Día 1</TableHead>
@@ -306,13 +336,13 @@ export default function InviteesPage() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center">
+                    <TableCell colSpan={10} className="text-center">
                       Cargando invitados...
                     </TableCell>
                   </TableRow>
                 ) : filteredInvitees.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center">
+                    <TableCell colSpan={10} className="text-center">
                       No se encontraron invitados
                     </TableCell>
                   </TableRow>
@@ -321,6 +351,8 @@ export default function InviteesPage() {
                     <TableRow key={invitee.id}>
                       <TableCell className="font-medium">{invitee.name}</TableCell>
                       <TableCell>{invitee.cuil}</TableCell>
+                      <TableCell>{invitee.email || '-'}</TableCell>
+                      <TableCell>{invitee.phone || '-'}</TableCell>
                       <TableCell>{invitee.payment?.payerEmail || 'N/A'}</TableCell>
                       <TableCell>${invitee.payment?.amount?.toLocaleString()}</TableCell>
                       <TableCell className="text-center">
@@ -496,6 +528,26 @@ export default function InviteesPage() {
                 value={formData.cuil}
                 onChange={(e) => setFormData(prev => ({ ...prev, cuil: e.target.value }))}
                 placeholder="CUIL del invitado"
+              />
+            </div>
+            <div>
+              <Label htmlFor="editEmail">Email (opcional)</Label>
+              <Input
+                id="editEmail"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="email@ejemplo.com"
+              />
+            </div>
+            <div>
+              <Label htmlFor="editPhone">Teléfono (opcional)</Label>
+              <Input
+                id="editPhone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                placeholder="+54 9 11 1234-5678"
               />
             </div>
           </div>
