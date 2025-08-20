@@ -51,6 +51,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import api from '@/lib/axios.config';
 
 interface EmailRecipient {
   email: string;
@@ -87,12 +88,10 @@ export default function EmailsPage() {
   const loadInviteesEmails = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/invitees/emails');
-      if (!response.ok) throw new Error('Error al cargar emails de invitados');
+      const response = await api.get('/invitees/emails');
       
-      const data = await response.json();
-      setInviteesEmails(data.emails || []);
-      toast.success(`${data.emails?.length || 0} emails de invitados cargados`);
+      setInviteesEmails(response.data.emails || []);
+      toast.success(`${response.data.emails?.length || 0} emails de invitados cargados`);
     } catch (error) {
       toast.error('Error al cargar emails de invitados');
       console.error(error);
@@ -105,12 +104,10 @@ export default function EmailsPage() {
   const loadPaymentsEmails = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/payments/emails');
-      if (!response.ok) throw new Error('Error al cargar emails de pagos');
+      const response = await api.get('/payments/emails');
       
-      const data = await response.json();
-      setPaymentsEmails(data.emails || []);
-      toast.success(`${data.emails?.length || 0} emails de pagos cargados`);
+      setPaymentsEmails(response.data.emails || []);
+      toast.success(`${response.data.emails?.length || 0} emails de pagos cargados`);
     } catch (error) {
       toast.error('Error al cargar emails de pagos');
       console.error(error);
@@ -162,26 +159,13 @@ export default function EmailsPage() {
     try {
       setIsSending(true);
       
-      const response = await fetch('/api/mail/send-bulk', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          subject: emailForm.subject,
-          htmlContent: emailForm.htmlContent,
-          recipients: selectedRecipients
-        }),
+      const response = await api.post('/mail/send-bulk', {
+        subject: emailForm.subject,
+        htmlContent: emailForm.htmlContent,
+        recipients: selectedRecipients
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Error al enviar emails');
-      }
-
-      const result = await response.json();
       
-      toast.success(`Emails enviados exitosamente a ${result.totalSent} destinatarios`);
+      toast.success(`Emails enviados exitosamente a ${response.data.totalSent} destinatarios`);
       
       // Reset form
       setEmailForm({
@@ -192,7 +176,7 @@ export default function EmailsPage() {
       setSelectedRecipients([]);
       
     } catch (error: any) {
-      toast.error(error.message || 'Error al enviar emails');
+      toast.error(error.response?.data?.message || error.message || 'Error al enviar emails');
       console.error('Error sending emails:', error);
     } finally {
       setIsSending(false);

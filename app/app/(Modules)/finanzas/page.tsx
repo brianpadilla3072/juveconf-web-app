@@ -49,6 +49,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import api from '@/lib/axios.config';
 
 interface Ingreso {
   id: string;
@@ -119,25 +120,14 @@ export default function FinanzasPage() {
     try {
       setIsLoading(true);
       const [ingresosRes, egresosRes, balanceRes] = await Promise.all([
-        fetch(`/api/finanzas/ingresos?year=${selectedYear}`),
-        fetch(`/api/finanzas/egresos?year=${selectedYear}`),
-        fetch(`/api/finanzas/balance?year=${selectedYear}`)
+        api.get(`/finanzas/ingresos?year=${selectedYear}`),
+        api.get(`/finanzas/egresos?year=${selectedYear}`),
+        api.get(`/finanzas/balance?year=${selectedYear}`)
       ]);
 
-      if (ingresosRes.ok) {
-        const ingresosData = await ingresosRes.json();
-        setIngresos(ingresosData);
-      }
-
-      if (egresosRes.ok) {
-        const egresosData = await egresosRes.json();
-        setEgresos(egresosData);
-      }
-
-      if (balanceRes.ok) {
-        const balanceData = await balanceRes.json();
-        setBalance(balanceData);
-      }
+      setIngresos(ingresosRes.data);
+      setEgresos(egresosRes.data);
+      setBalance(balanceRes.data);
     } catch (error) {
       toast.error('Error al cargar datos financieros');
       console.error(error);
@@ -153,20 +143,17 @@ export default function FinanzasPage() {
   // Create/Update Ingreso
   const handleIngresoSubmit = async () => {
     try {
-      const url = editingIngreso ? `/api/finanzas/ingresos/${editingIngreso.id}` : '/api/finanzas/ingresos';
-      const method = editingIngreso ? 'PUT' : 'POST';
+      const data = {
+        ...ingresoForm,
+        monto: parseFloat(ingresoForm.monto),
+        year: selectedYear
+      };
 
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...ingresoForm,
-          monto: parseFloat(ingresoForm.monto),
-          year: selectedYear
-        }),
-      });
-
-      if (!response.ok) throw new Error('Error al guardar ingreso');
+      if (editingIngreso) {
+        await api.put(`/finanzas/ingresos/${editingIngreso.id}`, data);
+      } else {
+        await api.post('/finanzas/ingresos', data);
+      }
 
       toast.success(editingIngreso ? 'Ingreso actualizado' : 'Ingreso creado');
       setIsIngresoDialogOpen(false);
@@ -189,20 +176,17 @@ export default function FinanzasPage() {
   // Create/Update Egreso
   const handleEgresoSubmit = async () => {
     try {
-      const url = editingEgreso ? `/api/finanzas/egresos/${editingEgreso.id}` : '/api/finanzas/egresos';
-      const method = editingEgreso ? 'PUT' : 'POST';
+      const data = {
+        ...egresoForm,
+        monto: parseFloat(egresoForm.monto),
+        year: selectedYear
+      };
 
-      const response = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...egresoForm,
-          monto: parseFloat(egresoForm.monto),
-          year: selectedYear
-        }),
-      });
-
-      if (!response.ok) throw new Error('Error al guardar egreso');
+      if (editingEgreso) {
+        await api.put(`/finanzas/egresos/${editingEgreso.id}`, data);
+      } else {
+        await api.post('/finanzas/egresos', data);
+      }
 
       toast.success(editingEgreso ? 'Egreso actualizado' : 'Egreso creado');
       setIsEgresoDialogOpen(false);
@@ -225,8 +209,7 @@ export default function FinanzasPage() {
   // Delete functions
   const deleteIngreso = async (id: string) => {
     try {
-      const response = await fetch(`/api/finanzas/ingresos/${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Error al eliminar ingreso');
+      await api.delete(`/finanzas/ingresos/${id}`);
       toast.success('Ingreso eliminado');
       loadData();
     } catch (error) {
@@ -237,8 +220,7 @@ export default function FinanzasPage() {
 
   const deleteEgreso = async (id: string) => {
     try {
-      const response = await fetch(`/api/finanzas/egresos/${id}`, { method: 'DELETE' });
-      if (!response.ok) throw new Error('Error al eliminar egreso');
+      await api.delete(`/finanzas/egresos/${id}`);
       toast.success('Egreso eliminado');
       loadData();
     } catch (error) {
