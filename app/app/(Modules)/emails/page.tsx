@@ -88,7 +88,7 @@ export default function EmailsPage() {
   const loadInviteesEmails = async () => {
     try {
       setIsLoading(true);
-      const response = await api.get('/invitees/emails');
+      const response = await api.get('/invitees/emails/list');
       
       setInviteesEmails(response.data.emails || []);
       toast.success(`${response.data.emails?.length || 0} emails de invitados cargados`);
@@ -104,7 +104,7 @@ export default function EmailsPage() {
   const loadPaymentsEmails = async () => {
     try {
       setIsLoading(true);
-      const response = await api.get('/payments/emails');
+      const response = await api.get('/payments/emails/list');
       
       setPaymentsEmails(response.data.emails || []);
       toast.success(`${response.data.emails?.length || 0} emails de pagos cargados`);
