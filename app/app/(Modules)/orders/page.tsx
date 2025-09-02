@@ -6,6 +6,7 @@ import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { useOrdersInReview } from "@/hooks/Orders/useOrdersInReview"
 import useApproveOrder from "@/hooks/Orders/useApproveOrder"
+import useRejectOrder from "@/hooks/Orders/useRejectOrder"
 import { useRouter } from "next/navigation"
 import React, { useMemo, useState, useEffect } from "react"
 
@@ -58,6 +59,15 @@ export default function OrdersModule() {
     isSuccess: approveSuccess,
     reset: resetApproveState 
   } = useApproveOrder();
+
+  // Reject order hook
+  const { 
+    rejectOrder, 
+    isLoading: isRejecting, 
+    error: rejectError, 
+    isSuccess: rejectSuccess,
+    reset: resetRejectState 
+  } = useRejectOrder();
   
   // Use the orders hook
   const { orders, loading, error, refetch } = useOrdersInReview();
@@ -440,25 +450,49 @@ export default function OrdersModule() {
       {/* Reject Confirmation Modal */}
       <Modal 
         opened={openedDelete} 
-        onClose={closeDelete} 
+        onClose={() => {
+          closeDelete();
+          resetRejectState();
+        }}
         title="Confirmar Rechazo"
       >
-        <Text>¿Estás seguro de que deseas rechazar esta orden?</Text>
+        <Stack gap="md">
+          <Text>¿Estás seguro de que deseas rechazar esta orden? Esta acción eliminará permanentemente la orden.</Text>
+          
+          {rejectError && (
+            <Text c="red" size="sm">
+              {rejectError}
+            </Text>
+          )}
+        </Stack>
+        
         <Group justify="flex-end" mt="md">
           <Button variant="default" onClick={closeDelete}>
             Cancelar
           </Button>
           <Button 
             color="red"
-            onClick={() => {
-              // TODO: Implement reject logic
-              notifications.show({
-                title: 'Orden rechazada',
-                message: 'La orden ha sido rechazada',
-                color: 'red'
-              });
-              closeDelete();
-              refetch();
+            loading={isRejecting}
+            onClick={async () => {
+              if (!selectedOrder) return;
+              
+              const { success, error } = await rejectOrder(selectedOrder.id);
+              
+              if (success) {
+                notifications.show({
+                  title: '¡Orden eliminada!',
+                  message: 'La orden ha sido rechazada y eliminada correctamente',
+                  color: 'red',
+                });
+                closeDelete();
+                refetch();
+              } else {
+                notifications.show({
+                  title: 'Error',
+                  message: error || 'Ocurrió un error al rechazar la orden',
+                  color: 'red',
+                });
+              }
             }}
           >
             Confirmar

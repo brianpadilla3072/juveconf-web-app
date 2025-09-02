@@ -69,9 +69,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       AuthService.setToken(access_token);
       await checkAuth(); // Verificar la autenticación después del login
       
+      // Solo redirigir si todo salió bien (no hay errores hasta aquí)
       router.push('/app');
     } catch (error: any) {
       console.error('Error en el inicio de sesión:', error);
+      // Limpiar cualquier token que pueda haberse guardado en caso de error
+      AuthService.removeToken();
+      setUser(null);
       throw error;
     }
   };

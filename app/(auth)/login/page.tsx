@@ -31,12 +31,39 @@ function LoginPage() {
     try {
       await login(loginData.email, loginData.password)
       toast.success('Inicio de sesión exitoso')
-      router.push('/app')
+      // No necesitamos router.push aquí porque AuthContext ya lo hace
     } catch (error: any) {
       console.error('Error en el inicio de sesión:', error)
-      const errorMessage = error.response?.data?.message || 
-                         error.message || 
-                         'Error al iniciar sesión'
+      
+      let errorMessage = 'Error al iniciar sesión';
+      
+      if (error.response) {
+        // Error del servidor con respuesta
+        switch (error.response.status) {
+          case 400:
+            errorMessage = 'Datos de inicio de sesión inválidos';
+            break;
+          case 401:
+            errorMessage = 'Email o contraseña incorrectos';
+            break;
+          case 403:
+            errorMessage = 'Acceso denegado';
+            break;
+          case 500:
+            errorMessage = 'Error del servidor. Inténtalo más tarde';
+            break;
+          default:
+            errorMessage = error.response.data?.message || 
+                         `Error ${error.response.status}: ${error.response.statusText}`;
+        }
+      } else if (error.request) {
+        // Error de red
+        errorMessage = 'No se pudo conectar al servidor. Verifica tu conexión a internet';
+      } else if (error.message) {
+        // Error específico
+        errorMessage = error.message;
+      }
+      
       toast.error(errorMessage)
     } finally {
       setIsLoading(false)

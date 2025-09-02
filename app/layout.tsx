@@ -2,6 +2,7 @@ import './globals.css'
 import '@mantine/core/styles.css';
 import { MantineProvider } from '@mantine/core';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { Toaster } from 'sonner';
 
 export const metadata = {
   title: 'Consagrados a Jesús',
@@ -82,6 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MantineProvider>
           <AuthProvider>
             {children}
+            <Toaster richColors position="top-right" />
           </AuthProvider>
         </MantineProvider>
       </body>
