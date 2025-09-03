@@ -16,7 +16,7 @@ import { Attendee } from "@/entities/Attendee";
 export default function PurchaseAvailable({
   combos, attendees, selectedPlan, attendeeCount,
   handlePlanChange, handleSubmit, setEmail, email,
-  cuil, setCuil, paymentLoading, updateAttendee,
+  phone, setPhone, cuil, setCuil, paymentLoading, updateAttendee,
   errorMessage
 }: any) {
 
@@ -46,6 +46,13 @@ export default function PurchaseAvailable({
                 <Input
                   id="email" type="email" placeholder="ejemplo@dominio.com"
                   value={email} onChange={(e) => setEmail(e.target.value)} required
+                />
+              </div>
+              <div className="grid gap-3">
+                <Label htmlFor="phone">Número de Teléfono</Label>
+                <Input
+                  id="phone" type="number" placeholder="291 5035 6245"
+                  value={phone} onChange={(e) => setPhone(e.target.value)} required
                 />
               </div>
               <div className="grid gap-3">

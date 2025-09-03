@@ -50,6 +50,7 @@ type Order = {
   updatedAt: string;
   deletedAt: string | null;
   email: string;
+  phone?: string;
   cuil: string;
   user: any | null;
   event: Event;

@@ -14,6 +14,7 @@ import React, { useMemo, useState, useEffect } from "react"
 type Order = {
   id: string;
   email: string;
+  phone: string;
   cuil: string;
   total: number;
   status: string;
@@ -82,6 +83,7 @@ export default function OrdersModule() {
       const searchFields = [
         order.id,
         order.email,
+        order.phone || '',
         order.cuil,
         order.event.topic,
         order.combos.map(combo => combo.name).join(' '),
@@ -177,6 +179,7 @@ export default function OrdersModule() {
                 <Table.Tr>
                   <Table.Th>Acciones</Table.Th>
                   <Table.Th>Email</Table.Th>
+                  <Table.Th>Teléfono</Table.Th>
                   <Table.Th>CUIL</Table.Th>
                   <Table.Th>Evento</Table.Th>
                   <Table.Th>Total</Table.Th>
@@ -202,6 +205,7 @@ export default function OrdersModule() {
                       </Group>
                     </Table.Td>
                     <Table.Td>{order.email}</Table.Td>
+                    <Table.Td>{order.phone || 'N/A'}</Table.Td>
                     <Table.Td>{order.cuil}</Table.Td>
                     <Table.Td>{order.event.topic}</Table.Td>
                     <Table.Td>${order.total}</Table.Td>
@@ -248,6 +252,13 @@ export default function OrdersModule() {
                     <Box style={{ flex: 1, minWidth: 0 }}>
                       <Text size="xs" c="dimmed">Email</Text>
                       <Text size="sm" lineClamp={1} style={{ wordBreak: 'break-word' }}>{order.email}</Text>
+                    </Box>
+                  </Group>
+                  
+                  <Group gap="xs" align="flex-start">
+                    <Box style={{ flex: 1, minWidth: 0 }}>
+                      <Text size="xs" c="dimmed">Teléfono</Text>
+                      <Text size="sm">{order.phone || 'N/A'}</Text>
                     </Box>
                   </Group>
                   
@@ -321,6 +332,10 @@ export default function OrdersModule() {
             <div>
               <Text fw={500}>Email:</Text>
               <Text>{selectedOrder.email}</Text>
+            </div>
+            <div>
+              <Text fw={500}>Teléfono:</Text>
+              <Text>{selectedOrder.phone || 'N/A'}</Text>
             </div>
             <div>
               <Text fw={500}>CUIL:</Text>
