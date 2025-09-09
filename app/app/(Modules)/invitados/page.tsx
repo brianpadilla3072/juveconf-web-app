@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Search, Plus, Edit, Trash2, Users, UserCheck, Calendar, RotateCcw } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Users, UserCheck, Calendar, RotateCcw, QrCode } from 'lucide-react';
 import { useQueryInvitees } from '@/hooks/invitees/useQueryInvitees';
 import { 
   useCreateInvitee, 
@@ -39,6 +39,9 @@ import {
   useMarkAttendance 
 } from '@/hooks/invitees/useMutateInvitee';
 import { useQueryPayments } from '@/hooks/payments/useQueryPayments';
+import QRAttendanceScanner from '@/components/attendance/QRAttendanceScanner';
+import AttendanceModal from '@/components/attendance/AttendanceModal';
+import { useQRAttendance } from '@/hooks/attendance/useQRAttendance';
 
 export default function InviteesPage() {
   const [search, setSearch] = useState('');
@@ -54,6 +57,19 @@ export default function InviteesPage() {
     orderId: '',
     paymentId: ''
   });
+
+  // Estados para QR Scanner y modal de asistencia
+  const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
+  const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
+  
+  // Hook para manejo de asistencia por QR
+  const { 
+    fetchInviteeByQR, 
+    confirmAttendance, 
+    clearData, 
+    inviteeData, 
+    isLoading: isQRLoading 
+  } = useQRAttendance();
 
   // Queries
   const { invitees, isLoading, error, refetch } = useQueryInvitees({ year: selectedYear });
@@ -135,6 +151,37 @@ export default function InviteesPage() {
     }
   };
 
+  // Manejar escaneo QR exitoso
+  const handleQRScanned = async (qrData: { inviteId: string; paymentId: string }) => {
+    setIsQRScannerOpen(false);
+    
+    const invitee = await fetchInviteeByQR(qrData);
+    if (invitee) {
+      setIsAttendanceModalOpen(true);
+    }
+  };
+
+  // Confirmar asistencia desde modal QR
+  const handleConfirmQRAttendance = async (data: {
+    inviteeId: string;
+    day: 'day1' | 'day2';
+    email?: string;
+    phone?: string;
+  }) => {
+    const success = await confirmAttendance(data);
+    if (success) {
+      setIsAttendanceModalOpen(false);
+      clearData();
+      refetch(); // Refrescar la lista
+    }
+  };
+
+  // Cerrar modal de asistencia
+  const handleCloseAttendanceModal = () => {
+    setIsAttendanceModalOpen(false);
+    clearData();
+  };
+
   if (error) {
     return <div className="p-4 text-red-600">Error al cargar invitados</div>;
   }
@@ -149,13 +196,22 @@ export default function InviteesPage() {
           </p>
         </div>
         
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-orange-600 hover:bg-orange-700">
-              <Plus className="mr-2 h-4 w-4" />
-              Nuevo Invitado
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setIsQRScannerOpen(true)}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <QrCode className="mr-2 h-4 w-4" />
+            Tomar Asistencia
+          </Button>
+
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-orange-600 hover:bg-orange-700">
+                <Plus className="mr-2 h-4 w-4" />
+                Nuevo Invitado
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Crear Nuevo Invitado</DialogTitle>
@@ -232,6 +288,7 @@ export default function InviteesPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -565,6 +622,22 @@ export default function InviteesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* QR Scanner Component */}
+      <QRAttendanceScanner
+        isOpen={isQRScannerOpen}
+        onClose={() => setIsQRScannerOpen(false)}
+        onQRScanned={handleQRScanned}
+      />
+
+      {/* Attendance Confirmation Modal */}
+      <AttendanceModal
+        isOpen={isAttendanceModalOpen}
+        onClose={handleCloseAttendanceModal}
+        invitee={inviteeData}
+        onConfirm={handleConfirmQRAttendance}
+        isLoading={isQRLoading}
+      />
     </div>
   );
 }
