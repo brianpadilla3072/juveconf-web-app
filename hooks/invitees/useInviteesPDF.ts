@@ -33,9 +33,9 @@ export function useInviteesPDF() {
     try {
       setIsGenerating(true);
 
-      // Crear nuevo documento PDF en orientación horizontal
+      // Crear nuevo documento PDF en orientación vertical
       const doc = new jsPDF({
-        orientation: 'landscape',
+        orientation: 'portrait',
         unit: 'mm',
         format: 'a4'
       });
@@ -70,8 +70,8 @@ export function useInviteesPDF() {
         invitee.cuil,
         invitee.email || '', // Celda vacía para escribir manualmente
         invitee.phone || '', // Celda vacía para escribir manualmente
-        invitee.attendedDay1 ? '☑' : '☐', // Símbolo visual de asistencia
-        invitee.attendedDay2 ? '☑' : '☐', // Símbolo visual de asistencia
+        invitee.attendedDay1 ? 'SI' : 'NO', // Texto simple para asistencia
+        invitee.attendedDay2 ? 'SI' : 'NO', // Texto simple para asistencia
         '' // Celda vacía para observaciones
       ]);
 
@@ -96,13 +96,13 @@ export function useInviteesPDF() {
           halign: 'center'
         },
         columnStyles: {
-          0: { cellWidth: 45 }, // Nombre - más ancho
-          1: { cellWidth: 30 }, // CUIL
-          2: { cellWidth: 40 }, // Email - espacio para escribir
-          3: { cellWidth: 35 }, // Teléfono - espacio para escribir  
-          4: { cellWidth: 15, halign: 'center' }, // Día 1 - centrado
-          5: { cellWidth: 15, halign: 'center' }, // Día 2 - centrado
-          6: { cellWidth: 50 } // Observaciones - más ancho para escribir
+          0: { cellWidth: 35 }, // Nombre
+          1: { cellWidth: 25 }, // CUIL
+          2: { cellWidth: 30 }, // Email - espacio para escribir
+          3: { cellWidth: 25 }, // Teléfono - espacio para escribir  
+          4: { cellWidth: 12, halign: 'center' }, // Día 1 - centrado
+          5: { cellWidth: 12, halign: 'center' }, // Día 2 - centrado
+          6: { cellWidth: 31 } // Observaciones - para escribir
         },
         alternateRowStyles: {
           fillColor: [245, 245, 245] // Gris claro alternado
@@ -117,7 +117,7 @@ export function useInviteesPDF() {
             const cellX = data.cell.x;
             const cellWidth = data.cell.width;
             
-            // Dibujar línea sutil en celdas vacías
+            // Dibujar línea sutil en celdas vacías para escritura manual
             doc.setDrawColor(200, 200, 200);
             doc.setLineWidth(0.1);
             doc.line(cellX + 2, cellY + cellHeight - 2, cellX + cellWidth - 2, cellY + cellHeight - 2);
