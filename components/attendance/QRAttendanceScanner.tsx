@@ -61,17 +61,23 @@ export default function QRAttendanceScanner({ onQRScanned, isOpen, onClose }: QR
 
   const handleQRSuccess = (decodedText: string) => {
     try {
-      // Parsear el JSON del QR
-      const qrData = JSON.parse(decodedText);
+      // Limpiar el texto del QR
+      const cleanText = decodedText.trim();
       
-      // Validar estructura esperada
-      if (!qrData.inviteId || !qrData.paymentId) {
-        throw new Error('Formato de QR inválido');
+      // Usar regex para extraer inviteId y paymentId del formato de objeto JavaScript
+      const inviteIdMatch = cleanText.match(/inviteId:\s*([a-f0-9-]{36})/i);
+      const paymentIdMatch = cleanText.match(/paymentId:\s*([a-f0-9-]{36})/i);
+      
+      if (!inviteIdMatch || !paymentIdMatch) {
+        throw new Error('No se encontraron IDs válidos en el QR');
       }
+      
+      const inviteId = inviteIdMatch[1];
+      const paymentId = paymentIdMatch[1];
 
       // Validar que sean UUIDs válidos (formato básico)
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(qrData.inviteId) || !uuidRegex.test(qrData.paymentId)) {
+      if (!uuidRegex.test(inviteId) || !uuidRegex.test(paymentId)) {
         throw new Error('IDs inválidos en el QR');
       }
 
@@ -83,8 +89,8 @@ export default function QRAttendanceScanner({ onQRScanned, isOpen, onClose }: QR
       
       setIsScanning(false);
       onQRScanned({
-        inviteId: qrData.inviteId,
-        paymentId: qrData.paymentId
+        inviteId: inviteId,
+        paymentId: paymentId
       });
       
       toast.success('QR escaneado correctamente');
