@@ -70,8 +70,8 @@ export function useInviteesPDF() {
         invitee.cuil,
         invitee.email || '', // Celda vacía para escribir manualmente
         invitee.phone || '', // Celda vacía para escribir manualmente
-        invitee.attendedDay1 ? 'SI' : 'NO', // Texto simple para asistencia
-        invitee.attendedDay2 ? 'SI' : 'NO', // Texto simple para asistencia
+        '', // Celda vacía para marcar asistencia día 1 manualmente
+        '', // Celda vacía para marcar asistencia día 2 manualmente
         '' // Celda vacía para observaciones
       ]);
 
@@ -96,21 +96,21 @@ export function useInviteesPDF() {
           halign: 'center'
         },
         columnStyles: {
-          0: { cellWidth: 35 }, // Nombre
-          1: { cellWidth: 25 }, // CUIL
-          2: { cellWidth: 30 }, // Email - espacio para escribir
-          3: { cellWidth: 25 }, // Teléfono - espacio para escribir  
-          4: { cellWidth: 12, halign: 'center' }, // Día 1 - centrado
-          5: { cellWidth: 12, halign: 'center' }, // Día 2 - centrado
-          6: { cellWidth: 31 } // Observaciones - para escribir
+          0: { cellWidth: 38 }, // Nombre - más espacio
+          1: { cellWidth: 27 }, // CUIL - más espacio
+          2: { cellWidth: 32 }, // Email - más espacio para escribir
+          3: { cellWidth: 27 }, // Teléfono - más espacio para escribir  
+          4: { cellWidth: 15, halign: 'center' }, // Día 1 - más espacio para marcar
+          5: { cellWidth: 15, halign: 'center' }, // Día 2 - más espacio para marcar
+          6: { cellWidth: 35 } // Observaciones - más espacio para escribir
         },
         alternateRowStyles: {
           fillColor: [245, 245, 245] // Gris claro alternado
         },
-        margin: { top: 20, left: 20, right: 20 },
+        margin: { top: 20, left: 8, right: 8 },
         didDrawCell: function(data) {
           // Agregar líneas adicionales en celdas vacías para facilitar escritura manual
-          if ((data.column.index === 2 || data.column.index === 3 || data.column.index === 6) && 
+          if ((data.column.index === 2 || data.column.index === 3 || data.column.index === 4 || data.column.index === 5 || data.column.index === 6) && 
               data.cell.raw === '') {
             const cellHeight = data.cell.height;
             const cellY = data.cell.y;
