@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Search, Plus, Edit, Trash2, Users, UserCheck, Calendar, RotateCcw, QrCode } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Users, UserCheck, Calendar, RotateCcw, QrCode, Download } from 'lucide-react';
 import { useQueryInvitees } from '@/hooks/invitees/useQueryInvitees';
 import { 
   useCreateInvitee, 
@@ -42,6 +42,8 @@ import { useQueryPayments } from '@/hooks/payments/useQueryPayments';
 import QRAttendanceScanner from '@/components/attendance/QRAttendanceScanner';
 import AttendanceModal from '@/components/attendance/AttendanceModal';
 import { useQRAttendance } from '@/hooks/attendance/useQRAttendance';
+import { useInviteesPDF } from '@/hooks/invitees/useInviteesPDF';
+import { toast } from 'sonner';
 
 export default function InviteesPage() {
   const [search, setSearch] = useState('');
@@ -70,6 +72,9 @@ export default function InviteesPage() {
     inviteeData, 
     isLoading: isQRLoading 
   } = useQRAttendance();
+
+  // Hook para generar PDF
+  const { generateInviteesPDF, isGenerating: isGeneratingPDF } = useInviteesPDF();
 
   // Queries
   const { invitees, isLoading, error, refetch } = useQueryInvitees({ year: selectedYear });
@@ -182,6 +187,20 @@ export default function InviteesPage() {
     clearData();
   };
 
+  // Manejar descarga de PDF
+  const handleDownloadPDF = async () => {
+    if (!filteredInvitees || filteredInvitees.length === 0) {
+      toast.error('No hay invitados para exportar');
+      return;
+    }
+
+    await generateInviteesPDF(
+      filteredInvitees,
+      selectedYear,
+      search || undefined
+    );
+  };
+
   if (error) {
     return <div className="p-4 text-red-600">Error al cargar invitados</div>;
   }
@@ -197,6 +216,15 @@ export default function InviteesPage() {
         </div>
         
         <div className="flex gap-2">
+          <Button
+            onClick={handleDownloadPDF}
+            disabled={isGeneratingPDF || !filteredInvitees || filteredInvitees.length === 0}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Download className="mr-2 h-4 w-4" />
+            {isGeneratingPDF ? 'Generando...' : 'Descargar PDF'}
+          </Button>
+
           <Button
             onClick={() => setIsQRScannerOpen(true)}
             className="bg-green-600 hover:bg-green-700"
