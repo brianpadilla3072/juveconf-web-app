@@ -13,7 +13,24 @@ export function useQueryCombos() {
     try {
       setIsLoading(true);
       const res = await api.get("/combos");
-      setCombos(res.data);
+
+      // Enrich combos with current price if not already included
+      const enrichedCombos = await Promise.all(
+        res.data.map(async (combo: Combo) => {
+          if (!combo.currentPrice) {
+            try {
+              const priceRes = await api.get(`/combos/${combo.id}/current-price`);
+              return { ...combo, currentPrice: priceRes.data };
+            } catch (err) {
+              console.warn(`No se pudo obtener precio actual para combo ${combo.id}`);
+              return combo;
+            }
+          }
+          return combo;
+        })
+      );
+
+      setCombos(enrichedCombos);
       setError(null);
     } catch (err: any) {
       setError(err);

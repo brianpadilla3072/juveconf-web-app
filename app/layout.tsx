@@ -5,14 +5,14 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from 'sonner';
 
 export const metadata = {
-  title: 'Consagrados a Jesús',
-  description: 'Aplicación para la gestión de eventos religiosos, finanzas y administración de la organización Consagrados a Jesús',
-  applicationName: 'Consagrados a Jesús',
-  authors: [{ name: 'Consagrados a Jesús' }],
+  title: 'JuveConf',
+  description: 'Aplicación para la gestión de eventos juveniles, finanzas y administración de la organización Juventud en Conferencia',
+  applicationName: 'JuveConf',
+  authors: [{ name: 'Juventud en Conferencia' }],
   generator: 'Next.js',
-  keywords: ['consagrados', 'jesús', 'eventos', 'finanzas', 'religioso', 'administración'],
-  creator: 'Consagrados a Jesús',
-  publisher: 'Consagrados a Jesús',
+  keywords: ['juveconf', 'juventud', 'conferencia', 'eventos', 'finanzas', 'religioso', 'administración'],
+  creator: 'Juventud en Conferencia',
+  publisher: 'Juventud en Conferencia',
   formatDetection: {
     email: false,
     address: false,
@@ -30,7 +30,7 @@ export const metadata = {
     ],
   },
   manifest: '/manifest.json',
-  themeColor: '#ea580c',
+  themeColor: '#8b3fff',
   colorScheme: 'light',
   viewport: {
     width: 'device-width',
@@ -41,26 +41,26 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Consagrados a Jesús',
+    title: 'JuveConf',
   },
   openGraph: {
     type: 'website',
-    siteName: 'Consagrados a Jesús',
-    title: 'Consagrados a Jesús',
-    description: 'Aplicación para la gestión de eventos religiosos, finanzas y administración de la organización Consagrados a Jesús',
+    siteName: 'JuveConf',
+    title: 'JuveConf',
+    description: 'Aplicación para la gestión de eventos juveniles, finanzas y administración de la organización Juventud en Conferencia',
     images: [
       {
         url: '/icons/icon-512x512.png',
         width: 512,
         height: 512,
-        alt: 'Consagrados a Jesús',
+        alt: 'JuveConf',
       },
     ],
   },
   twitter: {
     card: 'summary',
-    title: 'Consagrados a Jesús',
-    description: 'Aplicación para la gestión de eventos religiosos, finanzas y administración',
+    title: 'JuveConf',
+    description: 'Aplicación para la gestión de eventos juveniles, finanzas y administración',
     images: ['/icons/icon-512x512.png'],
   },
 };
@@ -71,12 +71,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" type="image/png" href="/favicon.png" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-        <meta name="theme-color" content="#ea580c" />
+        <meta name="theme-color" content="#8b3fff" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Consagrados a Jesús" />
-        <meta name="msapplication-TileColor" content="#ea580c" />
+        <meta name="apple-mobile-web-app-title" content="JuveConf" />
+        <meta name="msapplication-TileColor" content="#8b3fff" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
       <body>

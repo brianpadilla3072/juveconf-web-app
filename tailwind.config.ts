@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { COLORS, BRANDING_CONFIG } from "./lib/constants";
 
 const config: Config = {
   darkMode: ["class"],
@@ -12,30 +13,63 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Colores personalizados basados en la paleta
-        orange: {
-          50: '#FFF5F0',
-          100: '#FFE5D6',
-          200: '#FFC7A8',
-          300: '#FFA06B',
-          400: '#FF7A33',
-          500: '#FF5E00', // Naranja principal
-          600: '#E65500',
-          700: '#CC4C00',
-          800: '#993900',
-          900: '#662600',
+        // Colores de marca desde constants
+        brand: {
+          primary: BRANDING_CONFIG.brandColors.primary,
+          secondary: BRANDING_CONFIG.brandColors.secondary,
+          accent: BRANDING_CONFIG.brandColors.accent,
+          green: BRANDING_CONFIG.brandColors.accentGreen,
         },
+        // Violeta personalizado JuveConf
+        violet: {
+          50: '#F5EBFF',
+          100: '#EBD7FF',
+          200: '#D7AFFF',
+          300: '#C387FF',
+          400: '#AF5FFF',
+          500: '#8B3FFF', // Violeta principal
+          600: '#7032CC',
+          700: '#542699',
+          800: '#381966',
+          900: '#1C0D33',
+        },
+        // Verde lima acento
+        lime: {
+          50: '#FAFFF0',
+          100: '#F5FFE0',
+          200: '#EBFFC2',
+          300: '#E0FFA3',
+          400: '#D6FF85',
+          500: '#CCFF00', // Verde lima principal
+          600: '#A3CC00',
+          700: '#7A9900',
+          800: '#526600',
+          900: '#293300',
+        },
+        // Colores personalizados basados en la paleta JuveConf
         blue: {
-          50: '#E6E8FF',
-          100: '#C2C7FF',
-          200: '#7A84FF',
-          300: '#4D5CFF',
-          400: '#1A33FF',
-          500: '#000F47', // Azul marino oscuro (principal)
-          600: '#000D3D',
-          700: '#000B33',
-          800: '#000829',
-          900: '#00061F',
+          50: '#E6F2FF',
+          100: '#CCE5FF',
+          200: '#99CCFF',
+          300: '#66B2FF',
+          400: '#3399FF',
+          500: '#8b3fff', // Azul principal
+          600: '#0052A3',
+          700: '#003D7A',
+          800: '#002952',
+          900: '#001429',
+        },
+        cyan: {
+          50: '#E6F7FB',
+          100: '#CCF0F7',
+          200: '#99E0EF',
+          300: '#66D1E7',
+          400: '#33C1DF',
+          500: '#00B4D8', // Cyan/Acento
+          600: '#0090AD',
+          700: '#006C82',
+          800: '#004856',
+          900: '#00242B',
         },
         // Colores del tema
         background: "hsl(var(--background) / <alpha-value>)",

@@ -1,77 +1,78 @@
 @layer base {
   :root {
-    /* Colores base de la paleta */
-    --color-orange-500: 17 100% 50%;    /* #FF5E00 - Naranja principal */
-    --color-orange-400: 27 100% 60%;   /* #FF7A33 - Naranja claro */
-    --color-orange-600: 17 100% 40%;   /* #CC4C00 - Naranja oscuro */
-    --color-blue-900: 235 100% 15%;    /* #000F47 - Azul marino oscuro */
-    --color-blue-800: 235 100% 20%;    /* #001A66 - Azul marino */
-    --color-white: 0 0% 100%;          /* #FFFFFF - Blanco */
-    --color-gray-100: 0 0% 98%;        /* #FAFAFA - Gris muy claro */
-    --color-gray-200: 0 0% 96%;        /* #F5F5F5 - Gris claro */
-    --color-gray-300: 0 0% 90%;        /* #E6E6E6 - Gris medio claro */
-    --color-gray-700: 0 0% 30%;        /* #4D4D4D - Gris oscuro */
-    --color-black: 0 0% 0%;            /* #000000 - Negro */
+    /* Colores base de la paleta JuveConf */
+    --color-primary-500: 210 100% 40%;    /* #8b3fff - Azul principal */
+    --color-primary-400: 210 100% 60%;    /* #3399FF - Azul claro */
+    --color-primary-600: 210 100% 32%;    /* #0052A3 - Azul oscuro */
+    --color-primary-700: 210 100% 24%;    /* #003D7A - Azul muy oscuro */
+    --color-secondary-500: 191 100% 42%;  /* #00B4D8 - Cyan/Acento */
+    --color-secondary-600: 191 100% 34%;  /* #0090AD - Cyan oscuro */
+    --color-white: 0 0% 100%;             /* #FFFFFF - Blanco */
+    --color-gray-100: 0 0% 98%;           /* #FAFAFA - Gris muy claro */
+    --color-gray-200: 0 0% 96%;           /* #F5F5F5 - Gris claro */
+    --color-gray-300: 0 0% 90%;           /* #E6E6E6 - Gris medio claro */
+    --color-gray-700: 0 0% 30%;           /* #4D4D4D - Gris oscuro */
+    --color-black: 0 0% 0%;               /* #000000 - Negro */
 
     /* Sistema de colores */
     --background: var(--color-white);
-    --foreground: var(--color-blue-900);
+    --foreground: var(--color-primary-700);
     --card: var(--color-white);
-    --card-foreground: var(--color-blue-900);
+    --card-foreground: var(--color-primary-700);
     --popover: var(--color-white);
-    --popover-foreground: var(--color-blue-900);
-    --primary: var(--color-orange-500);
+    --popover-foreground: var(--color-primary-700);
+    --primary: var(--color-primary-500);
     --primary-foreground: var(--color-white);
-    --secondary: var(--color-blue-900);
+    --secondary: var(--color-secondary-500);
     --secondary-foreground: var(--color-white);
     --muted: var(--color-gray-200);
     --muted-foreground: var(--color-gray-700);
-    --accent: var(--color-orange-400);
+    --accent: var(--color-secondary-500);
     --accent-foreground: var(--color-white);
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: var(--color-white);
     --border: var(--color-gray-300);
     --input: var(--color-gray-300);
-    --ring: var(--color-orange-500);
+    --ring: var(--color-primary-500);
     --radius: 0.5rem;
 
     /* Colores para gráficos */
-    --chart-1: var(--color-orange-500);
-    --chart-2: var(--color-blue-900);
-    --chart-3: var(--color-orange-600);
-    --chart-4: var(--color-blue-800);
+    --chart-1: var(--color-primary-500);
+    --chart-2: var(--color-secondary-500);
+    --chart-3: var(--color-primary-600);
+    --chart-4: var(--color-primary-400);
     --chart-5: var(--color-gray-700);
 
     /* Estilos para la barra lateral */
-    --sidebar-background: var(--color-blue-900);
+    --sidebar-background: var(--color-primary-700);
     --sidebar-foreground: var(--color-white);
-    --sidebar-primary: var(--color-orange-500);
+    --sidebar-primary: var(--color-primary-500);
     --sidebar-primary-foreground: var(--color-white);
-    --sidebar-accent: var(--color-blue-800);
+    --sidebar-accent: var(--color-primary-600);
     --sidebar-accent-foreground: var(--color-white);
-    --sidebar-border: var(--color-blue-800);
-    --sidebar-ring: var(--color-orange-500);
+    --sidebar-border: var(--color-primary-600);
+    --sidebar-ring: var(--color-secondary-500);
   }
 
   .dark {
-    --background: var(--color-blue-900);
+    --background: var(--color-primary-700);
     --foreground: var(--color-white);
-    --card: var(--color-blue-800);
+    --card: var(--color-primary-600);
     --card-foreground: var(--color-white);
-    --popover: var(--color-blue-800);
+    --popover: var(--color-primary-600);
     --popover-foreground: var(--color-white);
-    --primary: var(--color-orange-500);
+    --primary: var(--color-primary-500);
     --primary-foreground: var(--color-white);
-    --secondary: var(--color-orange-400);
-    --secondary-foreground: var(--color-blue-900);
-    --muted: var(--color-blue-800);
+    --secondary: var(--color-secondary-500);
+    --secondary-foreground: var(--color-white);
+    --muted: var(--color-primary-600);
     --muted-foreground: var(--color-gray-200);
-    --accent: var(--color-orange-600);
+    --accent: var(--color-secondary-600);
     --accent-foreground: var(--color-white);
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: var(--color-white);
-    --border: var(--color-blue-700);
-    --input: var(--color-blue-700);
-    --ring: var(--color-orange-400);
+    --border: var(--color-primary-600);
+    --input: var(--color-primary-600);
+    --ring: var(--color-secondary-500);
   }
 }

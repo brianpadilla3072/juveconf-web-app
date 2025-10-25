@@ -8,6 +8,12 @@ interface CreateEventData {
   topic: string;
   capacity: number;
   salesStartDate: string;
+  salesEndDate?: string;
+  eventStartDate?: string;
+  eventEndDate?: string;
+  location?: string;
+  description?: string;
+  isActive?: boolean;
 }
 
 interface UpdateEventData {
@@ -15,6 +21,12 @@ interface UpdateEventData {
   topic?: string;
   capacity?: number;
   salesStartDate?: string;
+  salesEndDate?: string;
+  eventStartDate?: string;
+  eventEndDate?: string;
+  location?: string;
+  description?: string;
+  isActive?: boolean;
 }
 
 export function useCreateEvent() {

@@ -23,7 +23,7 @@ interface CombosRankingData {
   summary: CombosRankingSummary;
 }
 
-export const useCombosRanking = (year?: number, limit: number = 10) => {
+export const useCombosRanking = (year?: number, limit: number = 10, eventId?: string) => {
   const [data, setData] = useState<CombosRankingData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,12 +32,13 @@ export const useCombosRanking = (year?: number, limit: number = 10) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params: any = { limit: limit.toString() };
       if (year) params.year = year.toString();
-      
+      if (eventId) params.eventId = eventId;
+
       const response = await api.get('/dashboard/combos-ranking', { params });
-      
+
       setData(response.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al cargar el ranking de combos');
@@ -49,7 +50,7 @@ export const useCombosRanking = (year?: number, limit: number = 10) => {
 
   useEffect(() => {
     fetchCombosRanking();
-  }, [year, limit]);
+  }, [year, limit, eventId]);
 
   return {
     data,

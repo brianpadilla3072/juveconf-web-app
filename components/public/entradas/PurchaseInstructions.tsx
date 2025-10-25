@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
-import heroBackground from '../../../public/images/hero/hero-background.jpg';
+import heroBackground from '../../../public/images/hero/hero-background.webp';
 
 export default function PurchaseInstructions() {
   const [scrollY, setScrollY] = useState(0);
@@ -62,7 +62,7 @@ export default function PurchaseInstructions() {
               <div className="tracking-tight m-auto w-full justify-center items-center text-2xl md:text-3xl font-bold text-center text-white">
                 Compra de Entradas
               </div>
-              <div className="h-1 w-20 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full my-3" />
+              <div className="h-1 w-20 bg-gradient-to-r from-violet-400 to-violet-500 rounded-full my-3" />
 
               <div className="text-sm text-center text-white/60">
                 Para adquirir tus entradas, sigue estos pasos:
@@ -76,7 +76,7 @@ export default function PurchaseInstructions() {
                 <p className="text-white/60 mb-4">
                   Envía un mensaje al WhatsApp:{" "}
                   <a
-                    href="https://wa.me/5492914326563" className="text-orange-500 hover:text-orange-400"
+                    href="https://wa.me/5492914326563" className="text-violet-500 hover:text-violet-400"
                   >
                     +54 9 291 432 6563                  </a>
                 </p>

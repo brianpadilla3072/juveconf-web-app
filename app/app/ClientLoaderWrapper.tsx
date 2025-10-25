@@ -1,7 +1,7 @@
 // components/app/ClientLoaderWrapper.tsx
 "use client";
 
-import heroBackground from '../../public/images/hero/hero-background.jpg';
+import heroBackground from '../../public/images/hero/hero-background.webp';
 import { useEffect, useRef, useState } from "react";
 import logo from '../../public/images/logo.webp';
 import Image from 'next/image';

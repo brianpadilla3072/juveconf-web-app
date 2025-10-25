@@ -1,5 +1,5 @@
 import AuthRedirect from '@/components/auth/AuthRedirect';
-import heroBackground from '@/public/images/hero/hero-background.jpg';
+import heroBackground from '@/public/images/hero/hero-background.webp';
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthRedirect>

@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import Image from 'next/image';
-import heroBackground from '../../public/images/hero/hero-background.jpg';
+import heroBackground from '../../public/images/hero/hero-background.webp';
 import logo from '../../public/images/logo.webp';
+import { getOrgName } from '@/lib/constants';
 
 export function HeroSection() {
   const [scrollY, setScrollY] = useState(0);
@@ -78,7 +79,7 @@ export function HeroSection() {
               textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
               letterSpacing: '-0.02em'
             }}>
-              <span style={{ display: 'block' }}>CONSAGRADOS A JESÚS</span>
+              <span style={{ display: 'block' }}>{getOrgName(true).toUpperCase()}</span>
             </h1>
 
             {/* Logo con efecto de latido */}

@@ -68,7 +68,7 @@ export function Lema2025() {
           Cultura de adoración e intimidad
         </h2>
 
-        <div className="h-1 w-20 bg-orange-500 mb-6 rounded-full"></div>
+        <div className="h-1 w-20 bg-violet-500 mb-6 rounded-full"></div>
 
         <p className="text-lg text-white/70 leading-relaxed mb-6 max-w-3xl">
           La intimidad es fundamental para todos aquellos que desean establecer el Reino de Dios en la tierra. Por eso, este año queremos profundizar en una intimidad personal con Cristo, pero también en comunidad. Anhelamos ser vidas que adoren no solo con música, sino con todo lo que somos.

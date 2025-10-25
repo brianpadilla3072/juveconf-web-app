@@ -88,7 +88,7 @@ export function TestimoniosBreves() {
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">Testimonios</h2>
-          <div className="h-1 w-16 bg-orange-500 mx-auto mb-6 rounded-full"></div>
+          <div className="h-1 w-16 bg-violet-500 mx-auto mb-6 rounded-full"></div>
           <p className="text-lg text-blue-900/80 max-w-2xl mx-auto">
             Lo que Dios ha hecho en las vidas de quienes han sido parte de Consagrados a Jesús
           </p>
@@ -112,7 +112,7 @@ export function TestimoniosBreves() {
                   <div className="bg-white rounded-xl shadow-md p-6 h-full border border-blue-100 hover:shadow-lg transition-shadow duration-300">
                     <div className="flex items-start">
                       <div className="mr-4">
-                        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-orange-200">
+                        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-violet-200">
                           <img 
                             src={testimonio.foto} 
                             alt={testimonio.nombre} 
@@ -121,7 +121,7 @@ export function TestimoniosBreves() {
                         </div>
                       </div>
                       <div>
-                        <div className="flex items-center text-orange-400 mb-1">
+                        <div className="flex items-center text-violet-400 mb-1">
                           {[...Array(5)].map((_, i) => (
                             <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 20 20">
                               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -168,7 +168,7 @@ export function TestimoniosBreves() {
               onClick={() => goToTestimonio(index)}
               className={`h-2 rounded-full transition-all duration-300 ${
                 index * itemsToShow === currentIndex 
-                  ? 'w-8 bg-orange-500' 
+                  ? 'w-8 bg-violet-500' 
                   : 'w-3 bg-blue-200 hover:bg-blue-300'
               }`}
               aria-label={`Ir al testimonio ${index + 1}`}
@@ -178,7 +178,7 @@ export function TestimoniosBreves() {
 
         <div className="mt-12 text-center">
           <button 
-            className="inline-flex items-center px-6 py-3 border border-orange-500 text-orange-600 font-medium rounded-full hover:bg-orange-50 transition-colors"
+            className="inline-flex items-center px-6 py-3 border border-violet-500 text-violet-600 font-medium rounded-full hover:bg-violet-50 transition-colors"
             onClick={() => {
               // Aquí podrías agregar lógica para mostrar más testimonios o abrir un modal
               const element = document.getElementById('contacto');

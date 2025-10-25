@@ -11,7 +11,7 @@ export default function AuthRedirect({
   redirectTo = '/login',
   loadingComponent = (
     <div className="flex items-center justify-center min-h-screen">
-      <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
+      <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
     </div>
   ),
 }: {

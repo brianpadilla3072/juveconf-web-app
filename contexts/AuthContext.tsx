@@ -36,16 +36,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuth = async () => {
     try {
+      console.log('🔵 [checkAuth] Iniciando verificación...');
       const token = AuthService.getToken();
+
       if (!token) {
+        console.log('🟡 [checkAuth] No hay token, usuario no autenticado');
         setUser(null);
+        setIsLoading(false);
         return;
       }
 
+      console.log('🔵 [checkAuth] Token encontrado, consultando perfil...');
       const response = await api.get('/auth/profile');
+      console.log('🔵 [checkAuth] Perfil recibido:', response.data);
+
       setUser(response.data);
+      console.log('✅ [checkAuth] Usuario autenticado correctamente');
     } catch (error) {
-      console.error('Error al verificar autenticación:', error);
+      console.error('🔴 [checkAuth] Error al verificar autenticación:', error);
       setUser(null);
       AuthService.removeToken();
     } finally {
@@ -59,24 +67,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
+      console.log('🔵 [AuthContext] Iniciando login...');
+      setIsLoading(true);
+
+      console.log('🔵 [AuthContext] Enviando petición POST /auth/login');
       const response = await api.post('/auth/login', { email, password });
-      const { access_token } = response.data;
-      
+      console.log('🔵 [AuthContext] Respuesta recibida:', response.data);
+
+      const { access_token, requirePasswordChange } = response.data;
+
       if (!access_token) {
+        console.error('🔴 [AuthContext] No se recibió access_token');
         throw new Error('No se recibió un token de autenticación');
       }
-      
+
+      console.log('🔵 [AuthContext] Token recibido, guardando...');
       AuthService.setToken(access_token);
-      await checkAuth(); // Verificar la autenticación después del login
-      
-      // Solo redirigir si todo salió bien (no hay errores hasta aquí)
-      router.push('/app');
+
+      console.log('🔵 [AuthContext] Verificando autenticación...');
+      await checkAuth();
+
+      // Verificar si el usuario debe cambiar su contraseña
+      if (requirePasswordChange) {
+        console.log('🔵 [AuthContext] Usuario debe cambiar contraseña temporal, redirigiendo a /change-password');
+        router.push('/change-password');
+      } else {
+        console.log('🔵 [AuthContext] Login completado, redirigiendo a /app');
+        router.push('/app');
+      }
     } catch (error: any) {
-      console.error('Error en el inicio de sesión:', error);
+      console.error('🔴 [AuthContext] Error en login:', error);
+      console.error('🔴 [AuthContext] Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+
       // Limpiar cualquier token que pueda haberse guardado en caso de error
       AuthService.removeToken();
       setUser(null);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 

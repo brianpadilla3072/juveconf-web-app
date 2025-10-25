@@ -9,7 +9,7 @@ import agustin from "../../public/images/invitados/AgustínSchiro.jpg";
 
 // Background image configuration
 const invitadosBackground = {
-  src: "/images/hero/hero-background.jpg",
+  src: "/images/hero/hero-background.webp",
   width: 1920,
   height: 1080,
 };
@@ -100,7 +100,7 @@ export function Invitados2025() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Invitados 2025
           </h2>
-          <div className="h-1 w-16 bg-orange-500 mb-6 rounded-full"></div>
+          <div className="h-1 w-16 bg-violet-500 mb-6 rounded-full"></div>
           <p className="text-lg text-white/70 max-w-2xl mb-4">
             Tres voces, tres historias, una misma pasión por Jesús. Cada invitado aporta su experiencia y visión para enriquecer la diversidad de ministerios y generaciones.
           </p>
@@ -111,7 +111,7 @@ export function Invitados2025() {
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Nuestros Invitados
             </h2>
-            <div className="h-1 w-16 bg-orange-500 mx-auto mb-6 rounded-full"></div>
+            <div className="h-1 w-16 bg-violet-500 mx-auto mb-6 rounded-full"></div>
             <p className="text-base text-white/70 max-w-2xl mx-auto">
               Conoce a los ministros y líderes que nos acompañarán en este tiempo de avivamiento y adoración.
             </p>
@@ -202,7 +202,7 @@ const InvitadosCarousel = () => {
               <h3 className="font-bold text-xl text-white mb-1">
                 {invitado.nombre}
               </h3>
-              <div className="text-orange-500 font-medium mb-2">
+              <div className="text-violet-500 font-medium mb-2">
                 {invitado.rol}
               </div>
               <div className="text-sm text-white/70">
@@ -234,7 +234,7 @@ const InvitadosCarousel = () => {
             key={index}
             onClick={() => goToPage(index)}
             className={`w-3 h-3 rounded-full transition-all ${
-              index * visible === start ? "bg-orange-500 w-8" : "bg-orange-200"
+              index * visible === start ? "bg-violet-500 w-8" : "bg-violet-200"
             }`}
             aria-label={`Ir a la página ${index + 1}`}
           />

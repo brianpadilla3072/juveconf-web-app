@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import heroBackground from '../public/images/hero/hero-background.jpg';
+import heroBackground from '../public/images/hero/hero-background.webp';
 import { useState, useEffect } from "react";
 import logo from '../public/images/logo.webp';
 import Image from 'next/image';
@@ -48,7 +48,7 @@ export default function NotFound() {
       
       {/* Contenido centrado */}
       <div className="relative h-full w-full flex items-center justify-center p-4">
-          <div className="w-full max-w-md p-8 space-y-6 bg-piedra/5 backdrop-blur-[6px] rounded-lg shadow-xl text-center border border-orange-100/10">
+          <div className="w-full max-w-md p-8 space-y-6 bg-piedra/5 backdrop-blur-[6px] rounded-lg shadow-xl text-center border border-violet-100/10">
             <div className="flex justify-center">
               <div className="p-3  rounded-full">
               <Image

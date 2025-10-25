@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import logo from '../../public/images/logo.webp';
-import backgroundImage from '../../public/images/hero/hero-background.jpg'; // puede cambiar esta imagen
+import backgroundImage from '../../public/images/hero/hero-background.webp'; // puede cambiar esta imagen
 
 export function NuestraVision() {
   const [scrollY, setScrollY] = useState(0);
@@ -85,15 +85,15 @@ export function NuestraVision() {
             <div className="md:w-2/3 text-white space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold">Nuestra Visión</h2>
               <p className="text-lg leading-relaxed text-white-100/60">
-                Por mucho tiempo, el cuerpo de Cristo estuvo fracturado: divisiones, malos tratos, competencia. <span className="font-semibold text-orange-500">"Consagrados a Jesús"</span> viene a romper con esas estructuras, manifestando la unión dada por el Espíritu (<span className="text-orange-500 font-medium">Efesios 4:3-6</span>), enseñando a poner la mirada en Jesús y echar raíces donde Dios nos puso.
+                Por mucho tiempo, el cuerpo de Cristo estuvo fracturado: divisiones, malos tratos, competencia. <span className="font-semibold text-violet-500">"Consagrados a Jesús"</span> viene a romper con esas estructuras, manifestando la unión dada por el Espíritu (<span className="text-violet-500 font-medium">Efesios 4:3-6</span>), enseñando a poner la mirada en Jesús y echar raíces donde Dios nos puso.
               </p>
-              <div className="p-4 rounded-lg border-l-4 border-orange-400">
+              <div className="p-4 rounded-lg border-l-4 border-violet-400">
                 <p className="italic text-white-100/60">
                   "Solícitos en guardar la unidad del Espíritu en el vínculo de la paz; un cuerpo, y un Espíritu, como fuisteis también llamados en una misma esperanza de vuestra vocación; un Señor, una fe, un bautismo, un Dios y Padre de todos, el cual es sobre todos, y por todos, y en todos."
                 </p>
                 <p className="text-right text-white-200/60 mt-2 text-sm">— Efesios 4:3-6 (RVR1960)</p>
               </div>
-              <p className="text-lg font-medium text-orange-200">
+              <p className="text-lg font-medium text-violet-200">
                 Nuestro mayor deseo es ayudar a la iglesia a ser una novia pura y unida por Cristo, la cabeza.
               </p>
             </div>

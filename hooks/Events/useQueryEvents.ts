@@ -1,17 +1,7 @@
 "use client";
 import api from '@/lib/axios.config';
 import { useEffect, useState } from 'react';
-
-interface Event {
-  id: string;
-  year: number;
-  topic: string;
-  capacity: number;
-  salesStartDate: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-}
+import { Event } from '@/entities/Event';
 
 export function useQueryEvents() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -46,7 +36,7 @@ export function useQueryEvents() {
 }
 
 export function useQueryCurrentEvent() {
-  const [event, setEvent] = useState<Event | null>(null);
+  const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
 
@@ -54,12 +44,13 @@ export function useQueryCurrentEvent() {
     try {
       setLoading(true);
       const { data } = await api.get('/events/current');
-      setEvent(data);
+      // El backend ahora retorna un array de eventos del año actual
+      setEvents(Array.isArray(data) ? data : [data].filter(Boolean));
       setError(null);
     } catch (err) {
       setError(err);
-      console.error("Error al cargar evento actual:", err);
-      setEvent(null);
+      console.error("Error al cargar eventos actuales:", err);
+      setEvents([]);
     } finally {
       setLoading(false);
     }
@@ -73,5 +64,14 @@ export function useQueryCurrentEvent() {
     fetchCurrentEvent();
   };
 
-  return { event, isLoading, error, refetch };
+  // Para mantener compatibilidad, retornamos también el primer evento
+  const currentEvent = events.length > 0 ? events[0] : null;
+
+  return {
+    events,           // Array de todos los eventos del año actual
+    event: currentEvent,  // Primer evento (para compatibilidad)
+    isLoading,
+    error,
+    refetch
+  };
 }

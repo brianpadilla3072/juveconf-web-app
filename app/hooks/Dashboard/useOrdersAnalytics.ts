@@ -33,7 +33,7 @@ interface OrdersAnalyticsData {
   summary: OrdersAnalyticsSummary;
 }
 
-export const useOrdersAnalytics = (year?: number) => {
+export const useOrdersAnalytics = (year?: number, eventId?: string) => {
   const [data, setData] = useState<OrdersAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,10 +42,13 @@ export const useOrdersAnalytics = (year?: number) => {
     try {
       setLoading(true);
       setError(null);
-      
-      const params = year ? { year: year.toString() } : {};
+
+      const params: any = {};
+      if (year) params.year = year.toString();
+      if (eventId) params.eventId = eventId;
+
       const response = await api.get('/dashboard/orders-analytics', { params });
-      
+
       setData(response.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al cargar las analíticas de órdenes');
@@ -57,7 +60,7 @@ export const useOrdersAnalytics = (year?: number) => {
 
   useEffect(() => {
     fetchOrdersAnalytics();
-  }, [year]);
+  }, [year, eventId]);
 
   return {
     data,

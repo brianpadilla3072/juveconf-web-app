@@ -4,34 +4,24 @@ import { useState } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { toast } from 'sonner';
-
-interface InviteeData {
-  id: string;
-  name: string;
-  cuil: string;
-  email?: string;
-  phone?: string;
-  attendedDay1: boolean;
-  attendedDay2: boolean;
-  payment?: {
-    amount: number;
-    payerEmail?: string;
-  };
-  order?: {
-    status: string;
-  };
-}
+import { Invitee } from '@/entities/Invitee';
+import { Event } from '@/entities/Event';
 
 export function useInviteesPDF() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const generateInviteesPDF = async (
-    invitees: InviteeData[], 
+    invitees: Invitee[],
     year: number,
+    event?: Event | null,
     searchFilter?: string
   ) => {
     try {
       setIsGenerating(true);
+
+      // Obtener días del evento (dinámico)
+      const eventDays = event?.eventDays?.days || [];
+      const hasDays = eventDays.length > 0;
 
       // Crear nuevo documento PDF en orientación vertical
       const doc = new jsPDF({
@@ -59,27 +49,74 @@ export function useInviteesPDF() {
       doc.setFont('helvetica', 'normal');
       doc.text(`Generado: ${currentDate}`, 20, 30);
       doc.text(`Total de invitados: ${invitees.length}`, 20, 35);
-      
+
       if (searchFilter) {
         doc.text(`Filtro aplicado: "${searchFilter}"`, 20, 40);
       }
 
+      if (hasDays && event) {
+        doc.text(`Evento: ${event.topic || 'Sin nombre'}`, 20, 45);
+      }
+
+      // Preparar headers dinámicamente
+      const baseHeaders = ['Nombre', 'CUIL', 'Email', 'Teléfono'];
+      const dayHeaders = hasDays
+        ? eventDays.map(day => day.label || `Día ${day.dayNumber}`)
+        : ['Día 1', 'Día 2']; // Fallback si no hay evento
+      const headers = [...baseHeaders, ...dayHeaders, 'Observaciones'];
+
       // Preparar datos para la tabla
-      const tableData = invitees.map(invitee => [
-        invitee.name,
-        invitee.cuil,
-        invitee.email || '', // Celda vacía para escribir manualmente
-        invitee.phone || '', // Celda vacía para escribir manualmente
-        '', // Celda vacía para marcar asistencia día 1 manualmente
-        '', // Celda vacía para marcar asistencia día 2 manualmente
-        '' // Celda vacía para observaciones
-      ]);
+      const tableData = invitees.map(invitee => {
+        const baseData = [
+          invitee.name,
+          invitee.cuil,
+          invitee.email || '',
+          invitee.phone || ''
+        ];
+
+        // Agregar columnas vacías para cada día del evento
+        const dayColumns = hasDays
+          ? eventDays.map(() => '')
+          : ['', '']; // Fallback 2 días
+
+        return [...baseData, ...dayColumns, ''];
+      });
+
+      // Configurar estilos de columnas dinámicamente
+      const columnStyles: { [key: number]: any } = {
+        0: { cellWidth: 38 }, // Nombre
+        1: { cellWidth: 27 }, // CUIL
+        2: { cellWidth: 32 }, // Email
+        3: { cellWidth: 27 }, // Teléfono
+      };
+
+      // Calcular ancho disponible para días y observaciones
+      const totalBaseWidth = 38 + 27 + 32 + 27; // 124mm
+      const pageWidth = 210 - 16; // A4 width - margins (194mm)
+      const remainingWidth = pageWidth - totalBaseWidth; // ~70mm
+      const observationsWidth = 25; // Fijo para observaciones
+      const daysWidth = remainingWidth - observationsWidth; // ~45mm
+      const dayColumnWidth = hasDays
+        ? daysWidth / eventDays.length
+        : daysWidth / 2; // Distribuir equitativamente
+
+      // Agregar estilos para columnas de días
+      dayHeaders.forEach((_, index) => {
+        const colIndex = 4 + index;
+        columnStyles[colIndex] = {
+          cellWidth: dayColumnWidth,
+          halign: 'center'
+        };
+      });
+
+      // Estilo para observaciones (última columna)
+      columnStyles[headers.length - 1] = { cellWidth: observationsWidth };
 
       // Configurar tabla con autoTable
       autoTable(doc, {
-        head: [['Nombre', 'CUIL', 'Email', 'Teléfono', 'Día 1', 'Día 2', 'Observaciones']],
+        head: [headers],
         body: tableData,
-        startY: searchFilter ? 50 : 45,
+        startY: hasDays && event ? 55 : (searchFilter ? 50 : 45),
         theme: 'grid',
         styles: {
           fontSize: 9,
@@ -95,28 +132,24 @@ export function useInviteesPDF() {
           fontStyle: 'bold',
           halign: 'center'
         },
-        columnStyles: {
-          0: { cellWidth: 38 }, // Nombre - más espacio
-          1: { cellWidth: 27 }, // CUIL - más espacio
-          2: { cellWidth: 32 }, // Email - más espacio para escribir
-          3: { cellWidth: 27 }, // Teléfono - más espacio para escribir  
-          4: { cellWidth: 15, halign: 'center' }, // Día 1 - más espacio para marcar
-          5: { cellWidth: 15, halign: 'center' }, // Día 2 - más espacio para marcar
-          6: { cellWidth: 35 } // Observaciones - más espacio para escribir
-        },
+        columnStyles,
         alternateRowStyles: {
           fillColor: [245, 245, 245] // Gris claro alternado
         },
         margin: { top: 20, left: 8, right: 8 },
         didDrawCell: function(data) {
           // Agregar líneas adicionales en celdas vacías para facilitar escritura manual
-          if ((data.column.index === 2 || data.column.index === 3 || data.column.index === 4 || data.column.index === 5 || data.column.index === 6) && 
-              data.cell.raw === '') {
+          const isEmptyDataCell = (
+            data.column.index >= 2 && // Email en adelante
+            data.cell.raw === ''
+          );
+
+          if (isEmptyDataCell) {
             const cellHeight = data.cell.height;
             const cellY = data.cell.y;
             const cellX = data.cell.x;
             const cellWidth = data.cell.width;
-            
+
             // Dibujar línea sutil en celdas vacías para escritura manual
             doc.setDrawColor(200, 200, 200);
             doc.setLineWidth(0.1);
@@ -140,12 +173,12 @@ export function useInviteesPDF() {
 
       // Generar nombre de archivo
       const fileName = `lista_invitados_${year}_${new Date().toISOString().split('T')[0]}.pdf`;
-      
+
       // Descargar el PDF
       doc.save(fileName);
-      
+
       toast.success(`PDF generado correctamente: ${fileName}`);
-      
+
     } catch (error) {
       console.error('Error generando PDF:', error);
       toast.error('Error al generar el PDF. Intente nuevamente.');

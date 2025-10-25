@@ -15,12 +15,15 @@ import {
   X,
   Mail,
   DollarSign,
+  Tag,
+  BarChart3,
 } from "lucide-react";
 import { NavItem } from "@/components/app/navigation";
 import { SyncModuleProvider } from "@/components/app/SyncModuleProvider";
 import { UserMenu } from "@/components/app/UserMenu";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Logo } from "../components/Logo/Logo";
+import { getBrandColor, ORG_NAME } from "@/lib/constants";
 
 export default function DashboardLayout({
   children,
@@ -33,11 +36,13 @@ export default function DashboardLayout({
     '': 'Inicio',
     events: 'Eventos',
     combos: 'Combos',
+    presales: 'Preventas',
     orders: 'Órdenes',
     payments: 'Pagos',
     invitees: 'Invitados',
     emails: 'Emails',
     finanzas: 'Finanzas',
+    analytics: 'Analíticas',
     users: 'Usuarios',
     settings: 'Configuración',
   };
@@ -45,6 +50,10 @@ export default function DashboardLayout({
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
   };
 
   return (
@@ -69,8 +78,8 @@ export default function DashboardLayout({
           <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center space-x-2">
               <Logo size={40} />
-              <span className="font-bold text-xl text-orange-500">
-                Consagrados
+              <span className="font-bold text-xl" style={{ color: getBrandColor('accent') }}>
+                {ORG_NAME}
               </span>
             </div>
             <button
@@ -89,7 +98,7 @@ export default function DashboardLayout({
                   icon={<Home className="h-5 w-5" />}
                   label="Inicio"
                   moduleKey=""
-
+                  onNavigate={closeSidebar}
                 />
               </li>
               <li>
@@ -98,6 +107,7 @@ export default function DashboardLayout({
                   icon={<Calendar className="h-5 w-5" />}
                   label="Eventos"
                   moduleKey="events"
+                  onNavigate={closeSidebar}
                 />
               </li>
               <li>
@@ -106,6 +116,16 @@ export default function DashboardLayout({
                   icon={<Package className="h-5 w-5" />}
                   label="Combos"
                   moduleKey="combos"
+                  onNavigate={closeSidebar}
+                />
+              </li>
+              <li>
+                <NavItem
+                  href="/app/presales"
+                  icon={<Tag className="h-5 w-5" />}
+                  label="Preventas"
+                  moduleKey="presales"
+                  onNavigate={closeSidebar}
                 />
               </li>
               <li>
@@ -114,6 +134,7 @@ export default function DashboardLayout({
                   icon={<ShoppingCart className="h-5 w-5" />}
                   label="Órdenes"
                   moduleKey="orders"
+                  onNavigate={closeSidebar}
                 />
               </li>
               <li>
@@ -136,6 +157,7 @@ export default function DashboardLayout({
                   }
                   label="Pagos"
                   moduleKey="payments"
+                  onNavigate={closeSidebar}
                 />
               </li>
               <li>
@@ -144,6 +166,7 @@ export default function DashboardLayout({
                   icon={<UserCheck className="h-5 w-5" />}
                   label="Invitados"
                   moduleKey="invitees"
+                  onNavigate={closeSidebar}
                 />
               </li>
               <li>
@@ -152,6 +175,7 @@ export default function DashboardLayout({
                   icon={<Mail className="h-5 w-5" />}
                   label="Emails"
                   moduleKey="emails"
+                  onNavigate={closeSidebar}
                 />
               </li>
               <li>
@@ -160,6 +184,16 @@ export default function DashboardLayout({
                   icon={<DollarSign className="h-5 w-5" />}
                   label="Finanzas"
                   moduleKey="finanzas"
+                  onNavigate={closeSidebar}
+                />
+              </li>
+              <li>
+                <NavItem
+                  href="/app/analytics"
+                  icon={<BarChart3 className="h-5 w-5" />}
+                  label="Analíticas"
+                  moduleKey="analytics"
+                  onNavigate={closeSidebar}
                 />
               </li>
               <li>
@@ -168,6 +202,7 @@ export default function DashboardLayout({
                   icon={<Users className="h-5 w-5" />}
                   label="Usuarios"
                   moduleKey="users"
+                  onNavigate={closeSidebar}
                 />
               </li>
               <li>
@@ -176,6 +211,7 @@ export default function DashboardLayout({
                   icon={<Settings className="h-5 w-5" />}
                   label="Configuración"
                   moduleKey="settings"
+                  onNavigate={closeSidebar}
                 />
               </li>
             </ul>

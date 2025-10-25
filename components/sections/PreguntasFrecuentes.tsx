@@ -28,7 +28,7 @@ const faqs = [
         cualquier inconveniente, comunicate al{" "}
         <a
           href="https://wa.me/5492914326563"
-          className="text-orange-300 font-medium hover:underline hover:text-orange-200 transition-colors"
+          className="text-violet-300 font-medium hover:underline hover:text-violet-200 transition-colors"
         >
            +54 9 291 432 6563
         </a>
@@ -100,7 +100,7 @@ export function PreguntasFrecuentes() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">
             Preguntas frecuentes
           </h2>
-          <div className="h-1 w-20 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full mx-auto"></div>
+          <div className="h-1 w-20 bg-gradient-to-r from-violet-400 to-violet-500 rounded-full mx-auto"></div>
           <p className="text-white/80 mt-6 max-w-2xl mx-auto">
             Aquí encontrarás respuestas a las dudas más comunes sobre nuestro evento.
             Si necesitas más información, no dudes en contactarnos.

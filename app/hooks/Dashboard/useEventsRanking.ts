@@ -8,8 +8,7 @@ interface EventRanking {
   orderCount: number;
   totalRevenue: number;
   totalInvitees: number;
-  attendedDay1: number;
-  attendedDay2: number;
+  attendanceByDay: { [dayNumber: string]: number };
   utilizationRate: number;
 }
 

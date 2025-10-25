@@ -1,8 +1,8 @@
-# API Documentation - Consagrados a Jesús
+# API Documentation - JuveConf
 
 ## Overview
 
-This documentation describes the API architecture and configuration for the Consagrados a Jesús application, a Next.js-based event management system for religious events.
+This documentation describes the API architecture and configuration for the JuveConf application, a Next.js-based event management system for religious events.
 
 ## Table of Contents
 
@@ -38,8 +38,8 @@ SERVER_API=http://localhost:3072
 NODE_ENV=development
 
 # For production, use:
-# NEXT_PUBLIC_API_URL=https://api.consagradosajesus.com
-# SERVER_API=https://api.consagradosajesus.com
+# NEXT_PUBLIC_API_URL=https://api.juveconf.com
+# SERVER_API=https://api.juveconf.com
 ```
 
 #### Next.js Configuration
@@ -57,7 +57,7 @@ const nextConfig = {
 ### API Base URLs
 
 - **Development**: `http://localhost:3072`
-- **Production**: `https://api.consagradosajesus.com`
+- **Production**: `https://api.juveconf.com`
 
 ## Authentication System
 
@@ -124,7 +124,7 @@ type AuthContextType = {
 
 ```typescript
 const api = axios.create({
-  baseURL: process.env.SERVER_API || 'https://api.consagradosajesus.com',
+  baseURL: process.env.SERVER_API || 'https://api.juveconf.com',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -143,7 +143,7 @@ const api = axios.create({
 
 ```typescript
 const api = axios.create({
-  baseURL: process.env.SERVER_API || "https://api.consagradosajesus.com",
+  baseURL: process.env.SERVER_API || "https://api.juveconf.com",
   headers: { "Content-Type": "application/json" },
   timeout: 10000,
 });
@@ -259,7 +259,7 @@ When the API is unavailable in development mode (`NODE_ENV=development`), the sy
 ```javascript
 {
   id: "event-2025",
-  name: "Consagrados a Jesús 2025",
+  name: "JuveConf 2025",
   startDate: "2025-09-19T09:00:00",
   endDate: "2025-09-20T21:00:00",
   isActive: true,

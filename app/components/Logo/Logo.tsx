@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
 import { Box, type BoxProps } from '@mantine/core';
 import Image from 'next/image';
+import { BRANDING_CONFIG } from '@/lib/constants';
 
 interface LogoProps extends BoxProps {
   size?: number;
@@ -10,13 +11,13 @@ interface LogoProps extends BoxProps {
 }
 
 export const Logo = forwardRef<HTMLDivElement, LogoProps>(
-  ({ 
-    size = 40, 
+  ({
+    size = BRANDING_CONFIG.logo.width,
     width = size,
     height = size,
-    alt = 'Logo',
+    alt = BRANDING_CONFIG.logo.alt,
     style,
-    ...others 
+    ...others
   }, ref) => {
     return (
       <Box
@@ -30,7 +31,7 @@ export const Logo = forwardRef<HTMLDivElement, LogoProps>(
         {...others}
       >
         <Image
-          src="/images/logo.webp"
+          src={BRANDING_CONFIG.logo.src}
           alt={alt}
           fill
           sizes={`${width}px`}

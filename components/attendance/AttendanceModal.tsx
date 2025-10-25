@@ -16,6 +16,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { User, Calendar, DollarSign, Mail, Phone } from 'lucide-react';
 import { toast } from 'sonner';
+import { Event, EventDay } from '@/entities/Event';
+import { Attendance } from '@/entities/Invitee';
 
 interface InviteeData {
   id: string;
@@ -23,8 +25,7 @@ interface InviteeData {
   cuil: string;
   email?: string;
   phone?: string;
-  attendedDay1: boolean;
-  attendedDay2: boolean;
+  attendance?: Attendance;
   payment?: {
     id: string;
     amount: number;
@@ -39,34 +40,44 @@ interface AttendanceModalProps {
   isOpen: boolean;
   onClose: () => void;
   invitee: InviteeData | null;
+  event: Event | null; // NUEVO: necesitamos los días del evento
   onConfirm: (data: {
     inviteeId: string;
-    day: 'day1' | 'day2';
+    dayNumber: number;
     email?: string;
     phone?: string;
   }) => void;
   isLoading?: boolean;
 }
 
-export default function AttendanceModal({ 
-  isOpen, 
-  onClose, 
-  invitee, 
-  onConfirm, 
-  isLoading = false 
+export default function AttendanceModal({
+  isOpen,
+  onClose,
+  invitee,
+  event,
+  onConfirm,
+  isLoading = false
 }: AttendanceModalProps) {
-  const [selectedDay, setSelectedDay] = useState<'day1' | 'day2'>('day1');
+  const [selectedDayNumber, setSelectedDayNumber] = useState<number>(1);
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+
+  // Obtener días del evento
+  const eventDays = event?.eventDays?.days || [];
+
+  // Helper para verificar si asistió a un día específico
+  const hasAttended = (dayNumber: number): boolean => {
+    return invitee?.attendance?.days?.[dayNumber.toString()]?.attended || false;
+  };
 
   // Resetear formulario cuando se abre el modal con nuevos datos
   useEffect(() => {
     if (invitee && isOpen) {
       setEmail(invitee.email || '');
       setPhone(invitee.phone || '');
-      setSelectedDay('day1'); // Por defecto día 1
+      setSelectedDayNumber(eventDays[0]?.dayNumber || 1); // Por defecto primer día
     }
-  }, [invitee, isOpen]);
+  }, [invitee, isOpen, eventDays]);
 
   const handleConfirm = () => {
     if (!invitee) {
@@ -75,30 +86,29 @@ export default function AttendanceModal({
     }
 
     // Verificar si ya asistió al día seleccionado
-    const alreadyAttended = selectedDay === 'day1' 
-      ? invitee.attendedDay1 
-      : invitee.attendedDay2;
+    const alreadyAttended = hasAttended(selectedDayNumber);
+    const selectedDay = eventDays.find(d => d.dayNumber === selectedDayNumber);
 
     if (alreadyAttended) {
-      toast.warning(`El invitado ya está marcado como presente para el ${selectedDay === 'day1' ? 'Día 1' : 'Día 2'}`);
+      toast.warning(`El invitado ya está marcado como presente para el ${selectedDay?.label || `Día ${selectedDayNumber}`}`);
     }
 
     onConfirm({
       inviteeId: invitee.id,
-      day: selectedDay,
+      dayNumber: selectedDayNumber,
       email: email.trim() || undefined,
       phone: phone.trim() || undefined,
     });
   };
 
   const handleClose = () => {
-    setSelectedDay('day1');
+    setSelectedDayNumber(eventDays[0]?.dayNumber || 1);
     setEmail('');
     setPhone('');
     onClose();
   };
 
-  if (!invitee) {
+  if (!invitee || !event || eventDays.length === 0) {
     return null;
   }
 
@@ -134,37 +144,50 @@ export default function AttendanceModal({
                 </div>
               </div>
 
-              {/* Estado actual de asistencias */}
-              <div className="flex gap-2">
-                <Badge variant={invitee.attendedDay1 ? "default" : "secondary"}>
-                  Día 1: {invitee.attendedDay1 ? 'Asistió' : 'No asistió'}
-                </Badge>
-                <Badge variant={invitee.attendedDay2 ? "default" : "secondary"}>
-                  Día 2: {invitee.attendedDay2 ? 'Asistió' : 'No asistió'}
-                </Badge>
+              {/* Estado actual de asistencias - DINÁMICO */}
+              <div className="flex flex-wrap gap-2">
+                {eventDays.map((day) => {
+                  const attended = hasAttended(day.dayNumber);
+                  return (
+                    <Badge
+                      key={day.dayNumber}
+                      variant={attended ? "default" : "secondary"}
+                    >
+                      {day.label || `Día ${day.dayNumber}`}: {attended ? 'Asistió' : 'No asistió'}
+                    </Badge>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
 
-          {/* Seleccionar día */}
+          {/* Seleccionar día - DINÁMICO */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               Seleccionar día de asistencia
             </Label>
-            <RadioGroup 
-              value={selectedDay} 
-              onValueChange={(value) => setSelectedDay(value as 'day1' | 'day2')}
-              className="flex gap-4"
+            <RadioGroup
+              value={selectedDayNumber.toString()}
+              onValueChange={(value) => setSelectedDayNumber(parseInt(value))}
+              className="flex flex-wrap gap-4"
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="day1" id="day1" />
-                <Label htmlFor="day1" className="cursor-pointer">Día 1</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="day2" id="day2" />
-                <Label htmlFor="day2" className="cursor-pointer">Día 2</Label>
-              </div>
+              {eventDays.map((day) => (
+                <div key={day.dayNumber} className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value={day.dayNumber.toString()}
+                    id={`day-${day.dayNumber}`}
+                  />
+                  <Label htmlFor={`day-${day.dayNumber}`} className="cursor-pointer">
+                    {day.label || `Día ${day.dayNumber}`}
+                    {day.date && (
+                      <span className="text-xs text-muted-foreground ml-1">
+                        ({new Date(day.date).toLocaleDateString('es-AR')})
+                      </span>
+                    )}
+                  </Label>
+                </div>
+              ))}
             </RadioGroup>
           </div>
 

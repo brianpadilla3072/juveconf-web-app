@@ -9,17 +9,25 @@ interface NavItemProps {
   icon: ReactNode;
   label: string;
   moduleKey: Module;
+  onNavigate?: () => void;
 }
 
-export const NavItem = ({ href, icon, label, moduleKey }: NavItemProps) => {
+export const NavItem = ({ href, icon, label, moduleKey, onNavigate }: NavItemProps) => {
   const activeModule = useNavigationStore((s) => s.activeModule);
 
   const isActive = activeModule === moduleKey;
 
+  const handleClick = () => {
+    if (onNavigate) {
+      onNavigate();
+    }
+  };
+
   return (
-    
+
       <Link
         href={href}
+        onClick={handleClick}
         className={clsx(
           "flex items-center p-3 rounded-lg transition-colors",
           isActive
@@ -27,7 +35,7 @@ export const NavItem = ({ href, icon, label, moduleKey }: NavItemProps) => {
             : "text-gray-600 hover:bg-gray-100"
         )}
       >
-        <div className={clsx("mr-3", isActive ? "text-orange-500" : "text-gray-500")}>
+        <div className={clsx("mr-3", isActive ? "text-violet-500" : "text-gray-500")}>
           {icon}
         </div>
         <span>{label}</span>

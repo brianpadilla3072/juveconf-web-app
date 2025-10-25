@@ -1,37 +1,20 @@
 "use client"
 
-import { Table, Title, Card, Text, Container, Box, Button, Modal, Group, Badge, Stack, ActionIcon, TextInput, LoadingOverlay, SimpleGrid, useMantineTheme, rem, Divider } from "@mantine/core"
-import { Eye, Search, RotateCw, ChevronRight } from "lucide-react"
+import { Table, Title, Card, Text, Container, Box, Button, Modal, Group, Badge, Stack, ActionIcon, TextInput, LoadingOverlay, SimpleGrid, useMantineTheme, rem, Divider, Select, NumberInput, Tabs } from "@mantine/core"
+import { Eye, Search, RotateCw, ChevronRight, Plus, Trash } from "lucide-react"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { useOrdersInReview } from "@/hooks/Orders/useOrdersInReview"
+import { useOrdersPaid } from "@/hooks/Orders/useOrdersPaid"
 import useApproveOrder from "@/hooks/Orders/useApproveOrder"
 import useRejectOrder from "@/hooks/Orders/useRejectOrder"
+import useCreateOrder, { AttendeeDto } from "@/hooks/Orders/useCreateOrder"
+import { useQueryEvents } from "@/hooks/Events/useQueryEvents"
+import { useQueryCombos } from "@/hooks/combos/useQueryCombos"
+import { useQueryPreSales } from "@/hooks/presales/useQueryPreSales"
 import { useRouter } from "next/navigation"
 import React, { useMemo, useState, useEffect } from "react"
-
-// Remove the old Order type since we're importing it from the hook
-type Order = {
-  id: string;
-  email: string;
-  phone: string;
-  cuil: string;
-  total: number;
-  status: string;
-  paymentType: string;
-  event: {
-    topic: string;
-  };
-  combos: Array<{
-    name: string;
-    price: number;
-  }>;
-  invitees: Array<{
-    name: string;
-    cuil: string;
-  }>;
-  createdAt: string;
-};
+import { Order } from "@/entities/Order";
 
 // Format date helper function
 const formatDate = (dateString: string) => {
@@ -48,35 +31,81 @@ export default function OrdersModule() {
   // State
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<string>('review');
   const [opened, { open, close }] = useDisclosure(false);
   const [openedApprove, { open: openApprove, close: closeApprove }] = useDisclosure(false);
   const [openedDelete, { open: openDelete, close: closeDelete }] = useDisclosure(false);
-  
+  const [openedCreate, { open: openCreate, close: closeCreate }] = useDisclosure(false);
+
+  // Create order form state
+  const [formData, setFormData] = useState({
+    email: '',
+    phone: '',
+    cuil: '',
+    eventId: '',
+    comboId: '',
+    quantity: 1
+  });
+  const [attendees, setAttendees] = useState<AttendeeDto[]>([{ name: '', cuil: '' }]);
+
   // Approve order hook
-  const { 
-    approveOrder, 
-    isLoading: isApproving, 
-    error: approveError, 
+  const {
+    approveOrder,
+    isLoading: isApproving,
+    error: approveError,
     isSuccess: approveSuccess,
-    reset: resetApproveState 
+    reset: resetApproveState
   } = useApproveOrder();
 
   // Reject order hook
-  const { 
-    rejectOrder, 
-    isLoading: isRejecting, 
-    error: rejectError, 
+  const {
+    rejectOrder,
+    isLoading: isRejecting,
+    error: rejectError,
     isSuccess: rejectSuccess,
-    reset: resetRejectState 
+    reset: resetRejectState
   } = useRejectOrder();
-  
-  // Use the orders hook
-  const { orders, loading, error, refetch } = useOrdersInReview();
-  
+
+  // Create order hook
+  const { createOrder, isLoading: isCreating } = useCreateOrder();
+
+  // Use the orders hooks
+  const { orders: reviewOrders, loading: reviewLoading, error: reviewError, refetch: refetchReview } = useOrdersInReview();
+  const { orders: paidOrders, loading: paidLoading, error: paidError, refetch: refetchPaid } = useOrdersPaid();
+
+  // Query hooks for form
+  const { events } = useQueryEvents();
+  const { combos } = useQueryCombos();
+  const { preSales } = useQueryPreSales();
+
+  // Mantine theme hook
+  const theme = useMantineTheme();
+
+  // Get current orders and loading/error states based on active tab
+  const orders = useMemo(() => {
+    return activeTab === 'review' ? reviewOrders : paidOrders;
+  }, [activeTab, reviewOrders, paidOrders]);
+
+  const loading = useMemo(() => {
+    return activeTab === 'review' ? reviewLoading : paidLoading;
+  }, [activeTab, reviewLoading, paidLoading]);
+
+  const error = useMemo(() => {
+    return activeTab === 'review' ? reviewError : paidError;
+  }, [activeTab, reviewError, paidError]);
+
+  const refetch = () => {
+    if (activeTab === 'review') {
+      refetchReview();
+    } else {
+      refetchPaid();
+    }
+  };
+
   // Filter orders based on search query
   const filteredOrders = useMemo(() => {
     if (!searchQuery.trim()) return orders;
-    
+
     const query = searchQuery.toLowerCase().trim();
     return orders.filter(order => {
       // Check multiple fields for matches
@@ -85,12 +114,13 @@ export default function OrdersModule() {
         order.email,
         order.phone || '',
         order.cuil,
-        order.event.topic,
-        order.combos.map(combo => combo.name).join(' '),
+        order.event?.topic || '',
+        order.combo?.name || '',
         order.total.toString(),
         formatDate(order.createdAt),
-        order.status === 'REVIEW' ? 'en revision' : 
-        order.status === 'APPROVED' ? 'aprobado' : 'rechazado'
+        order.status === 'REVIEW' ? 'en revision' :
+        order.status === 'PAID' ? 'pagado' :
+        order.status === 'CANCELLED' ? 'cancelado' : 'pendiente'
       ];
 
       // Check if any field includes the search query
@@ -100,9 +130,114 @@ export default function OrdersModule() {
     });
   }, [orders, searchQuery]);
 
-  // Handle refresh
-  const handleRefresh = () => {
-    refetch();
+
+  // Filter combos by event (admin can see all active combos, not just published)
+  const availableCombos = useMemo(() => {
+    if (!formData.eventId) return [];
+    return combos?.filter(c =>
+      c.eventId === formData.eventId &&
+      c.isActive &&
+      !c.deletedAt
+    ) || [];
+  }, [combos, formData.eventId]);
+
+  // Get selected combo
+  const selectedCombo = useMemo(() => {
+    return combos?.find(c => c.id === formData.comboId);
+  }, [combos, formData.comboId]);
+
+  // Calculate total price
+  const totalPrice = useMemo(() => {
+    if (!selectedCombo) return 0;
+    return selectedCombo.price * formData.quantity;
+  }, [selectedCombo, formData.quantity]);
+
+  // Handle add attendee
+  const handleAddAttendee = () => {
+    setAttendees([...attendees, { name: '', cuil: '' }]);
+  };
+
+  // Handle remove attendee
+  const handleRemoveAttendee = (index: number) => {
+    if (attendees.length > 1) {
+      setAttendees(attendees.filter((_, i) => i !== index));
+    }
+  };
+
+  // Handle attendee change
+  const handleAttendeeChange = (index: number, field: keyof AttendeeDto, value: string) => {
+    const newAttendees = [...attendees];
+    newAttendees[index][field] = value;
+    setAttendees(newAttendees);
+  };
+
+  // Handle create order
+  const handleCreateOrder = async () => {
+    if (!selectedCombo) {
+      notifications.show({
+        title: 'Error',
+        message: 'Debes seleccionar un combo',
+        color: 'red',
+      });
+      return;
+    }
+
+    // Validate attendees
+    const minPersons = selectedCombo.personsIncluded || 1;
+    if (attendees.length < minPersons) {
+      notifications.show({
+        title: 'Error',
+        message: `Debes agregar al menos ${minPersons} asistente(s)`,
+        color: 'red',
+      });
+      return;
+    }
+
+    // Validate all attendees have name and CUIL
+    const invalidAttendees = attendees.some(a => !a.name.trim() || !a.cuil.trim());
+    if (invalidAttendees) {
+      notifications.show({
+        title: 'Error',
+        message: 'Todos los asistentes deben tener nombre y CUIL',
+        color: 'red',
+      });
+      return;
+    }
+
+    const dto = {
+      id: formData.comboId,
+      email: formData.email,
+      phone: formData.phone,
+      cuil: formData.cuil,
+      title: selectedCombo.name,
+      unit_price: selectedCombo.price,
+      quantity: formData.quantity,
+      minPersons: selectedCombo.personsIncluded || 1,
+      maxPersons: selectedCombo.maxPersons,
+      attendees: attendees,
+      eventId: formData.eventId
+    };
+
+    const result = await createOrder(dto);
+    if (result) {
+      notifications.show({
+        title: '¡Éxito!',
+        message: 'Orden creada exitosamente',
+        color: 'green',
+      });
+      closeCreate();
+      // Reset form
+      setFormData({
+        email: '',
+        phone: '',
+        cuil: '',
+        eventId: '',
+        comboId: '',
+        quantity: 1
+      });
+      setAttendees([{ name: '', cuil: '' }]);
+      refetch();
+    }
   };
 
   // Show loading state
@@ -120,25 +255,23 @@ export default function OrdersModule() {
     return (
       <Container size="xl" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '1rem' }}>
         <Text c="red">Error al cargar las órdenes: {error}</Text>
-        <Button onClick={handleRefresh} leftSection={<RotateCw size={16} />}>
+        <Button onClick={refetch} leftSection={<RotateCw size={16} />}>
           Reintentar
         </Button>
       </Container>
     );
   }
 
-  const theme = useMantineTheme();
-
   return (
     <Container size="xl" py="xl">
       <Title order={1} mb="xl">Gestión de Órdenes</Title>
-      
+
       <Card withBorder shadow="sm" radius="md">
         <Card.Section withBorder p="md">
-          <Group justify="space-between">
+          <Group justify="space-between" mb="md">
             <div>
-              <Title order={2} size="h4">Órdenes en Revisión</Title>
-              <Text c="dimmed" size="sm">Revisa y gestiona las órdenes pendientes</Text>
+              <Title order={2} size="h4">Órdenes</Title>
+              <Text c="dimmed" size="sm">Revisa y gestiona las órdenes</Text>
             </div>
             <Group>
               <TextInput
@@ -149,8 +282,8 @@ export default function OrdersModule() {
                 style={{ minWidth: '250px' }}
                 rightSection={
                   searchQuery ? (
-                    <ActionIcon 
-                      variant="transparent" 
+                    <ActionIcon
+                      variant="transparent"
                       onClick={() => setSearchQuery('')}
                       size="sm"
                       color="gray"
@@ -160,15 +293,32 @@ export default function OrdersModule() {
                   ) : null
                 }
               />
-              <Button 
-                leftSection={<RotateCw size={16} />} 
+              <Button
+                leftSection={<Plus size={16} />}
+                onClick={openCreate}
+              >
+                Nueva Orden
+              </Button>
+              <Button
+                leftSection={<RotateCw size={16} />}
                 variant="light"
-                onClick={handleRefresh}
+                onClick={refetch}
               >
                 Actualizar
               </Button>
             </Group>
           </Group>
+
+          <Tabs value={activeTab} onChange={(value) => setActiveTab(value || 'review')}>
+            <Tabs.List>
+              <Tabs.Tab value="review">
+                En Revisión ({reviewOrders.length})
+              </Tabs.Tab>
+              <Tabs.Tab value="paid">
+                Pagadas ({paidOrders.length})
+              </Tabs.Tab>
+            </Tabs.List>
+          </Tabs>
         </Card.Section>
 
         {/* Desktop Table View */}
@@ -207,16 +357,18 @@ export default function OrdersModule() {
                     <Table.Td>{order.email}</Table.Td>
                     <Table.Td>{order.phone || 'N/A'}</Table.Td>
                     <Table.Td>{order.cuil}</Table.Td>
-                    <Table.Td>{order.event.topic}</Table.Td>
+                    <Table.Td>{order.event?.topic || 'Sin evento'}</Table.Td>
                     <Table.Td>${order.total}</Table.Td>
                     <Table.Td>{formatDate(order.createdAt)}</Table.Td>
                     <Table.Td>
                       <Badge color={
-                        order.status === 'REVIEW' ? 'yellow' : 
-                        order.status === 'APPROVED' ? 'green' : 'red'
+                        order.status === 'REVIEW' ? 'yellow' :
+                        order.status === 'PAID' ? 'green' :
+                        order.status === 'CANCELLED' ? 'red' : 'gray'
                       }>
-                        {order.status === 'REVIEW' ? 'En Revisión' : 
-                         order.status === 'APPROVED' ? 'Aprobado' : 'Rechazado'}
+                        {order.status === 'REVIEW' ? 'En Revisión' :
+                         order.status === 'PAID' ? 'Pagado' :
+                         order.status === 'CANCELLED' ? 'Cancelado' : 'Pendiente'}
                       </Badge>
                     </Table.Td>
                   </Table.Tr>
@@ -234,15 +386,17 @@ export default function OrdersModule() {
                 <Stack gap="xs">
                   <Group justify="space-between" wrap="nowrap">
                     <Text fw={500} size="sm" lineClamp={1}>ID: {order.id.slice(0, 8)}...</Text>
-                    <Badge 
+                    <Badge
                       size="sm"
                       color={
-                        order.status === 'REVIEW' ? 'yellow' : 
-                        order.status === 'APPROVED' ? 'green' : 'red'
+                        order.status === 'REVIEW' ? 'yellow' :
+                        order.status === 'PAID' ? 'green' :
+                        order.status === 'CANCELLED' ? 'red' : 'gray'
                       }
                     >
-                      {order.status === 'REVIEW' ? 'En Revisión' : 
-                       order.status === 'APPROVED' ? 'Aprobado' : 'Rechazado'}
+                      {order.status === 'REVIEW' ? 'En Revisión' :
+                       order.status === 'PAID' ? 'Pagado' :
+                       order.status === 'CANCELLED' ? 'Cancelado' : 'Pendiente'}
                     </Badge>
                   </Group>
                   
@@ -272,7 +426,7 @@ export default function OrdersModule() {
                   <Group gap="xs" align="flex-start">
                     <Box style={{ flex: 1, minWidth: 0 }}>
                       <Text size="xs" c="dimmed">Evento</Text>
-                      <Text size="sm" lineClamp={1}>{order.event.topic}</Text>
+                      <Text size="sm" lineClamp={1}>{order.event?.topic || 'Sin evento'}</Text>
                     </Box>
                   </Group>
                   
@@ -280,7 +434,7 @@ export default function OrdersModule() {
                     <Box style={{ flex: 1, minWidth: 0 }}>
                       <Text size="xs" c="dimmed">Combo</Text>
                       <Text size="sm" lineClamp={2}>
-                        {order.combos.map(combo => combo.name).join(', ')}
+                        {order.combo?.name || 'Sin combo'}
                       </Text>
                     </Box>
                   </Group>
@@ -343,19 +497,21 @@ export default function OrdersModule() {
             </div>
             <div>
               <Text fw={500}>Evento:</Text>
-              <Text>{selectedOrder.event.topic}</Text>
+              <Text>{selectedOrder.event?.topic || 'Sin evento'}</Text>
             </div>
             <div>
-              <Text fw={500}>Combos:</Text>
-              {selectedOrder.combos.map((combo, index) => (
-                <Text key={index}>
-                  {combo.name} - ${combo.price}
+              <Text fw={500}>Combo:</Text>
+              {selectedOrder.combo ? (
+                <Text>
+                  {selectedOrder.combo.name} - ${selectedOrder.combo.price}
                 </Text>
-              ))}
+              ) : (
+                <Text c="dimmed">Sin combo</Text>
+              )}
             </div>
             <div>
               <Text fw={500}>Invitados:</Text>
-              {selectedOrder.invitees.length > 0 ? (
+              {selectedOrder.invitees && selectedOrder.invitees.length > 0 ? (
                 <Table>
                   <Table.Thead>
                     <Table.Tr>
@@ -463,8 +619,8 @@ export default function OrdersModule() {
       </Modal>
 
       {/* Reject Confirmation Modal */}
-      <Modal 
-        opened={openedDelete} 
+      <Modal
+        opened={openedDelete}
         onClose={() => {
           closeDelete();
           resetRejectState();
@@ -473,26 +629,26 @@ export default function OrdersModule() {
       >
         <Stack gap="md">
           <Text>¿Estás seguro de que deseas rechazar esta orden? Esta acción eliminará permanentemente la orden.</Text>
-          
+
           {rejectError && (
             <Text c="red" size="sm">
               {rejectError}
             </Text>
           )}
         </Stack>
-        
+
         <Group justify="flex-end" mt="md">
           <Button variant="default" onClick={closeDelete}>
             Cancelar
           </Button>
-          <Button 
+          <Button
             color="red"
             loading={isRejecting}
             onClick={async () => {
               if (!selectedOrder) return;
-              
+
               const { success, error } = await rejectOrder(selectedOrder.id);
-              
+
               if (success) {
                 notifications.show({
                   title: '¡Orden eliminada!',
@@ -511,6 +667,174 @@ export default function OrdersModule() {
             }}
           >
             Confirmar
+          </Button>
+        </Group>
+      </Modal>
+
+      {/* Create Order Modal */}
+      <Modal
+        opened={openedCreate}
+        onClose={closeCreate}
+        title="Crear Nueva Orden"
+        size="xl"
+      >
+        <Stack gap="md">
+          {/* Buyer Information */}
+          <div>
+            <Text fw={500} mb="sm">Información del Comprador</Text>
+            <Stack gap="sm">
+              <TextInput
+                label="Email"
+                placeholder="comprador@ejemplo.com"
+                required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              />
+              <TextInput
+                label="Teléfono"
+                placeholder="+54 9 11 1234-5678"
+                required
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              />
+              <TextInput
+                label="CUIL"
+                placeholder="20123456789"
+                required
+                value={formData.cuil}
+                onChange={(e) => setFormData({ ...formData, cuil: e.target.value })}
+              />
+            </Stack>
+          </div>
+
+          <Divider />
+
+          {/* Event and Combo Selection */}
+          <div>
+            <Text fw={500} mb="sm">Selección de Evento y Combo</Text>
+            <Stack gap="sm">
+              <Select
+                label="Evento"
+                placeholder="Seleccionar evento"
+                required
+                value={formData.eventId}
+                onChange={(value) => {
+                  setFormData({ ...formData, eventId: value || '', comboId: '' });
+                }}
+                data={events?.map(e => ({
+                  value: e.id,
+                  label: `${e.topic} (${e.year})`
+                })) || []}
+              />
+              <Select
+                label="Combo"
+                placeholder="Seleccionar combo"
+                required
+                disabled={!formData.eventId}
+                value={formData.comboId}
+                onChange={(value) => setFormData({ ...formData, comboId: value || '' })}
+                data={availableCombos.map(c => ({
+                  value: c.id,
+                  label: `${c.name} - $${c.price} (${c.personsIncluded} ${c.personsIncluded === 1 ? 'persona' : 'personas'})`
+                }))}
+              />
+              <NumberInput
+                label="Cantidad"
+                min={1}
+                value={formData.quantity}
+                onChange={(value) => setFormData({ ...formData, quantity: Number(value) || 1 })}
+              />
+            </Stack>
+          </div>
+
+          {selectedCombo && (
+            <>
+              <Divider />
+
+              {/* Price Summary */}
+              <Card withBorder p="sm" style={{ backgroundColor: '#f0f9ff' }}>
+                <Group justify="space-between">
+                  <div>
+                    <Text size="sm" c="dimmed">Precio Unitario</Text>
+                    <Text fw={600}>${selectedCombo.price}</Text>
+                  </div>
+                  <div>
+                    <Text size="sm" c="dimmed">Cantidad</Text>
+                    <Text fw={600}>x {formData.quantity}</Text>
+                  </div>
+                  <div>
+                    <Text size="sm" c="dimmed">Total</Text>
+                    <Text fw={700} size="xl" c="blue">${totalPrice}</Text>
+                  </div>
+                </Group>
+              </Card>
+
+              <Divider />
+
+              {/* Attendees */}
+              <div>
+                <Group justify="space-between" mb="sm">
+                  <div>
+                    <Text fw={500}>Asistentes</Text>
+                    <Text size="xs" c="dimmed">
+                      Mínimo requerido: {selectedCombo.personsIncluded || 1} persona(s)
+                    </Text>
+                  </div>
+                  <Button
+                    size="xs"
+                    leftSection={<Plus size={14} />}
+                    onClick={handleAddAttendee}
+                  >
+                    Agregar
+                  </Button>
+                </Group>
+
+                <Stack gap="sm">
+                  {attendees.map((attendee, index) => (
+                    <Card key={index} withBorder p="sm">
+                      <Group align="flex-start">
+                        <Stack style={{ flex: 1 }} gap="xs">
+                          <TextInput
+                            placeholder="Nombre completo"
+                            value={attendee.name}
+                            onChange={(e) => handleAttendeeChange(index, 'name', e.target.value)}
+                            required
+                          />
+                          <TextInput
+                            placeholder="CUIL"
+                            value={attendee.cuil}
+                            onChange={(e) => handleAttendeeChange(index, 'cuil', e.target.value)}
+                            required
+                          />
+                        </Stack>
+                        {attendees.length > 1 && (
+                          <ActionIcon
+                            color="red"
+                            variant="light"
+                            onClick={() => handleRemoveAttendee(index)}
+                          >
+                            <Trash size={16} />
+                          </ActionIcon>
+                        )}
+                      </Group>
+                    </Card>
+                  ))}
+                </Stack>
+              </div>
+            </>
+          )}
+        </Stack>
+
+        <Group justify="flex-end" mt="lg">
+          <Button variant="default" onClick={closeCreate}>
+            Cancelar
+          </Button>
+          <Button
+            loading={isCreating}
+            onClick={handleCreateOrder}
+            disabled={!formData.email || !formData.phone || !formData.cuil || !formData.eventId || !formData.comboId}
+          >
+            Crear Orden
           </Button>
         </Group>
       </Modal>

@@ -21,7 +21,7 @@ interface RevenueTrendsData {
   summary: RevenueTrendsSummary;
 }
 
-export const useRevenueTrends = (months: number = 12) => {
+export const useRevenueTrends = (months: number = 12, eventId?: string) => {
   const [data, setData] = useState<RevenueTrendsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,11 +30,12 @@ export const useRevenueTrends = (months: number = 12) => {
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await api.get('/dashboard/revenue-trends', {
-        params: { months: months.toString() }
-      });
-      
+
+      const params: any = { months: months.toString() };
+      if (eventId) params.eventId = eventId;
+
+      const response = await api.get('/dashboard/revenue-trends', { params });
+
       setData(response.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al cargar las tendencias de ingresos');
@@ -46,7 +47,7 @@ export const useRevenueTrends = (months: number = 12) => {
 
   useEffect(() => {
     fetchRevenueTrends();
-  }, [months]);
+  }, [months, eventId]);
 
   return {
     data,

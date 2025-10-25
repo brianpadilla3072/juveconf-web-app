@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, Heart } from "lucide-react"
 import CDAsvg from "@/public/CDAsvg.svg"
+import { BrandName } from "@/components/ui/BrandText"
 
 export default function Navigation() {
   const [open, setOpen] = useState(false)
@@ -18,7 +19,7 @@ export default function Navigation() {
     { name: "Nosotros", href: "/#nuestro-origen" },
     { name: "Cronograma", href: "/cronograma" },
     { name: "Entradas", href: "/entradas" },
-    { name: "Ofrendas", href: "/ofrenda", icon: <Heart className="h-4 w-4 text-orange-500 stroke-orange-500 fill-none" /> },
+    { name: "Ofrendas", href: "/ofrenda", icon: <Heart className="h-4 w-4 text-violet-500 stroke-violet-500 fill-none" /> },
   ]
 
   return (
@@ -35,9 +36,7 @@ export default function Navigation() {
                 className="object-contain"
               />
             </div>
-            <span className="font-bold text-lg text-blue-900">
-              Consagrados a Jesús
-            </span>
+            <BrandName variant="full" className="font-bold text-lg text-blue-900" />
           </Link>
 
           {/* Mobile Menu Trigger */}
@@ -58,7 +57,7 @@ export default function Navigation() {
                           asChild
                           variant="ghost"
                           className={`w-full justify-start text-lg transition-all duration-300 flex items-center gap-3
-                            ${active ? 'text-orange-600 bg-orange-50 font-semibold' : 'text-blue-900/90 hover:text-orange-500 hover:bg-orange-50/50'}`}
+                            ${active ? 'text-violet-600 bg-violet-50 font-semibold' : 'text-blue-900/90 hover:text-violet-500 hover:bg-violet-50/50'}`}
                           onClick={() => setOpen(false)}
                         >
                           <span className="flex items-center gap-2">
@@ -69,7 +68,7 @@ export default function Navigation() {
                       </Link>
                     );
                   })}
-                  {/* <Button className="bg-orange-500 hover:bg-orange-600 text-white w-full mt-4 transition-colors">
+                  {/* <Button className="bg-violet-500 hover:bg-violet-600 text-white w-full mt-4 transition-colors">
                     ¡Inscríbete!
                   </Button> */}
                 </nav>
@@ -85,7 +84,7 @@ export default function Navigation() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`px-4 py-2.5 rounded-lg transition-all duration-300 font-medium flex items-center gap-2 ${active ? 'text-orange-600 bg-orange-50 font-semibold' : 'text-blue-900/90 hover:text-orange-500 hover:bg-orange-50/50'}`}
+                  className={`px-4 py-2.5 rounded-lg transition-all duration-300 font-medium flex items-center gap-2 ${active ? 'text-violet-600 bg-violet-50 font-semibold' : 'text-blue-900/90 hover:text-violet-500 hover:bg-violet-50/50'}`}
                 >
                   {item.icon}
                   {item.name}
@@ -95,7 +94,7 @@ export default function Navigation() {
             {/*
             Botón de ingreso: lleva al usuario a la página de login. Estilizado con gradiente naranja y texto blanco.
             <Link href="/login">
-              <Button className="ml-4 bg-gradient-to-r from-orange-700 to-orange-500 hover:from-orange-500 hover:to-orange-700 text-white">
+              <Button className="ml-4 bg-gradient-to-r from-violet-700 to-violet-500 hover:from-violet-500 hover:to-violet-700 text-white">
                 ¡Igresar!
               </Button>
             </Link>

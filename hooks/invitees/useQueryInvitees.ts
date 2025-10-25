@@ -1,39 +1,10 @@
 "use client";
 import api from '@/lib/axios.config';
 import { useEffect, useState } from "react";
+import { Invitee } from '@/entities/Invitee';
 
 interface FilterInviteesParams {
   year?: number;
-}
-
-interface Invitee {
-  id: string;
-  name: string;
-  cuil: string;
-  email?: string;
-  phone?: string;
-  orderId: string;
-  paymentId: string;
-  attendedDay1: boolean | null;
-  attendedDay2: boolean | null;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  payment: {
-    id: string;
-    amount: number;
-    type: string;
-    payerEmail: string | null;
-    payerName: string | null;
-    payerDni: string | null;
-  };
-  order: {
-    id: string;
-    total: number;
-    status: string;
-    email: string | null;
-    cuil: string | null;
-  };
 }
 
 export function useQueryInvitees(params?: FilterInviteesParams) {

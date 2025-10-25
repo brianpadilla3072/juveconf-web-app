@@ -8,8 +8,7 @@ interface KPIs {
   pendingOrders: number;
   activeEvents: number;
   totalAttendees: number;
-  attendanceDay1: number;
-  attendanceDay2: number;
+  attendanceByDay: { [dayNumber: string]: number };
   capacityUtilization: number;
   totalUsers: number;
 }
@@ -30,7 +29,7 @@ interface DashboardOverview {
   summary: Summary;
 }
 
-export const useDashboardOverview = (year?: number) => {
+export const useDashboardOverview = (year?: number, eventId?: string) => {
   const [data, setData] = useState<DashboardOverview | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,10 +38,13 @@ export const useDashboardOverview = (year?: number) => {
     try {
       setLoading(true);
       setError(null);
-      
-      const params = year ? { year: year.toString() } : {};
+
+      const params: any = {};
+      if (year) params.year = year.toString();
+      if (eventId) params.eventId = eventId;
+
       const response = await api.get('/dashboard/overview', { params });
-      
+
       setData(response.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al cargar el resumen del dashboard');
@@ -54,7 +56,7 @@ export const useDashboardOverview = (year?: number) => {
 
   useEffect(() => {
     fetchOverview();
-  }, [year]);
+  }, [year, eventId]);
 
   return {
     data,

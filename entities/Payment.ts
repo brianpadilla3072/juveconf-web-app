@@ -1,3 +1,5 @@
+import { Attendance } from './Invitee';
+
 export interface Payment {
   id: string;
   year: number;
@@ -30,8 +32,7 @@ export interface Payment {
     id: string;
     name: string;
     cuil: string;
-    attendedDay1: boolean;
-    attendedDay2: boolean;
+    attendance?: Attendance;
   }>;
 }
 

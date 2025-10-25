@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import api from '@/lib/axios.config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,20 +31,23 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Search, Plus, Edit, Trash2, Users, UserCheck, Calendar, RotateCcw, QrCode, Download } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Users, UserCheck, Calendar, RotateCcw, QrCode, Download, Eye } from 'lucide-react';
 import { useQueryInvitees } from '@/hooks/invitees/useQueryInvitees';
-import { 
-  useCreateInvitee, 
-  useUpdateInvitee, 
-  useDeleteInvitee, 
-  useMarkAttendance 
+import InviteeDetailsDrawer from '@/components/invitees/InviteeDetailsDrawer';
+import {
+  useCreateInvitee,
+  useUpdateInvitee,
+  useDeleteInvitee,
+  useMarkAttendance
 } from '@/hooks/invitees/useMutateInvitee';
 import { useQueryPayments } from '@/hooks/payments/useQueryPayments';
+import { useQueryCurrentEvent } from '@/hooks/Events/useQueryEvents';
 import QRAttendanceScanner from '@/components/attendance/QRAttendanceScanner';
 import AttendanceModal from '@/components/attendance/AttendanceModal';
 import { useQRAttendance } from '@/hooks/attendance/useQRAttendance';
 import { useInviteesPDF } from '@/hooks/invitees/useInviteesPDF';
 import { toast } from 'sonner';
+import { Attendance } from '@/entities/Invitee';
 
 export default function InviteesPage() {
   const [search, setSearch] = useState('');
@@ -63,6 +67,10 @@ export default function InviteesPage() {
   // Estados para QR Scanner y modal de asistencia
   const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
+
+  // Estado para drawer de detalles de invitado
+  const [selectedInvitee, setSelectedInvitee] = useState<any>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   
   // Hook para manejo de asistencia por QR
   const { 
@@ -79,6 +87,7 @@ export default function InviteesPage() {
   // Queries
   const { invitees, isLoading, error, refetch } = useQueryInvitees({ year: selectedYear });
   const { payments } = useQueryPayments();
+  const { event, isLoading: isLoadingEvent } = useQueryCurrentEvent();
 
   // Mutations
   const { createInvitee, isLoading: isCreating } = useCreateInvitee();
@@ -94,10 +103,21 @@ export default function InviteesPage() {
     (invitee.phone && invitee.phone.includes(search))
   ) || [];
 
-  // Stats
+  // Helper para verificar asistencia de un invitado a un día específico
+  const hasAttended = (attendance: Attendance | undefined, dayNumber: number): boolean => {
+    return attendance?.days?.[dayNumber.toString()]?.attended || false;
+  };
+
+  // Stats dinámicas basadas en los días del evento
   const totalInvitees = filteredInvitees.length;
-  const attendedDay1 = filteredInvitees.filter(inv => inv.attendedDay1).length;
-  const attendedDay2 = filteredInvitees.filter(inv => inv.attendedDay2).length;
+  const eventDays = event?.eventDays?.days || [];
+
+  // Calcular asistencia por cada día del evento dinámicamente
+  const attendanceByDay = eventDays.map(day => ({
+    dayNumber: day.dayNumber,
+    label: day.label || `Día ${day.dayNumber}`,
+    count: filteredInvitees.filter(inv => hasAttended(inv.attendance, day.dayNumber)).length
+  }));
 
   const handleCreate = async () => {
     const result = await createInvitee(formData);
@@ -147,13 +167,27 @@ export default function InviteesPage() {
     }
   };
 
-  const handleAttendanceChange = async (inviteeId: string, day: 'day1' | 'day2', attended: boolean) => {
-    const result = await markAttendance(inviteeId, 
-      day === 'day1' ? { day1: attended } : { day2: attended }
-    );
-    if (result) {
+  const handleAttendanceChange = async (inviteeId: string, dayNumber: number, attended: boolean) => {
+    try {
+      await api.patch(`/invitees/${inviteeId}/attendance/day`, {
+        dayNumber,
+        attended
+      });
       refetch(); // Refrescar la lista
+      toast.success(`Asistencia actualizada para Día ${dayNumber}`);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Error al actualizar asistencia');
     }
+  };
+
+  const handleOpenDetails = (invitee: any) => {
+    setSelectedInvitee(invitee);
+    setIsDrawerOpen(true);
+  };
+
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
+    setSelectedInvitee(null);
   };
 
   // Manejar escaneo QR exitoso
@@ -169,7 +203,7 @@ export default function InviteesPage() {
   // Confirmar asistencia desde modal QR
   const handleConfirmQRAttendance = async (data: {
     inviteeId: string;
-    day: 'day1' | 'day2';
+    dayNumber: number;
     email?: string;
     phone?: string;
   }) => {
@@ -197,6 +231,7 @@ export default function InviteesPage() {
     await generateInviteesPDF(
       filteredInvitees,
       selectedYear,
+      event,
       search || undefined
     );
   };
@@ -235,7 +270,7 @@ export default function InviteesPage() {
 
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-orange-600 hover:bg-orange-700">
+              <Button className="bg-violet-600 hover:bg-violet-700">
                 <Plus className="mr-2 h-4 w-4" />
                 Nuevo Invitado
               </Button>
@@ -309,7 +344,7 @@ export default function InviteesPage() {
               <Button 
                 onClick={handleCreate}
                 disabled={isCreating}
-                className="bg-orange-600 hover:bg-orange-700"
+                className="bg-violet-600 hover:bg-violet-700"
               >
                 {isCreating ? 'Creando...' : 'Crear'}
               </Button>
@@ -319,8 +354,8 @@ export default function InviteesPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Stats Cards - DINÁMICAS */}
+      <div className="grid grid-cols-1 md:grid-cols-auto-fit gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Invitados</CardTitle>
@@ -330,24 +365,20 @@ export default function InviteesPage() {
             <div className="text-2xl font-bold">{totalInvitees}</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Asistieron Día 1</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{attendedDay1}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Asistieron Día 2</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{attendedDay2}</div>
-          </CardContent>
-        </Card>
+
+        {/* Tarjetas dinámicas por cada día del evento */}
+        {attendanceByDay.map((dayData) => (
+          <Card key={dayData.dayNumber}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Asistieron {dayData.label}</CardTitle>
+              <UserCheck className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{dayData.count}</div>
+            </CardContent>
+          </Card>
+        ))}
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Año Seleccionado</CardTitle>
@@ -412,8 +443,12 @@ export default function InviteesPage() {
                   <TableHead>Teléfono</TableHead>
                   <TableHead>Email Pago</TableHead>
                   <TableHead>Monto</TableHead>
-                  <TableHead className="text-center">Día 1</TableHead>
-                  <TableHead className="text-center">Día 2</TableHead>
+                  {/* Columnas dinámicas por cada día del evento */}
+                  {eventDays.map((day) => (
+                    <TableHead key={day.dayNumber} className="text-center">
+                      {day.label || `Día ${day.dayNumber}`}
+                    </TableHead>
+                  ))}
                   <TableHead className="text-center">Estado Orden</TableHead>
                   <TableHead className="text-center">Acciones</TableHead>
                 </TableRow>
@@ -421,13 +456,13 @@ export default function InviteesPage() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center">
+                    <TableCell colSpan={6 + eventDays.length + 2} className="text-center">
                       Cargando invitados...
                     </TableCell>
                   </TableRow>
                 ) : filteredInvitees.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center">
+                    <TableCell colSpan={6 + eventDays.length + 2} className="text-center">
                       No se encontraron invitados
                     </TableCell>
                   </TableRow>
@@ -440,28 +475,21 @@ export default function InviteesPage() {
                       <TableCell>{invitee.phone || '-'}</TableCell>
                       <TableCell>{invitee.payment?.payerEmail || 'N/A'}</TableCell>
                       <TableCell>${invitee.payment?.amount?.toLocaleString()}</TableCell>
+                      {/* Checkboxes dinámicos por cada día del evento */}
+                      {eventDays.map((day) => (
+                        <TableCell key={day.dayNumber} className="text-center">
+                          <Checkbox
+                            checked={hasAttended(invitee.attendance, day.dayNumber)}
+                            onCheckedChange={(checked) =>
+                              handleAttendanceChange(invitee.id, day.dayNumber, checked as boolean)
+                            }
+                          />
+                        </TableCell>
+                      ))}
                       <TableCell className="text-center">
-                        <Checkbox
-                          checked={invitee.attendedDay1 || false}
-                          onCheckedChange={(checked) => 
-                            handleAttendanceChange(invitee.id, 'day1', checked as boolean)
-                          }
-                          disabled={isMarkingAttendance}
-                        />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Checkbox
-                          checked={invitee.attendedDay2 || false}
-                          onCheckedChange={(checked) => 
-                            handleAttendanceChange(invitee.id, 'day2', checked as boolean)
-                          }
-                          disabled={isMarkingAttendance}
-                        />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Badge 
+                        <Badge
                           variant={
-                            invitee.order?.status === 'PAID' ? 'default' : 
+                            invitee.order?.status === 'PAID' ? 'default' :
                             invitee.order?.status === 'PENDING' ? 'secondary' : 'destructive'
                           }
                         >
@@ -470,6 +498,14 @@ export default function InviteesPage() {
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex justify-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenDetails(invitee)}
+                            className="bg-violet-50 hover:bg-violet-100 border-violet-200"
+                          >
+                            <Eye className="h-4 w-4 text-violet-600" />
+                          </Button>
                           <Button
                             variant="outline"
                             size="sm"
@@ -541,30 +577,31 @@ export default function InviteesPage() {
                     </div>
                   </div>
                   
+                  {/* Asistencias dinámicas por día */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={invitee.attendedDay1 || false}
-                        onCheckedChange={(checked) => 
-                          handleAttendanceChange(invitee.id, 'day1', checked as boolean)
-                        }
-                        disabled={isMarkingAttendance}
-                      />
-                      <span className="text-sm">Asistió Día 1</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={invitee.attendedDay2 || false}
-                        onCheckedChange={(checked) => 
-                          handleAttendanceChange(invitee.id, 'day2', checked as boolean)
-                        }
-                        disabled={isMarkingAttendance}
-                      />
-                      <span className="text-sm">Asistió Día 2</span>
-                    </div>
+                    {eventDays.map((day) => (
+                      <div key={day.dayNumber} className="flex items-center space-x-2">
+                        <Checkbox
+                          checked={hasAttended(invitee.attendance, day.dayNumber)}
+                          onCheckedChange={(checked) =>
+                            handleAttendanceChange(invitee.id, day.dayNumber, checked as boolean)
+                          }
+                        />
+                        <span className="text-sm">Asistió {day.label || `Día ${day.dayNumber}`}</span>
+                      </div>
+                    ))}
                   </div>
                   
                   <div className="flex justify-end gap-2 pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenDetails(invitee)}
+                      className="bg-violet-50 hover:bg-violet-100 border-violet-200"
+                    >
+                      <Eye className="h-4 w-4 mr-1 text-violet-600" />
+                      Ver
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
@@ -643,7 +680,7 @@ export default function InviteesPage() {
             <Button 
               onClick={handleUpdate}
               disabled={isUpdating}
-              className="bg-orange-600 hover:bg-orange-700"
+              className="bg-violet-600 hover:bg-violet-700"
             >
               {isUpdating ? 'Actualizando...' : 'Actualizar'}
             </Button>
@@ -663,8 +700,20 @@ export default function InviteesPage() {
         isOpen={isAttendanceModalOpen}
         onClose={handleCloseAttendanceModal}
         invitee={inviteeData}
+        event={event}
         onConfirm={handleConfirmQRAttendance}
         isLoading={isQRLoading}
+      />
+
+      {/* Invitee Details Drawer */}
+      <InviteeDetailsDrawer
+        invitee={selectedInvitee}
+        isOpen={isDrawerOpen}
+        onClose={handleCloseDrawer}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        event={event}
+        onAttendanceChange={handleAttendanceChange}
       />
     </div>
   );

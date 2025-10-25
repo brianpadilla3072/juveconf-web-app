@@ -22,24 +22,31 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Search, Plus, Edit, Trash2, Calendar, Users, Clock } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Calendar, Users, Clock, Copy, Check } from 'lucide-react';
 import { useQueryEvents } from '@/hooks/Events/useQueryEvents';
-import { 
-  useCreateEvent, 
-  useUpdateEvent, 
-  useDeleteEvent 
+import {
+  useCreateEvent,
+  useUpdateEvent,
+  useDeleteEvent
 } from '@/hooks/Events/useMutateEvent';
+import { toast } from 'sonner';
 
 export default function EventsPage() {
   const [search, setSearch] = useState('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any>(null);
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     year: new Date().getFullYear(),
     topic: '',
     capacity: 100,
-    salesStartDate: ''
+    salesStartDate: '',
+    salesEndDate: '',
+    eventStartDate: '',
+    eventEndDate: '',
+    location: '',
+    description: ''
   });
 
   // Queries
@@ -60,18 +67,68 @@ export default function EventsPage() {
   const totalEvents = filteredEvents.length;
   const currentYear = new Date().getFullYear();
   const currentYearEvents = filteredEvents.filter(event => event.year === currentYear).length;
-  const upcomingEvents = filteredEvents.filter(event => 
+  const upcomingEvents = filteredEvents.filter(event =>
     new Date(event.salesStartDate) > new Date()
   ).length;
+
+  const getPublishedCombosUrl = (eventId: string) => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3072';
+    return `${apiUrl}/combos/event/${eventId}/published`;
+  };
+
+  const isEventFinished = (event: any) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day
+
+    if (event.eventEndDate) {
+      const endDate = new Date(event.eventEndDate);
+      endDate.setHours(23, 59, 59, 999); // End of day
+      return today > endDate;
+    }
+
+    if (event.salesEndDate) {
+      const salesEnd = new Date(event.salesEndDate);
+      salesEnd.setHours(23, 59, 59, 999);
+      return today > salesEnd;
+    }
+
+    return false; // Si no hay fechas, asumimos que está activo
+  };
+
+  const copyToClipboard = async (url: string, eventId: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedUrl(eventId);
+      toast.success('URL copiada al portapapeles');
+      setTimeout(() => setCopiedUrl(null), 2000);
+    } catch (err) {
+      toast.error('Error al copiar la URL');
+    }
+  };
 
   const handleCreate = async () => {
     const result = await createEvent({
       ...formData,
-      salesStartDate: formData.salesStartDate
+      salesStartDate: formData.salesStartDate,
+      salesEndDate: formData.salesEndDate || undefined,
+      eventStartDate: formData.eventStartDate || undefined,
+      eventEndDate: formData.eventEndDate || undefined,
+      location: formData.location || undefined,
+      description: formData.description || undefined
     });
     if (result) {
       setIsCreateDialogOpen(false);
-      setFormData({ year: new Date().getFullYear(), topic: '', capacity: 100, salesStartDate: '' });
+      setFormData({
+        year: new Date().getFullYear(),
+        topic: '',
+        capacity: 100,
+        salesStartDate: '',
+        salesEndDate: '',
+        eventStartDate: '',
+        eventEndDate: '',
+        location: '',
+        description: ''
+      });
       refetch();
     }
   };
@@ -82,7 +139,12 @@ export default function EventsPage() {
       year: event.year,
       topic: event.topic,
       capacity: event.capacity,
-      salesStartDate: event.salesStartDate.split('T')[0] // Format for date input
+      salesStartDate: event.salesStartDate?.split('T')[0] || '',
+      salesEndDate: event.salesEndDate?.split('T')[0] || '',
+      eventStartDate: event.eventStartDate?.split('T')[0] || '',
+      eventEndDate: event.eventEndDate?.split('T')[0] || '',
+      location: event.location || '',
+      description: event.description || ''
     });
     setIsEditDialogOpen(true);
   };
@@ -93,12 +155,27 @@ export default function EventsPage() {
         year: formData.year,
         topic: formData.topic,
         capacity: formData.capacity,
-        salesStartDate: formData.salesStartDate
+        salesStartDate: formData.salesStartDate,
+        salesEndDate: formData.salesEndDate || undefined,
+        eventStartDate: formData.eventStartDate || undefined,
+        eventEndDate: formData.eventEndDate || undefined,
+        location: formData.location || undefined,
+        description: formData.description || undefined
       });
       if (result) {
         setIsEditDialogOpen(false);
         setEditingEvent(null);
-        setFormData({ year: new Date().getFullYear(), topic: '', capacity: 100, salesStartDate: '' });
+        setFormData({
+          year: new Date().getFullYear(),
+          topic: '',
+          capacity: 100,
+          salesStartDate: '',
+          salesEndDate: '',
+          eventStartDate: '',
+          eventEndDate: '',
+          location: '',
+          description: ''
+        });
         refetch();
       }
     }
@@ -129,7 +206,7 @@ export default function EventsPage() {
         
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-orange-600 hover:bg-orange-700">
+            <Button className="bg-violet-600 hover:bg-violet-700">
               <Plus className="mr-2 h-4 w-4" />
               Nuevo Evento
             </Button>
@@ -177,6 +254,53 @@ export default function EventsPage() {
                   onChange={(e) => setFormData(prev => ({ ...prev, salesStartDate: e.target.value }))}
                 />
               </div>
+              <div>
+                <Label htmlFor="salesEndDate">Fecha de Fin de Ventas</Label>
+                <Input
+                  id="salesEndDate"
+                  type="date"
+                  value={formData.salesEndDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, salesEndDate: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="eventStartDate">Fecha de Inicio del Evento</Label>
+                <Input
+                  id="eventStartDate"
+                  type="date"
+                  value={formData.eventStartDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, eventStartDate: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="eventEndDate">Fecha de Fin del Evento</Label>
+                <Input
+                  id="eventEndDate"
+                  type="date"
+                  value={formData.eventEndDate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, eventEndDate: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="location">Ubicación</Label>
+                <Input
+                  id="location"
+                  type="text"
+                  value={formData.location}
+                  onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                  placeholder="Ubicación del evento"
+                />
+              </div>
+              <div>
+                <Label htmlFor="description">Descripción</Label>
+                <Input
+                  id="description"
+                  type="text"
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Descripción breve"
+                />
+              </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
@@ -185,7 +309,7 @@ export default function EventsPage() {
               <Button 
                 onClick={handleCreate}
                 disabled={isCreating}
-                className="bg-orange-600 hover:bg-orange-700"
+                className="bg-violet-600 hover:bg-violet-700"
               >
                 {isCreating ? 'Creando...' : 'Crear'}
               </Button>
@@ -229,7 +353,7 @@ export default function EventsPage() {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{currentYear}</div>
+            <div className="text-2xl font-bold text-violet-600">{currentYear}</div>
           </CardContent>
         </Card>
       </div>
@@ -261,19 +385,20 @@ export default function EventsPage() {
                   <TableHead>Capacidad</TableHead>
                   <TableHead>Inicio de Ventas</TableHead>
                   <TableHead>Estado</TableHead>
+                  <TableHead>URL Combos Publicados</TableHead>
                   <TableHead className="text-center">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center">
+                    <TableCell colSpan={7} className="text-center">
                       Cargando eventos...
                     </TableCell>
                   </TableRow>
                 ) : filteredEvents.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center">
+                    <TableCell colSpan={7} className="text-center">
                       No se encontraron eventos
                     </TableCell>
                   </TableRow>
@@ -291,14 +416,39 @@ export default function EventsPage() {
                           {new Date(event.salesStartDate).toLocaleDateString('es-ES')}
                         </TableCell>
                         <TableCell>
-                          <Badge 
+                          <Badge
                             variant={
-                              isUpcoming ? 'secondary' : 
+                              isUpcoming ? 'secondary' :
                               isCurrentYear ? 'default' : 'outline'
                             }
                           >
                             {isUpcoming ? 'Próximo' : isCurrentYear ? 'Activo' : 'Pasado'}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {isEventFinished(event) ? (
+                            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                              <span>Evento finalizado</span>
+                              <Badge variant="outline" className="text-xs">Sin acceso</Badge>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <code className="text-xs bg-muted px-2 py-1 rounded flex-1 truncate max-w-[300px]">
+                                {getPublishedCombosUrl(event.id)}
+                              </code>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => copyToClipboard(getPublishedCombosUrl(event.id), event.id)}
+                              >
+                                {copiedUrl === event.id ? (
+                                  <Check className="h-4 w-4 text-green-600" />
+                                ) : (
+                                  <Copy className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </div>
+                          )}
                         </TableCell>
                         <TableCell className="text-center">
                           <div className="flex justify-center gap-2">
@@ -379,7 +529,38 @@ export default function EventsPage() {
                         </p>
                       </div>
                     </div>
-                    
+
+                    {isEventFinished(event) ? (
+                      <div className="bg-muted/50 rounded-lg p-3 border border-violet-200">
+                        <p className="text-xs text-muted-foreground font-medium mb-1">Estado del evento</p>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs">Finalizado</Badge>
+                          <span className="text-xs text-muted-foreground">URL de combos no disponible</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-muted/50 rounded-lg p-3 border">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <p className="text-xs text-muted-foreground font-medium">URL API Combos Publicados</p>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard(getPublishedCombosUrl(event.id), event.id)}
+                            className="h-7"
+                          >
+                            {copiedUrl === event.id ? (
+                              <Check className="h-3 w-3 text-green-600" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
+                        <code className="text-[10px] break-all">
+                          {getPublishedCombosUrl(event.id)}
+                        </code>
+                      </div>
+                    )}
+
                     <div className="flex justify-end gap-2 pt-2">
                       <Button
                         variant="outline"
@@ -452,6 +633,51 @@ export default function EventsPage() {
                 onChange={(e) => setFormData(prev => ({ ...prev, salesStartDate: e.target.value }))}
               />
             </div>
+            <div>
+              <Label htmlFor="editSalesEndDate">Fecha de Fin de Ventas</Label>
+              <Input
+                id="editSalesEndDate"
+                type="date"
+                value={formData.salesEndDate}
+                onChange={(e) => setFormData(prev => ({ ...prev, salesEndDate: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editEventStartDate">Fecha de Inicio del Evento</Label>
+              <Input
+                id="editEventStartDate"
+                type="date"
+                value={formData.eventStartDate}
+                onChange={(e) => setFormData(prev => ({ ...prev, eventStartDate: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editEventEndDate">Fecha de Fin del Evento</Label>
+              <Input
+                id="editEventEndDate"
+                type="date"
+                value={formData.eventEndDate}
+                onChange={(e) => setFormData(prev => ({ ...prev, eventEndDate: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="editLocation">Ubicación</Label>
+              <Input
+                id="editLocation"
+                value={formData.location}
+                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
+                placeholder="Ubicación del evento"
+              />
+            </div>
+            <div>
+              <Label htmlFor="editDescription">Descripción</Label>
+              <Input
+                id="editDescription"
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Descripción del evento"
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
@@ -460,7 +686,7 @@ export default function EventsPage() {
             <Button 
               onClick={handleUpdate}
               disabled={isUpdating}
-              className="bg-orange-600 hover:bg-orange-700"
+              className="bg-violet-600 hover:bg-violet-700"
             >
               {isUpdating ? 'Actualizando...' : 'Actualizar'}
             </Button>

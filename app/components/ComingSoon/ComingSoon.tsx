@@ -15,13 +15,13 @@ export function ComingSoon({ moduleName = 'esta sección' }: ComingSoonProps) {
           width: rem(80),
           height: rem(80),
           borderRadius: '50%',
-          backgroundColor: 'var(--mantine-color-orange-0)',
+          backgroundColor: 'var(--mantine-color-violet-0)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           marginBottom: '1.5rem'
         }}>
-          <Clock size={40} color="var(--mantine-color-orange-6)" />
+          <Clock size={40} color="var(--mantine-color-violet-6)" />
         </div>
         <Title order={2} mb="md">
           ¡Próximamente!

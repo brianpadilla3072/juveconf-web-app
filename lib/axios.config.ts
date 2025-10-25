@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 
 // Crear instancia de axios
 const api = axios.create({
-  baseURL: process.env.SERVER_API || 'https://api.consagradosajesus.com',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3072',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -19,14 +19,17 @@ api.interceptors.request.use(
     // Solo ejecutar en el cliente
     if (typeof window !== 'undefined') {
       const token = AuthService.getToken();
+      console.log('🟡 [Axios Interceptor] Token from storage:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+        console.log('🟡 [Axios Interceptor] Authorization header set:', config.headers.Authorization ? 'YES' : 'NO');
       }
-      
+
       // Asegurar que las cabeceras necesarias estén presentes
       config.headers['Content-Type'] = 'application/json';
       config.headers['Accept'] = 'application/json';
     }
+    console.log('🟡 [Axios Interceptor] Request config:', { url: config.url, headers: config.headers });
     return config;
   },
   (error) => {
@@ -41,48 +44,30 @@ api.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
-    const originalRequest = error.config as any;
-    
-    // Si el error es 401 y no es una solicitud de refresco
-    if (error.response?.status === 401 && !originalRequest?._retry) {
-      originalRequest._retry = true;
-      
-      try {
-        // Intentar refrescar el token
-        const response = await axios.post(
-          `${process.env.NET_PUBAPI_URL || 'https://api.consagradosajesus.com'}/auth/refresh-token`,
-          {},
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              ...(originalRequest.headers || {})
-            }
-          }
-        );
-        
-        const { access_token } = response.data;
-        
-        if (access_token) {
-          // Guardar el nuevo token
-          AuthService.setToken(access_token);
-          
-          // Reintentar la petición original con el nuevo token
-          originalRequest.headers.Authorization = `Bearer ${access_token}`;
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
-        // Si hay un error al refrescar el token, cerrar sesión
-        AuthService.removeToken();
-        
-        // Redirigir al login solo si estamos en el cliente
+    // Si el error es 401, verificar si NO es del endpoint de login
+    if (error.response?.status === 401) {
+      const isLoginEndpoint = error.config?.url?.includes('/auth/login');
+      const isRegisterEndpoint = error.config?.url?.includes('/auth/register');
+
+      // Si NO es login ni register, significa que el token es inválido
+      if (!isLoginEndpoint && !isRegisterEndpoint) {
+        console.log('[Axios Interceptor] 401 Unauthorized - Token inválido o expirado');
+
+        // Borrar token y redirigir al login solo si estamos en el cliente
         if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+          AuthService.removeToken();
+          // Solo redirigir si no estamos ya en login
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = '/login';
+          }
         }
+      } else {
+        // Si es login/register, es un error de credenciales, no tocar el token
+        console.log('[Axios Interceptor] 401 en login/register - Credenciales incorrectas');
       }
     }
-    
-    // Para otros errores, rechazar la promesa
+
+    // Para todos los errores, rechazar la promesa
     return Promise.reject(error);
   }
 );

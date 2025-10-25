@@ -1,11 +1,11 @@
 {
-  "name": "Consagrados a Jesús",
-  "short_name": "Consagrados",
-  "description": "Aplicación para la gestión de eventos religiosos, finanzas y administración de la organización Consagrados a Jesús",
+  "name": "JuveConf",
+  "short_name": "JuveConf",
+  "description": "Aplicación para la gestión de eventos juveniles, finanzas y administración de la organización Juventud en Conferencia",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#ea580c",
+  "theme_color": "#8b3fff",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [
@@ -96,7 +96,7 @@
       ]
     }
   ],
-  "categories": ["productivity", "business", "finance"],
+  "categories": ["productivity", "business", "events"],
   "lang": "es",
   "dir": "ltr"
 }

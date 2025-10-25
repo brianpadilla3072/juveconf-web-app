@@ -9,14 +9,15 @@ interface QRData {
   paymentId: string;
 }
 
+import { Attendance } from '@/entities/Invitee';
+
 interface InviteeData {
   id: string;
   name: string;
   cuil: string;
   email?: string;
   phone?: string;
-  attendedDay1: boolean;
-  attendedDay2: boolean;
+  attendance?: Attendance;
   payment?: {
     id: string;
     amount: number;
@@ -29,7 +30,7 @@ interface InviteeData {
 
 interface AttendanceConfirmation {
   inviteeId: string;
-  day: 'day1' | 'day2';
+  dayNumber: number;
   email?: string;
   phone?: string;
 }
@@ -59,8 +60,7 @@ export function useQRAttendance() {
         cuil: response.data.cuil,
         email: response.data.email,
         phone: response.data.phone,
-        attendedDay1: response.data.attendedDay1,
-        attendedDay2: response.data.attendedDay2,
+        attendance: response.data.attendance,
         payment: response.data.payment,
         order: response.data.order,
       };
@@ -87,17 +87,18 @@ export function useQRAttendance() {
       setIsLoading(true);
       setError(null);
 
-      // Actualizar asistencia
+      // Actualizar asistencia usando el nuevo endpoint dinámico
       const attendanceData = {
-        [data.day === 'day1' ? 'day1' : 'day2']: true
+        dayNumber: data.dayNumber,
+        attended: true
       };
 
-      await api.patch(`/invitees/${data.inviteeId}/attendance`, attendanceData);
+      await api.patch(`/invitees/${data.inviteeId}/attendance/day`, attendanceData);
 
       // Actualizar datos personales si se proporcionaron
       if (data.email || data.phone) {
         const updateData: { email?: string; phone?: string } = {};
-        
+
         if (data.email) {
           updateData.email = data.email;
         }
@@ -110,17 +111,31 @@ export function useQRAttendance() {
 
       // Actualizar datos locales
       if (inviteeData) {
-        setInviteeData(prev => prev ? {
-          ...prev,
-          attendedDay1: data.day === 'day1' ? true : prev.attendedDay1,
-          attendedDay2: data.day === 'day2' ? true : prev.attendedDay2,
-          email: data.email || prev.email,
-          phone: data.phone || prev.phone,
-        } : null);
+        setInviteeData(prev => {
+          if (!prev) return null;
+
+          const updatedAttendance = prev.attendance || { days: {} };
+          const newAttendance = {
+            ...updatedAttendance,
+            days: {
+              ...updatedAttendance.days,
+              [data.dayNumber.toString()]: {
+                attended: true,
+                timestamp: new Date().toISOString()
+              }
+            }
+          };
+
+          return {
+            ...prev,
+            attendance: newAttendance,
+            email: data.email || prev.email,
+            phone: data.phone || prev.phone,
+          };
+        });
       }
 
-      const dayText = data.day === 'day1' ? 'Día 1' : 'Día 2';
-      toast.success(`Asistencia confirmada para ${dayText}`);
+      toast.success(`Asistencia confirmada para Día ${data.dayNumber}`);
       
       return true;
     } catch (err: any) {

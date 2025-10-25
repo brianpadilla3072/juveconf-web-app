@@ -27,7 +27,10 @@ export const AuthService = {
   // Guardar token en localStorage
   setToken(token: string): void {
     if (typeof window !== 'undefined') {
+      console.log('[AuthService] Guardando token en localStorage:', token.substring(0, 20) + '...');
       localStorage.setItem(TOKEN_KEY, token);
+      const saved = localStorage.getItem(TOKEN_KEY);
+      console.log('[AuthService] Token guardado y verificado:', saved ? 'YES' : 'NO');
     }
   },
 

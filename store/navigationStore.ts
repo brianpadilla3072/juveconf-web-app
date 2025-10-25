@@ -4,11 +4,13 @@ export type Module =
   | ''
   | 'events'
   | 'combos'
+  | 'presales'
   | 'orders'
   | 'payments'
   | 'invitees'
   | 'emails'
   | 'finanzas'
+  | 'analytics'
   | 'users'
   | 'settings'
 

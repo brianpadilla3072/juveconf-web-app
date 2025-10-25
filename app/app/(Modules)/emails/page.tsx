@@ -233,7 +233,7 @@ export default function EmailsPage() {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{selectedRecipients.length}</div>
+            <div className="text-2xl font-bold text-violet-600">{selectedRecipients.length}</div>
           </CardContent>
         </Card>
         
@@ -308,7 +308,7 @@ export default function EmailsPage() {
             <Button 
               onClick={sendBulkEmail} 
               disabled={isSending || selectedRecipients.length === 0}
-              className="bg-orange-600 hover:bg-orange-700"
+              className="bg-violet-600 hover:bg-violet-700"
             >
               {isSending ? (
                 <LoadingSpinner />

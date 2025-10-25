@@ -10,7 +10,7 @@ import {
   Utensils,
   CalendarCheck
 } from "lucide-react";
-import heroBackground from '../../public/images/hero/hero-background.jpg';
+import heroBackground from '../../public/images/hero/hero-background.webp';
 
 // Definir tipos para resolver errores de tipado
 type TituloActividad =
@@ -30,40 +30,40 @@ type IconosBloqueType = {
 
 // Datos separados para facilitar mantenimiento con tipado correcto
 const iconosBloque: IconosBloqueType = {
-  "Recepción": <CalendarCheck className="text-orange-400" size={20} />,
-  "CDO ABIERTA": <BookOpen className="text-orange-500" size={20} />,
-  "Break": <Coffee className="text-orange-300" size={20} />,
-  "Break 2": <Utensils className="text-orange-300" size={20} />,
-  "Taller 1": <Users className="text-orange-400" size={20} />,
-  "Taller 2": <Users className="text-orange-400" size={20} />,
-  "Plenaria final": <Star className="text-orange-500" size={20} />,
-  "Plenaria final + Santa Cena": <Star className="text-orange-500" size={20} />,
-  "Cierre": <CheckCircle className="text-orange-400" size={20} />
+  "Recepción": <CalendarCheck className="text-violet-400" size={20} />,
+  "CDO ABIERTA": <BookOpen className="text-violet-500" size={20} />,
+  "Break": <Coffee className="text-violet-300" size={20} />,
+  "Break 2": <Utensils className="text-violet-300" size={20} />,
+  "Taller 1": <Users className="text-violet-400" size={20} />,
+  "Taller 2": <Users className="text-violet-400" size={20} />,
+  "Plenaria final": <Star className="text-violet-500" size={20} />,
+  "Plenaria final + Santa Cena": <Star className="text-violet-500" size={20} />,
+  "Cierre": <CheckCircle className="text-violet-400" size={20} />
 };
 
 // Función auxiliar para generar badges según el tipo de actividad
 const badgeBloque = (titulo: string): React.ReactNode => {
   if (titulo.includes("Taller"))
     return (
-      <span className="ml-2 bg-orange-0/30 text-orange-400 border border-orange-300/30 rounded-full px-3 py-1 text-xs font-medium">
+      <span className="ml-2 bg-violet-0/30 text-violet-400 border border-violet-300/30 rounded-full px-3 py-1 text-xs font-medium">
         Taller
       </span>
     );
   if (titulo.includes("Plenaria"))
     return (
-      <span className="ml-2 bg-orange-0/30 text-orange-400 border border-orange-400/30 rounded-full px-3 py-1 text-xs font-medium">
+      <span className="ml-2 bg-violet-0/30 text-violet-400 border border-violet-400/30 rounded-full px-3 py-1 text-xs font-medium">
         Plenaria
       </span>
     );
   if (titulo.includes("Santa Cena"))
     return (
-      <span className="ml-2 bg-orange-0/30 text-orange-400 border border-orange-500/30 rounded-full px-3 py-1 text-xs font-medium">
+      <span className="ml-2 bg-violet-0/30 text-violet-400 border border-violet-500/30 rounded-full px-3 py-1 text-xs font-medium">
         Santa Cena
       </span>
     );
   if (titulo.includes("CDO"))
     return (
-      <span className="ml-2 bg-orange-0/30 text-orange-400 border border-orange-400/30 rounded-full px-3 py-1 text-xs font-medium">
+      <span className="ml-2 bg-violet-0/30 text-violet-400 border border-violet-400/30 rounded-full px-3 py-1 text-xs font-medium">
         Encuentro
       </span>
     );
@@ -72,14 +72,14 @@ const badgeBloque = (titulo: string): React.ReactNode => {
 
 // Función para obtener el color del borde según el tipo de actividad
 const getBorderColor = (titulo: string): string => {
-  if (titulo.includes("Taller")) return "border-l-orange-300/50";
-  if (titulo.includes("Plenaria")) return "border-l-orange-300/50";
-  if (titulo.includes("Santa Cena")) return "border-l-orange-300/50";
-  if (titulo.includes("CDO")) return "border-l-orange-300/50";
-  if (titulo.includes("Break")) return "border-l-orange-300/50";
-  if (titulo.includes("Recepción")) return "border-l-orange-300/50";
-  if (titulo.includes("Cierre")) return "border-l-orange-300/50";
-  return "border-l-orange-300/50";
+  if (titulo.includes("Taller")) return "border-l-violet-300/50";
+  if (titulo.includes("Plenaria")) return "border-l-violet-300/50";
+  if (titulo.includes("Santa Cena")) return "border-l-violet-300/50";
+  if (titulo.includes("CDO")) return "border-l-violet-300/50";
+  if (titulo.includes("Break")) return "border-l-violet-300/50";
+  if (titulo.includes("Recepción")) return "border-l-violet-300/50";
+  if (titulo.includes("Cierre")) return "border-l-violet-300/50";
+  return "border-l-violet-300/50";
 };
 
 // Datos del cronograma (actualizado con la información proporcionada)
@@ -278,7 +278,7 @@ export function CronogramaEventos() {
             <h2 className="text-3xl md:text-4xl font-bold text-neutral-50 mb-4">
               Cronograma CAJ 2025
             </h2>
-            <div className="h-1 w-16 bg-orange-500 mx-auto mb-6 rounded-full"></div>
+            <div className="h-1 w-16 bg-violet-500 mx-auto mb-6 rounded-full"></div>
             <p className="text-lg text-neutral-50/80 max-w-2xl mx-auto">
               Descubre todo lo que tenemos preparado para estos días de avivamiento y adoración
             </p>
@@ -331,7 +331,7 @@ export function CronogramaEventos() {
                 >
                   {dia.dia}
                   {activeDay === index && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500"></div>
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-500"></div>
                   )}
                 </button>
               ))}
@@ -377,7 +377,7 @@ export function CronogramaEventos() {
                     // Búsqueda exacta por clave en lugar de includes()
                     const Icono =
                       iconosBloque[bloque.titulo as TituloActividad] ?? (
-                        <Clock className="text-orange-500" size={20} />
+                        <Clock className="text-violet-500" size={20} />
                       );
 
                     return (
@@ -387,7 +387,7 @@ export function CronogramaEventos() {
                           bloque.titulo
                         )} last:border-l-0 last:pb-0 last:mb-0`}
                       >
-                        <div className="absolute left-0 w-4 h-4 rounded-full bg-white border-4 border-orange-500/80 -translate-x-[calc(0.5rem+1px)] mt-1"></div>
+                        <div className="absolute left-0 w-4 h-4 rounded-full bg-white border-4 border-violet-500/80 -translate-x-[calc(0.5rem+1px)] mt-1"></div>
 
                         <div className="bg-white/10 p-4 rounded-lg hover:bg-white/20 transition-colors">
                           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">

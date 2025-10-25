@@ -1,4 +1,4 @@
-# consagradosajesus
+# JuveConf - Juventud en Conferencia
 
 ```
 src/

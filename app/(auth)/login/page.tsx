@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/AuthContext"
 import { Logo } from "../../components/Logo/Logo"
-import heroBackground from '../../../public/images/hero/hero-background.jpg';
+import heroBackground from '../../../public/images/hero/hero-background.webp';
 
 function LoginPage() {
   const router = useRouter()
@@ -25,10 +25,16 @@ function LoginPage() {
   })
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
+    console.log('🟢 [LoginPage] handleLoginSubmit ejecutado');
+    console.log('🟢 [LoginPage] Datos:', { email: loginData.email, password: '***' });
+
     e.preventDefault()
+    console.log('🟢 [LoginPage] preventDefault ejecutado');
+
     setIsLoading(true)
-    
+
     try {
+      console.log('🟢 [LoginPage] Llamando a login()...');
       await login(loginData.email, loginData.password)
       toast.success('Inicio de sesión exitoso')
       // No necesitamos router.push aquí porque AuthContext ya lo hace
@@ -75,16 +81,21 @@ function LoginPage() {
       <div className="w-full max-w-md">
         <Card className="border-0 shadow-xl">
           <CardHeader className="bg-white-500 text-white">
-            <CardTitle className="text-3xl font-bold text-orange-500 mb-4 text-center">Iniciar Sesión</CardTitle>
+            <CardTitle className="text-3xl font-bold text-violet-500 mb-4 text-center">Iniciar Sesión</CardTitle>
             <CardDescription className="text-white/90 text-center text-gray-700">
               Ingresa tus datos para acceder a tu cuenta
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">
-            <form onSubmit={handleLoginSubmit} className="space-y-4 md:space-y-6">
+            <form onSubmit={(e) => {
+              console.log('🔴 [FORM] onSubmit EJECUTADO - preventDefault AHORA');
+              e.preventDefault();
+              e.stopPropagation();
+              handleLoginSubmit(e);
+            }} className="space-y-4 md:space-y-6">
               <div className="space-y-1.5">
                 <Label htmlFor="login-email" className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-orange-500" />
+                  <Mail className="h-4 w-4 text-violet-500" />
                   Correo Electrónico
                 </Label>
                 <Input
@@ -100,7 +111,7 @@ function LoginPage() {
 
               <div className="space-y-1.5">
                 <Label htmlFor="login-password" className="flex items-center gap-2">
-                  <Lock className="h-4 w-4 text-orange-500" />
+                  <Lock className="h-4 w-4 text-violet-500" />
                   Contraseña
                 </Label>
                 <div className="relative">
@@ -142,14 +153,14 @@ function LoginPage() {
                     Recordar usuario
                     </label>
                   </div> */}
-                  <Link href="/reset-password" className="text-sm text-orange-600 hover:text-orange-700">
+                  <Link href="/reset-password" className="text-sm text-violet-600 hover:text-violet-700">
                     ¿Olvidaste tu contraseña?
                   </Link>
                 </div>
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 h-auto text-base"
+                  className="w-full bg-violet-500 hover:bg-violet-600 text-white py-2 h-auto text-base"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -164,7 +175,7 @@ function LoginPage() {
 
                 <div className="text-center text-sm text-gray-600">
                   ¿No tienes una cuenta?{" "}
-                  <Link href="/signin" className="text-orange-600 hover:text-orange-700 font-medium">
+                  <Link href="/signin" className="text-violet-600 hover:text-violet-700 font-medium">
                     Regístrate aquí
                   </Link>
                 </div>

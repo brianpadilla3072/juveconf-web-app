@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { WifiOff, RefreshCw, Home } from 'lucide-react'
 import Link from 'next/link'
+import { BrandName } from '@/components/ui/BrandText'
 
 export default function OfflinePage() {
   const [isOnline, setIsOnline] = useState(false)
@@ -42,7 +43,7 @@ export default function OfflinePage() {
           <div className="space-y-3">
             <button
               onClick={handleRefresh}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+              className="w-full bg-violet-500 hover:bg-violet-600 text-white font-medium py-3 px-4 rounded-lg transition-colors"
             >
               Actualizar página
             </button>
@@ -73,11 +74,11 @@ export default function OfflinePage() {
           No se pudo conectar a internet. Algunas funciones pueden no estar disponibles.
         </p>
 
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
-          <h3 className="font-medium text-orange-900 mb-2">
+        <div className="bg-violet-50 border border-violet-200 rounded-lg p-4 mb-6">
+          <h3 className="font-medium text-violet-900 mb-2">
             Funciones disponibles offline:
           </h3>
-          <ul className="text-sm text-orange-800 space-y-1">
+          <ul className="text-sm text-violet-800 space-y-1">
             <li>• Consultar páginas visitadas recientemente</li>
             <li>• Ver información almacenada en caché</li>
             <li>• Navegar por secciones ya cargadas</li>
@@ -87,7 +88,7 @@ export default function OfflinePage() {
         <div className="space-y-3">
           <button
             onClick={handleRefresh}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-violet-500 hover:bg-violet-600 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             <RefreshCw className="w-4 h-4" />
             Intentar de nuevo
@@ -104,7 +105,7 @@ export default function OfflinePage() {
 
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-sm text-gray-500">
-            Consagrados a Jesús
+            <BrandName variant="full" />
           </p>
           <p className="text-xs text-gray-400 mt-1">
             Versión offline disponible

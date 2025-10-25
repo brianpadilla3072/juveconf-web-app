@@ -77,11 +77,11 @@ export function NuestroOrigen() {
           Nuestra Historia
         </h2>
 
-        <div className="h-1 w-20 bg-orange-500 mb-8 rounded-full"></div>
+        <div className="h-1 w-20 bg-violet-500 mb-8 rounded-full"></div>
 
         <div className="prose prose-lg max-w-none text-white/80">
           <p className="text-lg leading-relaxed mb-6">
-            <span className="text-orange-400 font-semibold">CAJ</span> comenzó en el año 2022 como una alternativa a las fiestas de primavera que se realizan en Monte Hermoso. Pero Dios tenía otros planes. Ese mismo año, Él nos hizo entender que esto no nos pertenecía, sino que había nacido de Su corazón. Transformó nuestra visión y nos condujo a convertirnos en un congreso interdenominacional, con el propósito de fomentar la comunión del cuerpo de Cristo en nuestra ciudad.
+            <span className="text-violet-400 font-semibold">CAJ</span> comenzó en el año 2022 como una alternativa a las fiestas de primavera que se realizan en Monte Hermoso. Pero Dios tenía otros planes. Ese mismo año, Él nos hizo entender que esto no nos pertenecía, sino que había nacido de Su corazón. Transformó nuestra visión y nos condujo a convertirnos en un congreso interdenominacional, con el propósito de fomentar la comunión del cuerpo de Cristo en nuestra ciudad.
           </p>
           <p className="text-lg leading-relaxed mb-8">
           Actualmente, contamos con el apoyo de distintos pastores de congregaciones de Bahía Blanca, y con un equipo de trabajo totalmente comprometido a obedecer lo que Dios está deseando.
@@ -92,7 +92,7 @@ export function NuestroOrigen() {
           </p>
 
           <div className="mt-10 pt-8 border-t border-white/20 mb-8 ">
-            <blockquote className="relative pl-6 border-l-4 border-orange-500 italic text-white/80">
+            <blockquote className="relative pl-6 border-l-4 border-violet-500 italic text-white/80">
               <p className="mb-3 text-lg">
                 "Y nos ha hecho reyes y sacerdotes para Dios, su Padre; a él sea gloria e imperio por los siglos de los siglos. Amén."
               </p>
@@ -103,7 +103,7 @@ export function NuestroOrigen() {
           </div>
 
           <p className="text-lg leading-relaxed mb-8">
-            Significa que hemos sido hechos <span className="font-semibold text-orange-400">reyes y sacerdotes</span>, completamente apartados para Él. Anhelamos que este fuego arda en los corazones de las personas de nuestra ciudad: vidas que eligen vivir consagradas a su Amado, que no se contaminan con lo que el mundo ofrece, sino que desean, por encima de todo, ser agradables a Dios.
+            Significa que hemos sido hechos <span className="font-semibold text-violet-400">reyes y sacerdotes</span>, completamente apartados para Él. Anhelamos que este fuego arda en los corazones de las personas de nuestra ciudad: vidas que eligen vivir consagradas a su Amado, que no se contaminan con lo que el mundo ofrece, sino que desean, por encima de todo, ser agradables a Dios.
           </p>          
         </div>
       </div>

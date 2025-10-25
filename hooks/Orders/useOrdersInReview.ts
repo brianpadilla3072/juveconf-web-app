@@ -1,63 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import api from '@/lib/axios.config';
-
-type Invitee = {
-  name: string;
-  cuil: string;
-};
-
-type Combo = {
-  id: string;
-  name: string;
-  price: number;
-  year: number;
-  minPersons: number;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  eventId: string;
-};
-
-type Event = {
-  id: string;
-  year: number;
-  topic: string;
-  capacity: number;
-  salesStartDate: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-};
-
-type Payment = {
-  // Add payment properties when available
-  [key: string]: any;
-};
-
-type Order = {
-  id: string;
-  year: number;
-  userId: string | null;
-  eventId: string;
-  total: number;
-  status: string;
-  paymentType: string;
-  externalReference: string | null;
-  metadataToken: string;
-  preferenceId: string | null;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
-  email: string;
-  phone?: string;
-  cuil: string;
-  user: any | null;
-  event: Event;
-  combos: Combo[];
-  payments: Payment[];
-  invitees: Invitee[];
-};
+import { Order } from '@/entities/Order';
 
 export const useOrdersInReview = () => {
   const [orders, setOrders] = useState<Order[]>([]);

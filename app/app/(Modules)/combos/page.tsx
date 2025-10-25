@@ -5,69 +5,124 @@ import { useQueryCombos } from "@/hooks/combos/useQueryCombos"
 import { useCreateCombo } from "@/hooks/combos/useCreateCombo"
 import { useUpdateCombo } from "@/hooks/combos/useUpdateCombo"
 import { useDeleteCombo } from "@/hooks/combos/useDeleteCombo"
+import { useQueryEvents } from "@/hooks/Events/useQueryEvents"
 import { Combo, CreateComboDto, UpdateComboDto } from "@/entities/Combo"
 import { useState } from "react"
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
 } from "@/components/ui/dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
-import { Trash2, Edit, Plus, Package, DollarSign, Users, Search, RotateCcw, X } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Trash2, Edit, Plus, Package, DollarSign, Users, Search, RotateCcw, X, List } from "lucide-react"
 import { toast } from "sonner"
+import { DetailItemsEditor, DetailItem } from "@/components/combos/DetailItemsEditor"
+import { MerchandiseEditor, MerchandiseItem } from "@/components/combos/MerchandiseEditor"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export default function CombosModule() {
   const { combos, isLoading, error, refetch } = useQueryCombos()
   const { createCombo, isLoading: isCreating } = useCreateCombo()
   const { updateCombo, isLoading: isUpdating } = useUpdateCombo()
   const { deleteCombo, isLoading: isDeleting } = useDeleteCombo()
+  const { events, isLoading: isLoadingEvents } = useQueryEvents()
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
   const [selectedCombo, setSelectedCombo] = useState<Combo | null>(null)
   const [search, setSearch] = useState('')
-  
+  const [detailItems, setDetailItems] = useState<DetailItem[]>([])
+  const [editDetailItems, setEditDetailItems] = useState<DetailItem[]>([])
+  const [comboDescription, setComboDescription] = useState('')
+  const [editComboDescription, setEditComboDescription] = useState('')
+
+  // Merchandising states
+  const [merchandiseEnabled, setMerchandiseEnabled] = useState(false)
+  const [merchandiseItems, setMerchandiseItems] = useState<MerchandiseItem[]>([])
+  const [editMerchandiseEnabled, setEditMerchandiseEnabled] = useState(false)
+  const [editMerchandiseItems, setEditMerchandiseItems] = useState<MerchandiseItem[]>([])
+
+  // Get active events (not deleted)
+  const activeEvents = events?.filter(e => !e.deletedAt) || []
+
   // Form states
   const [createForm, setCreateForm] = useState<CreateComboDto>({
     name: "",
     price: 0,
-    year: new Date().getFullYear(),
-    minPersons: 1,
-    eventId: "event-1" // Default event ID
+    personsIncluded: 1,
+    eventId: activeEvents[0]?.id || "", // First available event
+    isFree: false
   })
-  
+
   const [editForm, setEditForm] = useState<UpdateComboDto>({})
 
   const handleCreateCombo = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    const result = await createCombo(createForm)
+
+    // Validation: eventId is required
+    if (!createForm.eventId) {
+      toast.error("Debes seleccionar un evento")
+      return
+    }
+
+    const comboData = {
+      ...createForm,
+      metadata: (detailItems.length > 0 || comboDescription || merchandiseEnabled) ? {
+        description: comboDescription || undefined,
+        detailItems,
+        benefits: detailItems.map(item => item.value), // Para compatibilidad con static site
+        merchandise: merchandiseEnabled ? {
+          enabled: true,
+          allMerchandise: merchandiseItems
+        } : undefined
+      } : undefined
+    }
+
+    const result = await createCombo(comboData)
     if (result) {
       toast.success("Combo creado exitosamente")
       setIsCreateDialogOpen(false)
       setCreateForm({
         name: "",
         price: 0,
-        year: new Date().getFullYear(),
-        minPersons: 1,
-        eventId: "event-1"
+        personsIncluded: 1,
+        eventId: activeEvents[0]?.id || "",
+        isFree: false
       })
+      setDetailItems([])
+      setComboDescription('')
+      setMerchandiseEnabled(false)
+      setMerchandiseItems([])
       refetch()
     } else {
       toast.error("Error al crear combo")
@@ -76,15 +131,32 @@ export default function CombosModule() {
 
   const handleEditCombo = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!selectedCombo) return
-    
-    const result = await updateCombo(selectedCombo.id, editForm)
+
+    const comboData = {
+      ...editForm,
+      metadata: (editDetailItems.length > 0 || editComboDescription || editMerchandiseEnabled) ? {
+        description: editComboDescription || undefined,
+        detailItems: editDetailItems,
+        benefits: editDetailItems.map(item => item.value), // Para compatibilidad con static site
+        merchandise: editMerchandiseEnabled ? {
+          enabled: true,
+          allMerchandise: editMerchandiseItems
+        } : undefined
+      } : undefined
+    }
+
+    const result = await updateCombo(selectedCombo.id, comboData)
     if (result) {
       toast.success("Combo actualizado exitosamente")
       setIsEditDialogOpen(false)
       setSelectedCombo(null)
       setEditForm({})
+      setEditDetailItems([])
+      setEditComboDescription('')
+      setEditMerchandiseEnabled(false)
+      setEditMerchandiseItems([])
       refetch()
     } else {
       toast.error("Error al actualizar combo")
@@ -108,11 +180,20 @@ export default function CombosModule() {
     setEditForm({
       name: combo.name,
       price: combo.price,
-      year: combo.year,
-      minPersons: combo.minPersons,
-      eventId: combo.eventId
+      personsIncluded: combo.personsIncluded,
+      eventId: combo.eventId,
+      isFree: combo.isFree || false
     })
+    setEditDetailItems(combo.metadata?.detailItems || [])
+    setEditComboDescription(combo.metadata?.description || '')
+    setEditMerchandiseEnabled(combo.metadata?.merchandise?.enabled || false)
+    setEditMerchandiseItems(combo.metadata?.merchandise?.allMerchandise || [])
     setIsEditDialogOpen(true)
+  }
+
+  const openDetailsDialog = (combo: Combo) => {
+    setSelectedCombo(combo)
+    setIsDetailsDialogOpen(true)
   }
 
   const formatPrice = (price: number) => {
@@ -142,13 +223,14 @@ export default function CombosModule() {
   const filteredCombos = combos.filter(combo => {
     if (combo.deletedAt) return false
     if (!search.trim()) return true
-    
+
     const searchLower = search.toLowerCase()
     return (
       combo.name.toLowerCase().includes(searchLower) ||
       combo.price.toString().includes(search) ||
-      combo.year.toString().includes(search) ||
-      combo.minPersons.toString().includes(search)
+      combo.personsIncluded.toString().includes(search) ||
+      combo.event?.topic.toLowerCase().includes(searchLower) ||
+      combo.event?.year.toString().includes(search)
     )
   })
   
@@ -169,7 +251,7 @@ export default function CombosModule() {
               Nuevo Combo
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Crear Nuevo Combo</DialogTitle>
             </DialogHeader>
@@ -184,41 +266,132 @@ export default function CombosModule() {
                   required
                 />
               </div>
+
               <div>
-                <Label htmlFor="price">Precio (ARS)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={createForm.price}
-                  onChange={(e) => setCreateForm({...createForm, price: parseFloat(e.target.value) || 0})}
-                  required
-                />
+                <Label htmlFor="eventId">Evento</Label>
+                {isLoadingEvents ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
+                    <LoadingSpinner />
+                    Cargando eventos...
+                  </div>
+                ) : activeEvents.length === 0 ? (
+                  <div className="text-sm text-destructive py-2">
+                    No hay eventos disponibles. Crea un evento primero.
+                  </div>
+                ) : (
+                  <Select
+                    value={createForm.eventId}
+                    onValueChange={(value) => setCreateForm({...createForm, eventId: value})}
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecciona un evento" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {activeEvents.map((event) => (
+                        <SelectItem key={event.id} value={event.id}>
+                          {event.topic} ({event.year})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
-              <div>
-                <Label htmlFor="year">Año</Label>
-                <Input
-                  id="year"
-                  type="number"
-                  min="2020"
-                  max="2030"
-                  value={createForm.year}
-                  onChange={(e) => setCreateForm({...createForm, year: parseInt(e.target.value) || new Date().getFullYear()})}
-                  required
+
+              <div className="flex items-center space-x-2 py-2">
+                <Checkbox
+                  id="isFree"
+                  checked={createForm.isFree || false}
+                  onCheckedChange={(checked) => {
+                    setCreateForm({
+                      ...createForm,
+                      isFree: checked as boolean,
+                      price: checked ? 0 : createForm.price
+                    })
+                  }}
                 />
+                <Label htmlFor="isFree" className="cursor-pointer font-normal">
+                  Combo Gratuito
+                </Label>
               </div>
+
+              {!createForm.isFree && (
+                <div>
+                  <Label htmlFor="price">Precio (ARS)</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={createForm.price}
+                    onChange={(e) => setCreateForm({...createForm, price: parseFloat(e.target.value) || 0})}
+                    required
+                  />
+                </div>
+              )}
+
+              {createForm.isFree && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <p className="text-sm text-green-700 flex items-center gap-2">
+                    <span className="text-green-600">✓</span>
+                    Este combo será gratuito (precio: $0)
+                  </p>
+                </div>
+              )}
               <div>
-                <Label htmlFor="minPersons">Mínimo de personas</Label>
+                <Label htmlFor="personsIncluded">Cantidad de personas incluidas</Label>
                 <Input
-                  id="minPersons"
+                  id="personsIncluded"
                   type="number"
                   min="1"
-                  value={createForm.minPersons}
-                  onChange={(e) => setCreateForm({...createForm, minPersons: parseInt(e.target.value) || 1})}
+                  value={createForm.personsIncluded}
+                  onChange={(e) => setCreateForm({...createForm, personsIncluded: parseInt(e.target.value) || 1})}
                   required
                 />
               </div>
+
+              <div className="flex gap-6">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="isActive"
+                    checked={createForm.isActive ?? true}
+                    onCheckedChange={(checked) => setCreateForm({...createForm, isActive: checked as boolean})}
+                  />
+                  <Label htmlFor="isActive" className="cursor-pointer font-normal">
+                    Activado
+                  </Label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="isPublished"
+                    checked={createForm.isPublished ?? false}
+                    onCheckedChange={(checked) => setCreateForm({...createForm, isPublished: checked as boolean})}
+                  />
+                  <Label htmlFor="isPublished" className="cursor-pointer font-normal">
+                    Publicado
+                  </Label>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <DetailItemsEditor
+                  description={comboDescription}
+                  items={detailItems}
+                  onDescriptionChange={setComboDescription}
+                  onChange={setDetailItems}
+                />
+              </div>
+
+              <div className="border-t pt-4">
+                <MerchandiseEditor
+                  enabled={merchandiseEnabled}
+                  items={merchandiseItems}
+                  onEnabledChange={setMerchandiseEnabled}
+                  onChange={setMerchandiseItems}
+                />
+              </div>
+
               <Button type="submit" disabled={isCreating} className="w-full">
                 {isCreating ? <LoadingSpinner /> : "Crear Combo"}
               </Button>
@@ -234,7 +407,7 @@ export default function CombosModule() {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por nombre, precio, año o mín. personas..."
+                placeholder="Buscar por nombre, evento, precio o personas..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-10 pr-10"
@@ -291,7 +464,7 @@ export default function CombosModule() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {activeCombos.reduce((sum, combo) => sum + combo.minPersons, 0)}
+              {activeCombos.reduce((sum, combo) => sum + combo.personsIncluded, 0)}
             </div>
           </CardContent>
         </Card>
@@ -308,10 +481,12 @@ export default function CombosModule() {
             <TableHeader>
               <TableRow>
                 <TableHead>Nombre</TableHead>
+                <TableHead>Evento</TableHead>
                 <TableHead>Precio</TableHead>
-                <TableHead>Año</TableHead>
-                <TableHead>Min. Personas</TableHead>
-                <TableHead>Estado</TableHead>
+                <TableHead>Personas Incluidas</TableHead>
+                <TableHead>Detalles</TableHead>
+                <TableHead>Activo</TableHead>
+                <TableHead>Publicado</TableHead>
                 <TableHead>Fecha de Creación</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
@@ -319,21 +494,76 @@ export default function CombosModule() {
             <TableBody>
               {activeCombos.map((combo) => (
                 <TableRow key={combo.id}>
-                  <TableCell className="font-medium">{combo.name}</TableCell>
-                  <TableCell className="font-semibold text-green-600">
-                    {formatPrice(combo.price)}
+                  <TableCell className="font-medium">
+                    {combo.metadata?.description ? (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="cursor-help border-b border-dashed border-primary/50">
+                              {combo.name}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs">
+                            <p className="text-sm">{combo.metadata.description}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : (
+                      combo.name
+                    )}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">{combo.year}</Badge>
+                    {combo.event ? (
+                      <div className="flex flex-col gap-1">
+                        <span className="font-medium text-sm">{combo.event.topic}</span>
+                        <Badge variant="outline" className="w-fit text-xs">
+                          {combo.event.year}
+                        </Badge>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">Sin evento</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col gap-1">
+                      <span className="font-semibold text-green-600">
+                        {formatPrice(combo.price)}
+                      </span>
+                      {combo.isFree && (
+                        <Badge variant="secondary" className="w-fit text-xs">
+                          GRATUITO
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary">
-                      {combo.minPersons} {combo.minPersons === 1 ? 'persona' : 'personas'}
+                      {combo.personsIncluded} {combo.personsIncluded === 1 ? 'persona' : 'personas'}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="default">
-                      Activo
+                    {combo.metadata?.detailItems?.length > 0 ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openDetailsDialog(combo)}
+                        className="gap-2"
+                      >
+                        <List className="w-4 h-4" />
+                        {combo.metadata.detailItems.length} {combo.metadata.detailItems.length === 1 ? 'item' : 'items'}
+                      </Button>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">Sin detalles</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={combo.isActive ? "default" : "secondary"}>
+                      {combo.isActive ? "Activo" : "Inactivo"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={combo.isPublished ? "default" : "outline"}>
+                      {combo.isPublished ? "Publicado" : "No publicado"}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -383,22 +613,35 @@ export default function CombosModule() {
                       <h3 className="font-medium text-lg">{combo.name}</h3>
                       <p className="text-xl font-semibold text-green-600">{formatPrice(combo.price)}</p>
                     </div>
-                    <Badge variant="default">Activo</Badge>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="text-muted-foreground">Año</p>
-                      <Badge variant="outline">{combo.year}</Badge>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Min. Personas</p>
-                      <Badge variant="secondary">
-                        {combo.minPersons} {combo.minPersons === 1 ? 'persona' : 'personas'}
+                    <div className="flex flex-col gap-1">
+                      <Badge variant={combo.isActive ? "default" : "secondary"}>
+                        {combo.isActive ? "Activo" : "Inactivo"}
+                      </Badge>
+                      <Badge variant={combo.isPublished ? "default" : "outline"}>
+                        {combo.isPublished ? "Publicado" : "No publicado"}
                       </Badge>
                     </div>
                   </div>
-                  
+
+                  {combo.event && (
+                    <div className="bg-primary/5 rounded-lg p-3 border border-primary/20">
+                      <p className="text-xs text-muted-foreground mb-1">Evento</p>
+                      <p className="font-medium text-sm">{combo.event.topic}</p>
+                      <Badge variant="outline" className="text-xs mt-1">
+                        {combo.event.year}
+                      </Badge>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 gap-4 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">Personas Incluidas</p>
+                      <Badge variant="secondary">
+                        {combo.personsIncluded} {combo.personsIncluded === 1 ? 'persona' : 'personas'}
+                      </Badge>
+                    </div>
+                  </div>
+
                   <div>
                     <p className="text-muted-foreground text-sm">Fecha de Creación</p>
                     <p className="font-medium">
@@ -434,7 +677,7 @@ export default function CombosModule() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Combo</DialogTitle>
           </DialogHeader>
@@ -447,42 +690,213 @@ export default function CombosModule() {
                 onChange={(e) => setEditForm({...editForm, name: e.target.value})}
               />
             </div>
+
             <div>
-              <Label htmlFor="edit-price">Precio (ARS)</Label>
-              <Input
-                id="edit-price"
-                type="number"
-                step="0.01"
-                min="0"
-                value={editForm.price || ""}
-                onChange={(e) => setEditForm({...editForm, price: parseFloat(e.target.value) || 0})}
-              />
+              <Label htmlFor="edit-eventId">Evento</Label>
+              {isLoadingEvents ? (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
+                  <LoadingSpinner />
+                  Cargando eventos...
+                </div>
+              ) : activeEvents.length === 0 ? (
+                <div className="text-sm text-destructive py-2">
+                  No hay eventos disponibles.
+                </div>
+              ) : (
+                <Select
+                  value={editForm.eventId || ""}
+                  onValueChange={(value) => setEditForm({...editForm, eventId: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona un evento" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {activeEvents.map((event) => (
+                      <SelectItem key={event.id} value={event.id}>
+                        {event.topic} ({event.year})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
-            <div>
-              <Label htmlFor="edit-year">Año</Label>
-              <Input
-                id="edit-year"
-                type="number"
-                min="2020"
-                max="2030"
-                value={editForm.year || ""}
-                onChange={(e) => setEditForm({...editForm, year: parseInt(e.target.value) || new Date().getFullYear()})}
+
+            <div className="flex items-center space-x-2 py-2">
+              <Checkbox
+                id="edit-isFree"
+                checked={editForm.isFree || false}
+                onCheckedChange={(checked) => {
+                  setEditForm({
+                    ...editForm,
+                    isFree: checked as boolean,
+                    price: checked ? 0 : editForm.price || 0
+                  })
+                }}
               />
+              <Label htmlFor="edit-isFree" className="cursor-pointer font-normal">
+                Combo Gratuito
+              </Label>
             </div>
+
+            {!editForm.isFree && (
+              <div>
+                <Label htmlFor="edit-price">Precio (ARS)</Label>
+                <Input
+                  id="edit-price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={editForm.price || ""}
+                  onChange={(e) => setEditForm({...editForm, price: parseFloat(e.target.value) || 0})}
+                />
+              </div>
+            )}
+
+            {editForm.isFree && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-sm text-green-700 flex items-center gap-2">
+                  <span className="text-green-600">✓</span>
+                  Este combo será gratuito (precio: $0)
+                </p>
+              </div>
+            )}
             <div>
-              <Label htmlFor="edit-minPersons">Mínimo de personas</Label>
+              <Label htmlFor="edit-personsIncluded">Cantidad de personas incluidas</Label>
               <Input
-                id="edit-minPersons"
+                id="edit-personsIncluded"
                 type="number"
                 min="1"
-                value={editForm.minPersons || ""}
-                onChange={(e) => setEditForm({...editForm, minPersons: parseInt(e.target.value) || 1})}
+                value={editForm.personsIncluded || ""}
+                onChange={(e) => setEditForm({...editForm, personsIncluded: parseInt(e.target.value) || 1})}
               />
             </div>
+
+            <div className="flex gap-6">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="edit-isActive"
+                  checked={editForm.isActive ?? true}
+                  onCheckedChange={(checked) => setEditForm({...editForm, isActive: checked as boolean})}
+                />
+                <Label htmlFor="edit-isActive" className="cursor-pointer font-normal">
+                  Activado
+                </Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="edit-isPublished"
+                  checked={editForm.isPublished ?? false}
+                  onCheckedChange={(checked) => setEditForm({...editForm, isPublished: checked as boolean})}
+                />
+                <Label htmlFor="edit-isPublished" className="cursor-pointer font-normal">
+                  Publicado
+                </Label>
+              </div>
+            </div>
+
+            <div className="border-t pt-4">
+              <DetailItemsEditor
+                description={editComboDescription}
+                items={editDetailItems}
+                onDescriptionChange={setEditComboDescription}
+                onChange={setEditDetailItems}
+              />
+            </div>
+
+            <div className="border-t pt-4">
+              <MerchandiseEditor
+                enabled={editMerchandiseEnabled}
+                items={editMerchandiseItems}
+                onEnabledChange={setEditMerchandiseEnabled}
+                onChange={setEditMerchandiseItems}
+              />
+            </div>
+
             <Button type="submit" disabled={isUpdating} className="w-full">
               {isUpdating ? <LoadingSpinner /> : "Actualizar Combo"}
             </Button>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Details Dialog */}
+      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              Detalles de {selectedCombo?.name}
+              {selectedCombo?.isFree && (
+                <Badge variant="secondary" className="text-xs">
+                  GRATUITO
+                </Badge>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedCombo?.metadata?.description && (
+              <Card className="bg-primary/5 border-primary/20">
+                <CardContent className="pt-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                        <span className="text-primary font-bold text-lg">📝</span>
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-sm mb-2 text-primary">Descripción</h4>
+                      <p className="text-sm text-foreground leading-relaxed">
+                        {selectedCombo.metadata.description}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {selectedCombo?.metadata?.detailItems && selectedCombo.metadata.detailItems.length > 0 ? (
+              <div className="space-y-3">
+                {selectedCombo.metadata.detailItems.map((item: DetailItem, index: number) => (
+                  <Card key={index} className="border-l-4 border-l-primary">
+                    <CardContent className="py-4">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 mt-1">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <List className="w-4 h-4 text-primary" />
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-sm text-primary mb-1">
+                            {item.label}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            {item.value}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card className="border-dashed">
+                <CardContent className="py-8 text-center text-muted-foreground">
+                  <List className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm">Este combo no tiene detalles agregados</p>
+                </CardContent>
+              </Card>
+            )}
+
+            <div className="border-t pt-4">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => setIsDetailsDialogOpen(false)}
+              >
+                Cerrar
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
