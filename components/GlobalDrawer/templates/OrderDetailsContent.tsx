@@ -6,6 +6,7 @@ import {
   SheetDescription,
 } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
   ShoppingCart,
@@ -15,15 +16,21 @@ import {
   Calendar,
   Package,
   User,
-  CreditCard
+  CreditCard,
+  Check,
+  X
 } from 'lucide-react';
 import { Order } from '@/entities/Order';
 
 interface OrderDetailsContentProps {
   order: Order;
+  onApprove?: () => void;
+  onReject?: () => void;
+  isApproving?: boolean;
+  isRejecting?: boolean;
 }
 
-export function OrderDetailsContent({ order }: OrderDetailsContentProps) {
+export function OrderDetailsContent({ order, onApprove, onReject, isApproving, isRejecting }: OrderDetailsContentProps) {
   return (
     <>
       <SheetHeader className="pb-4">
@@ -118,7 +125,7 @@ export function OrderDetailsContent({ order }: OrderDetailsContentProps) {
               <div className="flex-1">
                 <p className="text-xs text-slate-500 font-medium">Cantidad de Invitados</p>
                 <p className="text-sm text-slate-900 font-medium">
-                  {order.quantity || 0}
+                  {order.invitees?.length || 0}
                 </p>
               </div>
             </div>
@@ -137,7 +144,7 @@ export function OrderDetailsContent({ order }: OrderDetailsContentProps) {
               <div className="flex-1">
                 <p className="text-xs text-slate-500 font-medium">Monto Total</p>
                 <p className="text-sm text-slate-900 font-bold">
-                  ${order.amount?.toLocaleString() || '0'}
+                  ${order.total?.toLocaleString() || '0'}
                 </p>
               </div>
             </div>
@@ -146,7 +153,9 @@ export function OrderDetailsContent({ order }: OrderDetailsContentProps) {
               <div className="flex-1">
                 <p className="text-xs text-slate-500 font-medium">Método de Pago</p>
                 <p className="text-sm text-slate-900 font-medium">
-                  {order.payment?.type || 'Pendiente'}
+                  {order.paymentType === 'TRANSFER' ? 'Transferencia' :
+                   order.paymentType === 'CASH' ? 'Efectivo' :
+                   order.paymentType === 'MERCADOPAGO' ? 'MercadoPago' : 'Pendiente'}
                 </p>
               </div>
             </div>
@@ -177,6 +186,39 @@ export function OrderDetailsContent({ order }: OrderDetailsContentProps) {
             )}
           </div>
         </div>
+
+        {/* Action Buttons - Only show for REVIEW status */}
+        {order.status === 'REVIEW' && (onApprove || onReject) && (
+          <>
+            <Separator className="my-4" />
+            <div className="space-y-3">
+              <h4 className="text-sm font-semibold text-slate-700">Acciones</h4>
+              <div className="grid grid-cols-2 gap-3">
+                {onReject && (
+                  <Button
+                    variant="outline"
+                    className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                    onClick={onReject}
+                    disabled={isRejecting || isApproving}
+                  >
+                    <X className="mr-2 h-4 w-4" />
+                    {isRejecting ? 'Rechazando...' : 'Rechazar'}
+                  </Button>
+                )}
+                {onApprove && (
+                  <Button
+                    className="w-full bg-green-600 hover:bg-green-700 text-white"
+                    onClick={onApprove}
+                    disabled={isApproving || isRejecting}
+                  >
+                    <Check className="mr-2 h-4 w-4" />
+                    {isApproving ? 'Aprobando...' : 'Aprobar'}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   );

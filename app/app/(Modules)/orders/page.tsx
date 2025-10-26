@@ -1,7 +1,7 @@
 "use client"
 
 import { Table, Title, Card, Text, Container, Box, Button, Modal, Group, Badge, Stack, ActionIcon, TextInput, LoadingOverlay, SimpleGrid, useMantineTheme, rem, Divider, Select, NumberInput, Tabs } from "@mantine/core"
-import { Eye, Search, RotateCw, ChevronRight, Plus, Trash } from "lucide-react"
+import { Eye, Search, RotateCw, ChevronRight, Plus, Trash, Check, X } from "lucide-react"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { useOrdersInReview } from "@/hooks/Orders/useOrdersInReview"
@@ -246,7 +246,47 @@ export default function OrdersModule() {
 
   const handleOpenDetails = (order: Order) => {
     openDrawer(order, (data) => (
-      <OrderDetailsContent order={data} />
+      <OrderDetailsContent
+        order={data}
+        onApprove={async () => {
+          const { success, error } = await approveOrder(data.id);
+          if (success) {
+            notifications.show({
+              title: '¡Éxito!',
+              message: 'La orden ha sido aprobada correctamente',
+              color: 'green',
+            });
+            closeDrawer();
+            refetch();
+          } else {
+            notifications.show({
+              title: 'Error',
+              message: error || 'Ocurrió un error al aprobar la orden',
+              color: 'red',
+            });
+          }
+        }}
+        onReject={async () => {
+          const { success, error } = await rejectOrder(data.id);
+          if (success) {
+            notifications.show({
+              title: '¡Orden eliminada!',
+              message: 'La orden ha sido rechazada y eliminada correctamente',
+              color: 'red',
+            });
+            closeDrawer();
+            refetch();
+          } else {
+            notifications.show({
+              title: 'Error',
+              message: error || 'Ocurrió un error al rechazar la orden',
+              color: 'red',
+            });
+          }
+        }}
+        isApproving={isApproving}
+        isRejecting={isRejecting}
+      />
     ));
   };
 
@@ -451,15 +491,45 @@ export default function OrdersModule() {
                       <Text size="xs" c="dimmed">Total</Text>
                       <Text fw={600} size="md">${order.total}</Text>
                     </div>
-                    <Button
-                      variant="light"
-                      size="sm"
-                      rightSection={<ChevronRight size={14} />}
-                      onClick={() => handleOpenDetails(order)}
-                      style={{ minWidth: '120px' }}
-                    >
-                      Ver detalles
-                    </Button>
+                    <Group gap="xs">
+                      {order.status === 'REVIEW' && (
+                        <>
+                          <ActionIcon
+                            color="red"
+                            variant="light"
+                            size="lg"
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              openDelete();
+                            }}
+                            disabled={isRejecting || isApproving}
+                          >
+                            <X size={18} />
+                          </ActionIcon>
+                          <ActionIcon
+                            color="green"
+                            variant="light"
+                            size="lg"
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              openApprove();
+                            }}
+                            disabled={isApproving || isRejecting}
+                          >
+                            <Check size={18} />
+                          </ActionIcon>
+                        </>
+                      )}
+                      <Button
+                        variant="light"
+                        size="sm"
+                        rightSection={<ChevronRight size={14} />}
+                        onClick={() => handleOpenDetails(order)}
+                        style={{ minWidth: '120px' }}
+                      >
+                        Ver detalles
+                      </Button>
+                    </Group>
                   </Group>
                 </Stack>
               </Card>
