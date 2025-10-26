@@ -38,7 +38,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Trash2, Edit, Plus, Package, DollarSign, Users, Search, RotateCcw, X, List } from "lucide-react"
+import { Trash2, Edit, Plus, Package, DollarSign, Users, Search, RotateCcw, X, List, Eye } from "lucide-react"
 import { toast } from "sonner"
 import { DetailItemsEditor, DetailItem } from "@/components/combos/DetailItemsEditor"
 import { MerchandiseEditor, MerchandiseItem } from "@/components/combos/MerchandiseEditor"
@@ -48,6 +48,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useDrawer } from '@/hooks/useDrawer'
+import { ComboDetailsContent } from '@/components/GlobalDrawer/templates/ComboDetailsContent'
 
 export default function CombosModule() {
   const { combos, isLoading, error, refetch } = useQueryCombos()
@@ -55,10 +57,10 @@ export default function CombosModule() {
   const { updateCombo, isLoading: isUpdating } = useUpdateCombo()
   const { deleteCombo, isLoading: isDeleting } = useDeleteCombo()
   const { events, isLoading: isLoadingEvents } = useQueryEvents()
+  const { openDrawer, closeDrawer } = useDrawer()
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
-  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
   const [selectedCombo, setSelectedCombo] = useState<Combo | null>(null)
   const [search, setSearch] = useState('')
   const [detailItems, setDetailItems] = useState<DetailItem[]>([])
@@ -191,9 +193,10 @@ export default function CombosModule() {
     setIsEditDialogOpen(true)
   }
 
-  const openDetailsDialog = (combo: Combo) => {
-    setSelectedCombo(combo)
-    setIsDetailsDialogOpen(true)
+  const handleOpenDetails = (combo: Combo) => {
+    openDrawer(combo, (data) => (
+      <ComboDetailsContent combo={data} />
+    ))
   }
 
   const formatPrice = (price: number) => {
@@ -546,7 +549,7 @@ export default function CombosModule() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => openDetailsDialog(combo)}
+                        onClick={() => handleOpenDetails(combo)}
                         className="gap-2"
                       >
                         <List className="w-4 h-4" />
@@ -571,6 +574,14 @@ export default function CombosModule() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenDetails(combo)}
+                        className="bg-violet-50 hover:bg-violet-100 border-violet-200"
+                      >
+                        <Eye className="w-4 h-4 text-violet-600" />
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"
@@ -817,86 +828,6 @@ export default function CombosModule() {
               {isUpdating ? <LoadingSpinner /> : "Actualizar Combo"}
             </Button>
           </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* Details Dialog */}
-      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              Detalles de {selectedCombo?.name}
-              {selectedCombo?.isFree && (
-                <Badge variant="secondary" className="text-xs">
-                  GRATUITO
-                </Badge>
-              )}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {selectedCombo?.metadata?.description && (
-              <Card className="bg-primary/5 border-primary/20">
-                <CardContent className="pt-4">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                        <span className="text-primary font-bold text-lg">📝</span>
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-sm mb-2 text-primary">Descripción</h4>
-                      <p className="text-sm text-foreground leading-relaxed">
-                        {selectedCombo.metadata.description}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {selectedCombo?.metadata?.detailItems && selectedCombo.metadata.detailItems.length > 0 ? (
-              <div className="space-y-3">
-                {selectedCombo.metadata.detailItems.map((item: DetailItem, index: number) => (
-                  <Card key={index} className="border-l-4 border-l-primary">
-                    <CardContent className="py-4">
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 mt-1">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <List className="w-4 h-4 text-primary" />
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-sm text-primary mb-1">
-                            {item.label}
-                          </h4>
-                          <p className="text-sm text-muted-foreground">
-                            {item.value}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <Card className="border-dashed">
-                <CardContent className="py-8 text-center text-muted-foreground">
-                  <List className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p className="text-sm">Este combo no tiene detalles agregados</p>
-                </CardContent>
-              </Card>
-            )}
-
-            <div className="border-t pt-4">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => setIsDetailsDialogOpen(false)}
-              >
-                Cerrar
-              </Button>
-            </div>
-          </div>
         </DialogContent>
       </Dialog>
     </div>

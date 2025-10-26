@@ -36,14 +36,19 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
-import { Trash2, Edit, Plus, Users, UserCheck, UserX, Search, RotateCcw, X } from "lucide-react"
+import { Trash2, Edit, Plus, Users, UserCheck, UserX, Search, RotateCcw, X, Eye } from "lucide-react"
 import { toast } from "sonner"
+import { useDrawer } from '@/hooks/useDrawer'
+import { UserDetailsContent } from '@/components/GlobalDrawer/templates/UserDetailsContent'
 
 export default function UsersModule() {
   const { users, isLoading, error, refetch } = useQueryUsers()
   const { createUser, isLoading: isCreating } = useCreateUser()
   const { updateUser, isLoading: isUpdating } = useUpdateUser()
   const { deleteUser, isLoading: isDeleting } = useDeleteUser()
+
+  // Drawer
+  const { openDrawer, closeDrawer } = useDrawer()
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -132,6 +137,12 @@ export default function UsersModule() {
       default: return 'default'
     }
   }
+
+  const handleOpenDetails = (user: User) => {
+    openDrawer(user, (data) => (
+      <UserDetailsContent user={data} />
+    ));
+  };
 
   if (isLoading) {
     return (
@@ -362,6 +373,14 @@ export default function UsersModule() {
                       <Button
                         variant="outline"
                         size="sm"
+                        onClick={() => handleOpenDetails(user)}
+                        className="bg-violet-50 hover:bg-violet-100 border-violet-200"
+                      >
+                        <Eye className="w-4 h-4 text-violet-600" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => openEditDialog(user)}
                       >
                         <Edit className="w-4 h-4" />
@@ -430,6 +449,15 @@ export default function UsersModule() {
                   </div>
                   
                   <div className="flex justify-end gap-2 pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenDetails(user)}
+                      className="bg-violet-50 hover:bg-violet-100 border-violet-200"
+                    >
+                      <Eye className="w-4 h-4 mr-1 text-violet-600" />
+                      Ver
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"

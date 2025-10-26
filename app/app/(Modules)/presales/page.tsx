@@ -32,8 +32,10 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
-import { Trash2, Edit, Plus, Tag, Calendar, RotateCcw, DollarSign } from "lucide-react"
+import { Trash2, Edit, Plus, Tag, Calendar, RotateCcw, DollarSign, Eye } from "lucide-react"
 import { toast } from "sonner"
+import { useDrawer } from '@/hooks/useDrawer'
+import { PreSaleDetailsContent } from '@/components/GlobalDrawer/templates/PreSaleDetailsContent'
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Select,
@@ -50,6 +52,9 @@ export default function PreSalesModule() {
   const { createPreSale, isLoading: isCreating } = useCreatePreSale()
   const { updatePreSale, isLoading: isUpdating } = useUpdatePreSale()
   const { deletePreSale, isLoading: isDeleting } = useDeletePreSale()
+
+  // Drawer
+  const { openDrawer, closeDrawer } = useDrawer()
 
   // Filtrar solo eventos activos (no eliminados, año actual o futuro)
   const currentYear = new Date().getFullYear()
@@ -275,6 +280,12 @@ export default function PreSalesModule() {
       !c.deletedAt
     )
   }
+
+  const handleOpenDetails = (preSale: PreSale) => {
+    openDrawer(preSale, (data) => (
+      <PreSaleDetailsContent preSale={data} />
+    ));
+  };
 
   if (isLoading) {
     return (
@@ -558,6 +569,14 @@ export default function PreSalesModule() {
                       <Button
                         variant="outline"
                         size="sm"
+                        onClick={() => handleOpenDetails(preSale)}
+                        className="bg-violet-50 hover:bg-violet-100 border-violet-200"
+                      >
+                        <Eye className="w-4 h-4 text-violet-600" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => openEditDialog(preSale)}
                       >
                         <Edit className="w-4 h-4" />
@@ -627,6 +646,15 @@ export default function PreSalesModule() {
                   </div>
 
                   <div className="flex justify-end gap-2 pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenDetails(preSale)}
+                      className="bg-violet-50 hover:bg-violet-100 border-violet-200"
+                    >
+                      <Eye className="w-4 h-4 mr-1 text-violet-600" />
+                      Ver
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"

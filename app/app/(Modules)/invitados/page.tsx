@@ -33,7 +33,8 @@ import {
 import { Label } from '@/components/ui/label';
 import { Search, Plus, Edit, Trash2, Users, UserCheck, Calendar, RotateCcw, QrCode, Download, Eye } from 'lucide-react';
 import { useQueryInvitees } from '@/hooks/invitees/useQueryInvitees';
-import InviteeDetailsDrawer from '@/components/invitees/InviteeDetailsDrawer';
+import { InviteeDetailsContent } from '@/components/GlobalDrawer/templates/InviteeDetailsContent';
+import { useDrawer } from '@/hooks/useDrawer';
 import {
   useCreateInvitee,
   useUpdateInvitee,
@@ -68,10 +69,9 @@ export default function InviteesPage() {
   const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
 
-  // Estado para drawer de detalles de invitado
-  const [selectedInvitee, setSelectedInvitee] = useState<any>(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  
+  // Hook para drawer global
+  const { openDrawer, closeDrawer } = useDrawer();
+
   // Hook para manejo de asistencia por QR
   const { 
     fetchInviteeByQR, 
@@ -181,13 +181,18 @@ export default function InviteesPage() {
   };
 
   const handleOpenDetails = (invitee: any) => {
-    setSelectedInvitee(invitee);
-    setIsDrawerOpen(true);
-  };
-
-  const handleCloseDrawer = () => {
-    setIsDrawerOpen(false);
-    setSelectedInvitee(null);
+    openDrawer(invitee, (data) => (
+      <InviteeDetailsContent
+        invitee={data}
+        onEdit={handleEdit}
+        onDelete={(id) => {
+          handleDelete(id);
+          closeDrawer();
+        }}
+        event={event}
+        onAttendanceChange={handleAttendanceChange}
+      />
+    ));
   };
 
   // Manejar escaneo QR exitoso
@@ -703,17 +708,6 @@ export default function InviteesPage() {
         event={event}
         onConfirm={handleConfirmQRAttendance}
         isLoading={isQRLoading}
-      />
-
-      {/* Invitee Details Drawer */}
-      <InviteeDetailsDrawer
-        invitee={selectedInvitee}
-        isOpen={isDrawerOpen}
-        onClose={handleCloseDrawer}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        event={event}
-        onAttendanceChange={handleAttendanceChange}
       />
     </div>
   );

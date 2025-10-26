@@ -44,8 +44,10 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
-import { Trash2, Edit, Plus, CreditCard, DollarSign, TrendingUp, Activity, Search, RotateCcw, X, ExternalLink, MoreHorizontal } from "lucide-react"
+import { Trash2, Edit, Plus, CreditCard, DollarSign, TrendingUp, Activity, Search, RotateCcw, X, ExternalLink, MoreHorizontal, Eye } from "lucide-react"
 import { toast } from "sonner"
+import { useDrawer } from '@/hooks/useDrawer'
+import { PaymentDetailsContent } from '@/components/GlobalDrawer/templates/PaymentDetailsContent'
 
 export default function PaymentsModule() {
   const { payments, isLoading, error, refetch } = useQueryPayments()
@@ -54,6 +56,7 @@ export default function PaymentsModule() {
   const { deletePayment, isLoading: isDeleting } = useDeletePayment()
   const { summary, isLoading: isSummaryLoading } = usePaymentsSummary()
   const { orders, loading: ordersLoading } = useQueryOrders()
+  const { openDrawer, closeDrawer } = useDrawer()
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -152,6 +155,12 @@ export default function PaymentsModule() {
       style: 'currency',
       currency: 'ARS'
     }).format(price)
+  }
+
+  const handleOpenDetails = (payment: Payment) => {
+    openDrawer(payment, (data) => (
+      <PaymentDetailsContent payment={data} />
+    ))
   }
 
   if (isLoading || isSummaryLoading) {
@@ -431,6 +440,10 @@ export default function PaymentsModule() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleOpenDetails(payment)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            Ver Detalles
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => window.open(`https://consagradosajesus.com/descargar-entrada/${payment.id}`, '_blank')}>
                             <ExternalLink className="mr-2 h-4 w-4" />
                             Ver Entrada
@@ -514,6 +527,10 @@ export default function PaymentsModule() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleOpenDetails(payment)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            Ver Detalles
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => window.open(`https://consagradosajesus.com/descargar-entrada/${payment.id}`, '_blank')}>
                             <ExternalLink className="mr-2 h-4 w-4" />
                             Ver Entrada

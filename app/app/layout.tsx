@@ -24,6 +24,8 @@ import { UserMenu } from "@/components/app/UserMenu";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { Logo } from "../components/Logo/Logo";
 import { getBrandColor, ORG_NAME } from "@/lib/constants";
+import { DrawerProvider } from "@/contexts/DrawerContext";
+import GlobalDrawer from "@/components/GlobalDrawer/GlobalDrawer";
 
 export default function DashboardLayout({
   children,
@@ -59,8 +61,9 @@ export default function DashboardLayout({
   return (
     <ClientLoaderWrapper>
       <SyncModuleProvider>
-            <div className="min-h-screen bg-gray-50">
-        <ProtectedRoute>
+        <DrawerProvider>
+          <div className="min-h-screen bg-gray-50">
+            <ProtectedRoute>
         {isSidebarOpen && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
@@ -266,7 +269,9 @@ export default function DashboardLayout({
           </main>
         </div>
         </ProtectedRoute>
+          <GlobalDrawer />
       </div>
+        </DrawerProvider>
     </SyncModuleProvider>
     </ClientLoaderWrapper>
 

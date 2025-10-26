@@ -130,7 +130,7 @@ export const PWA_CONFIG = {
 export const BRANDING_CONFIG = {
   // Organización
   organizationName: "JuveConf",
-  organizationFullName: "JuveConf",
+  organizationFullName: "Juventud en Conferencia",
 
   // Logos y Assets
   logo: {

@@ -63,15 +63,19 @@ export default function InscripcionPage() {
         </div>
 
         {/* Footer */}
-        <div className="hidden lg:flex justify-end items-center gap-4 mt-8">
+        <div className="flex justify-end items-center gap-4 mt-8">
           <div className="text-right">
             <p className="text-[#CCFF00] text-base lg:text-lg font-normal leading-tight">
               CONFERENCIA JUVENIL<br />
               BAHIA BLANCA
             </p>
           </div>
-          <div className="bg-[#CCFF00] px-6 py-2 rounded">
-            <span className="text-[#8B3FFF] font-black text-2xl lg:text-3xl">JUVECONFE</span>
+          <div className="bg-[#CCFF00] px-4 py-2 rounded">
+            <img
+              src="/icons/juveconfe.svg"
+              alt="JUVECONFE"
+              className="h-8 lg:h-10 w-auto"
+            />
           </div>
         </div>
       </div>

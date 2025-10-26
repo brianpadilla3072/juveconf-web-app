@@ -141,8 +141,8 @@ export default function Dashboard() {
                 title="Total Invitados"
                 value={overviewData?.kpis.totalAttendees || 0}
                 icon={Users}
-                iconColor="text-purple-500"
-                iconBg="bg-purple-100"
+                iconColor="text-violet-500"
+                iconBg="bg-violet-100"
               />
             </div>
 
@@ -317,8 +317,8 @@ export default function Dashboard() {
               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-gray-500 font-medium">Usuarios Registrados</h3>
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <UserCheck className="h-5 w-5 text-purple-500" />
+                  <div className="p-2 bg-violet-100 rounded-lg">
+                    <UserCheck className="h-5 w-5 text-violet-500" />
                   </div>
                 </div>
                 <p className="text-3xl font-bold">{overviewData?.kpis.totalUsers}</p>

@@ -22,7 +22,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Search, Plus, Edit, Trash2, Calendar, Users, Clock, Copy, Check } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Calendar, Users, Clock, Copy, Check, Eye } from 'lucide-react';
 import { useQueryEvents } from '@/hooks/Events/useQueryEvents';
 import {
   useCreateEvent,
@@ -30,6 +30,8 @@ import {
   useDeleteEvent
 } from '@/hooks/Events/useMutateEvent';
 import { toast } from 'sonner';
+import { useDrawer } from '@/hooks/useDrawer';
+import { EventDetailsContent } from '@/components/GlobalDrawer/templates/EventDetailsContent';
 
 export default function EventsPage() {
   const [search, setSearch] = useState('');
@@ -56,6 +58,9 @@ export default function EventsPage() {
   const { createEvent, isLoading: isCreating } = useCreateEvent();
   const { updateEvent, isLoading: isUpdating } = useUpdateEvent();
   const { deleteEvent, isLoading: isDeleting } = useDeleteEvent();
+
+  // Drawer
+  const { openDrawer, closeDrawer } = useDrawer();
 
   // Filtered events
   const filteredEvents = events?.filter(event =>
@@ -188,6 +193,12 @@ export default function EventsPage() {
         refetch();
       }
     }
+  };
+
+  const handleOpenDetails = (event: any) => {
+    openDrawer(event, (data) => (
+      <EventDetailsContent event={data} />
+    ));
   };
 
   if (error) {
@@ -455,6 +466,14 @@ export default function EventsPage() {
                             <Button
                               variant="outline"
                               size="sm"
+                              onClick={() => handleOpenDetails(event)}
+                              className="bg-violet-50 hover:bg-violet-100 border-violet-200"
+                            >
+                              <Eye className="h-4 w-4 text-violet-600" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
                               onClick={() => handleEdit(event)}
                             >
                               <Edit className="h-4 w-4" />
@@ -562,6 +581,15 @@ export default function EventsPage() {
                     )}
 
                     <div className="flex justify-end gap-2 pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenDetails(event)}
+                        className="bg-violet-50 hover:bg-violet-100 border-violet-200"
+                      >
+                        <Eye className="h-4 w-4 mr-1 text-violet-600" />
+                        Ver
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"

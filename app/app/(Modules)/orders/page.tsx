@@ -15,6 +15,8 @@ import { useQueryPreSales } from "@/hooks/presales/useQueryPreSales"
 import { useRouter } from "next/navigation"
 import React, { useMemo, useState, useEffect } from "react"
 import { Order } from "@/entities/Order";
+import { useDrawer } from '@/hooks/useDrawer'
+import { OrderDetailsContent } from '@/components/GlobalDrawer/templates/OrderDetailsContent'
 
 // Format date helper function
 const formatDate = (dateString: string) => {
@@ -32,10 +34,12 @@ export default function OrdersModule() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<string>('review');
-  const [opened, { open, close }] = useDisclosure(false);
   const [openedApprove, { open: openApprove, close: closeApprove }] = useDisclosure(false);
   const [openedDelete, { open: openDelete, close: closeDelete }] = useDisclosure(false);
   const [openedCreate, { open: openCreate, close: closeCreate }] = useDisclosure(false);
+
+  // Drawer
+  const { openDrawer, closeDrawer } = useDrawer();
 
   // Create order form state
   const [formData, setFormData] = useState({
@@ -240,6 +244,12 @@ export default function OrdersModule() {
     }
   };
 
+  const handleOpenDetails = (order: Order) => {
+    openDrawer(order, (data) => (
+      <OrderDetailsContent order={data} />
+    ));
+  };
+
   // Show loading state
   if (loading) {
     return (
@@ -342,13 +352,10 @@ export default function OrdersModule() {
                   <Table.Tr key={order.id}>
                     <Table.Td>
                       <Group gap={4}>
-                        <ActionIcon 
-                          variant="light" 
+                        <ActionIcon
+                          variant="light"
                           color="blue"
-                          onClick={() => {
-                            setSelectedOrder(order);
-                            open();
-                          }}
+                          onClick={() => handleOpenDetails(order)}
                         >
                           <Eye size={16} />
                         </ActionIcon>
@@ -444,14 +451,11 @@ export default function OrdersModule() {
                       <Text size="xs" c="dimmed">Total</Text>
                       <Text fw={600} size="md">${order.total}</Text>
                     </div>
-                    <Button 
-                      variant="light" 
+                    <Button
+                      variant="light"
                       size="sm"
                       rightSection={<ChevronRight size={14} />}
-                      onClick={() => {
-                        setSelectedOrder(order);
-                        open();
-                      }}
+                      onClick={() => handleOpenDetails(order)}
                       style={{ minWidth: '120px' }}
                     >
                       Ver detalles
@@ -469,101 +473,6 @@ export default function OrdersModule() {
           </Box>
         )}
       </Card>
-
-      {/* Order Details Modal */}
-      <Modal 
-        opened={opened} 
-        onClose={close} 
-        title="Detalles de la Orden"
-        size="lg"
-      >
-        {selectedOrder && (
-          <Stack>
-            <div>
-              <Text fw={500}>ID:</Text>
-              <Text>{selectedOrder.id}</Text>
-            </div>
-            <div>
-              <Text fw={500}>Email:</Text>
-              <Text>{selectedOrder.email}</Text>
-            </div>
-            <div>
-              <Text fw={500}>Teléfono:</Text>
-              <Text>{selectedOrder.phone || 'N/A'}</Text>
-            </div>
-            <div>
-              <Text fw={500}>CUIL:</Text>
-              <Text>{selectedOrder.cuil}</Text>
-            </div>
-            <div>
-              <Text fw={500}>Evento:</Text>
-              <Text>{selectedOrder.event?.topic || 'Sin evento'}</Text>
-            </div>
-            <div>
-              <Text fw={500}>Combo:</Text>
-              {selectedOrder.combo ? (
-                <Text>
-                  {selectedOrder.combo.name} - ${selectedOrder.combo.price}
-                </Text>
-              ) : (
-                <Text c="dimmed">Sin combo</Text>
-              )}
-            </div>
-            <div>
-              <Text fw={500}>Invitados:</Text>
-              {selectedOrder.invitees && selectedOrder.invitees.length > 0 ? (
-                <Table>
-                  <Table.Thead>
-                    <Table.Tr>
-                      <Table.Th>Nombre</Table.Th>
-                      <Table.Th>CUIL</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {selectedOrder.invitees.map((invitee, index) => (
-                      <Table.Tr key={index}>
-                        <Table.Td>{invitee.name}</Table.Td>
-                        <Table.Td>{invitee.cuil}</Table.Td>
-                      </Table.Tr>
-                    ))}
-                  </Table.Tbody>
-                </Table>
-              ) : (
-                <Text>No hay invitados</Text>
-              )}
-            </div>
-            <div>
-              <Text fw={500}>Total:</Text>
-              <Text>${selectedOrder.total}</Text>
-            </div>
-            <div>
-              <Text fw={500}>Fecha:</Text>
-              <Text>{formatDate(selectedOrder.createdAt)}</Text>
-            </div>
-            <Group justify="flex-end" mt="md">
-              <Button 
-                variant="light" 
-                color="red"
-                onClick={() => {
-                  close();
-                  openDelete();
-                }}
-              >
-                Rechazar
-              </Button>
-              <Button 
-                color="green"
-                onClick={() => {
-                  close();
-                  openApprove();
-                }}
-              >
-                Aprobar
-              </Button>
-            </Group>
-          </Stack>
-        )}
-      </Modal>
 
       {/* Approve Confirmation Modal */}
       <Modal 
