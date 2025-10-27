@@ -48,6 +48,7 @@ import { Trash2, Edit, Plus, CreditCard, DollarSign, TrendingUp, Activity, Searc
 import { toast } from "sonner"
 import { useDrawer } from '@/hooks/useDrawer'
 import { PaymentDetailsContent } from '@/components/GlobalDrawer/templates/PaymentDetailsContent'
+import { getTicketDownloadUrl } from '@/lib/config'
 
 export default function PaymentsModule() {
   const { payments, isLoading, error, refetch } = useQueryPayments()
@@ -444,7 +445,7 @@ export default function PaymentsModule() {
                             <Eye className="mr-2 h-4 w-4" />
                             Ver Detalles
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => window.open(`https://consagradosajesus.com/descargar-entrada/${payment.id}`, '_blank')}>
+                          <DropdownMenuItem onClick={() => window.open(getTicketDownloadUrl(payment.id), '_blank')}>
                             <ExternalLink className="mr-2 h-4 w-4" />
                             Ver Entrada
                           </DropdownMenuItem>
@@ -531,7 +532,7 @@ export default function PaymentsModule() {
                             <Eye className="mr-2 h-4 w-4" />
                             Ver Detalles
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => window.open(`https://consagradosajesus.com/descargar-entrada/${payment.id}`, '_blank')}>
+                          <DropdownMenuItem onClick={() => window.open(getTicketDownloadUrl(payment.id), '_blank')}>
                             <ExternalLink className="mr-2 h-4 w-4" />
                             Ver Entrada
                           </DropdownMenuItem>
