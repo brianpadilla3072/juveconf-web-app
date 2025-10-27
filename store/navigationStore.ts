@@ -10,7 +10,6 @@ export type Module =
   | 'invitees'
   | 'emails'
   | 'finanzas'
-  | 'analytics'
   | 'users'
   | 'settings'
 

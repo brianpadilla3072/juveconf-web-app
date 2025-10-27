@@ -42,6 +42,7 @@ import { Trash2, Edit, Plus, Package, DollarSign, Users, Search, RotateCcw, X, L
 import { toast } from "sonner"
 import { DetailItemsEditor, DetailItem } from "@/components/combos/DetailItemsEditor"
 import { MerchandiseEditor, MerchandiseItem } from "@/components/combos/MerchandiseEditor"
+import { BenefitsEditor } from "@/components/combos/BenefitsEditor"
 import {
   Tooltip,
   TooltipContent,
@@ -67,6 +68,10 @@ export default function CombosModule() {
   const [editDetailItems, setEditDetailItems] = useState<DetailItem[]>([])
   const [comboDescription, setComboDescription] = useState('')
   const [editComboDescription, setEditComboDescription] = useState('')
+
+  // Benefits states
+  const [benefits, setBenefits] = useState<string[]>([])
+  const [editBenefits, setEditBenefits] = useState<string[]>([])
 
   // Merchandising states
   const [merchandiseEnabled, setMerchandiseEnabled] = useState(false)
@@ -99,10 +104,10 @@ export default function CombosModule() {
 
     const comboData = {
       ...createForm,
-      metadata: (detailItems.length > 0 || comboDescription || merchandiseEnabled) ? {
+      metadata: (detailItems.length > 0 || comboDescription || benefits.length > 0 || merchandiseEnabled) ? {
         description: comboDescription || undefined,
         detailItems,
-        benefits: detailItems.map(item => item.value), // Para compatibilidad con static site
+        benefits: benefits.length > 0 ? benefits : undefined,
         merchandise: merchandiseEnabled ? {
           enabled: true,
           allMerchandise: merchandiseItems
@@ -123,6 +128,7 @@ export default function CombosModule() {
       })
       setDetailItems([])
       setComboDescription('')
+      setBenefits([])
       setMerchandiseEnabled(false)
       setMerchandiseItems([])
       refetch()
@@ -138,10 +144,10 @@ export default function CombosModule() {
 
     const comboData = {
       ...editForm,
-      metadata: (editDetailItems.length > 0 || editComboDescription || editMerchandiseEnabled) ? {
+      metadata: (editDetailItems.length > 0 || editComboDescription || editBenefits.length > 0 || editMerchandiseEnabled) ? {
         description: editComboDescription || undefined,
         detailItems: editDetailItems,
-        benefits: editDetailItems.map(item => item.value), // Para compatibilidad con static site
+        benefits: editBenefits.length > 0 ? editBenefits : undefined,
         merchandise: editMerchandiseEnabled ? {
           enabled: true,
           allMerchandise: editMerchandiseItems
@@ -157,6 +163,7 @@ export default function CombosModule() {
       setEditForm({})
       setEditDetailItems([])
       setEditComboDescription('')
+      setEditBenefits([])
       setEditMerchandiseEnabled(false)
       setEditMerchandiseItems([])
       refetch()
@@ -188,6 +195,7 @@ export default function CombosModule() {
     })
     setEditDetailItems(combo.metadata?.detailItems || [])
     setEditComboDescription(combo.metadata?.description || '')
+    setEditBenefits(combo.metadata?.benefits || [])
     setEditMerchandiseEnabled(combo.metadata?.merchandise?.enabled || false)
     setEditMerchandiseItems(combo.metadata?.merchandise?.allMerchandise || [])
     setIsEditDialogOpen(true)
@@ -383,6 +391,13 @@ export default function CombosModule() {
                   items={detailItems}
                   onDescriptionChange={setComboDescription}
                   onChange={setDetailItems}
+                />
+              </div>
+
+              <div className="border-t pt-4">
+                <BenefitsEditor
+                  benefits={benefits}
+                  onChange={setBenefits}
                 />
               </div>
 
@@ -812,6 +827,13 @@ export default function CombosModule() {
                 items={editDetailItems}
                 onDescriptionChange={setEditComboDescription}
                 onChange={setEditDetailItems}
+              />
+            </div>
+
+            <div className="border-t pt-4">
+              <BenefitsEditor
+                benefits={editBenefits}
+                onChange={setEditBenefits}
               />
             </div>
 

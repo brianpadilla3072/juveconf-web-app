@@ -16,7 +16,6 @@ import {
   Mail,
   DollarSign,
   Tag,
-  BarChart3,
 } from "lucide-react";
 import { NavItem } from "@/components/app/navigation";
 import { SyncModuleProvider } from "@/components/app/SyncModuleProvider";
@@ -44,7 +43,6 @@ export default function DashboardLayout({
     invitees: 'Invitados',
     emails: 'Emails',
     finanzas: 'Finanzas',
-    analytics: 'Analíticas',
     users: 'Usuarios',
     settings: 'Configuración',
   };
@@ -187,15 +185,6 @@ export default function DashboardLayout({
                   icon={<DollarSign className="h-5 w-5" />}
                   label="Finanzas"
                   moduleKey="finanzas"
-                  onNavigate={closeSidebar}
-                />
-              </li>
-              <li>
-                <NavItem
-                  href="/app/analytics"
-                  icon={<BarChart3 className="h-5 w-5" />}
-                  label="Analíticas"
-                  moduleKey="analytics"
                   onNavigate={closeSidebar}
                 />
               </li>
