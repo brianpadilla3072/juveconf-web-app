@@ -5,6 +5,8 @@ import { Invitee } from '@/entities/Invitee';
 
 interface FilterInviteesParams {
   year?: number;
+  eventId?: string;
+  comboId?: string;
 }
 
 export function useQueryInvitees(params?: FilterInviteesParams) {
@@ -30,7 +32,7 @@ export function useQueryInvitees(params?: FilterInviteesParams) {
 
   useEffect(() => {
     fetchInvitees();
-  }, [params?.year]);
+  }, [params?.year, params?.eventId, params?.comboId]);
 
   const refetch = () => {
     fetchInvitees();

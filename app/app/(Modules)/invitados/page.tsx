@@ -42,7 +42,8 @@ import {
   useMarkAttendance
 } from '@/hooks/invitees/useMutateInvitee';
 import { useQueryPayments } from '@/hooks/payments/useQueryPayments';
-import { useQueryCurrentEvent } from '@/hooks/Events/useQueryEvents';
+import { useQueryCurrentEvent, useQueryEvents } from '@/hooks/Events/useQueryEvents';
+import { useQueryCombos } from '@/hooks/combos/useQueryCombos';
 import QRAttendanceScanner from '@/components/attendance/QRAttendanceScanner';
 import AttendanceModal from '@/components/attendance/AttendanceModal';
 import { useQRAttendance } from '@/hooks/attendance/useQRAttendance';
@@ -52,7 +53,8 @@ import { Attendance } from '@/entities/Invitee';
 
 export default function InviteesPage() {
   const [search, setSearch] = useState('');
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [selectedEventId, setSelectedEventId] = useState<string>('all');
+  const [selectedComboId, setSelectedComboId] = useState<string>('all');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingInvitee, setEditingInvitee] = useState<any>(null);
@@ -85,9 +87,14 @@ export default function InviteesPage() {
   const { generateInviteesPDF, isGenerating: isGeneratingPDF } = useInviteesPDF();
 
   // Queries
-  const { invitees, isLoading, error, refetch } = useQueryInvitees({ year: selectedYear });
+  const { invitees, isLoading, error, refetch } = useQueryInvitees({
+    eventId: selectedEventId !== 'all' ? selectedEventId : undefined,
+    comboId: selectedComboId !== 'all' ? selectedComboId : undefined
+  });
   const { payments } = useQueryPayments();
   const { event, isLoading: isLoadingEvent } = useQueryCurrentEvent();
+  const { events: allEvents } = useQueryEvents();
+  const { combos: allCombos } = useQueryCombos();
 
   // Mutations
   const { createInvitee, isLoading: isCreating } = useCreateInvitee();
@@ -235,7 +242,7 @@ export default function InviteesPage() {
 
     await generateInviteesPDF(
       filteredInvitees,
-      selectedYear,
+      new Date().getFullYear(),
       event,
       search || undefined
     );
@@ -383,22 +390,13 @@ export default function InviteesPage() {
             </CardContent>
           </Card>
         ))}
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Año Seleccionado</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{selectedYear}</div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Filters */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col gap-4">
+            {/* Primera fila: Campo de búsqueda */}
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
@@ -408,24 +406,48 @@ export default function InviteesPage() {
                 className="pl-10"
               />
             </div>
-            <div className="flex gap-2">
-              <Select 
-                value={selectedYear.toString()} 
-                onValueChange={(value) => setSelectedYear(parseInt(value))}
+
+            {/* Segunda fila: Selects de filtros y botón actualizar */}
+            <div className="flex flex-col md:flex-row gap-2">
+              <Select
+                value={selectedEventId}
+                onValueChange={setSelectedEventId}
               >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Año" />
+                <SelectTrigger className="w-full md:w-[250px]">
+                  <SelectValue placeholder="Todos los eventos" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="2024">2024</SelectItem>
-                  <SelectItem value="2025">2025</SelectItem>
-                  <SelectItem value="2026">2026</SelectItem>
+                  <SelectItem value="all">Todos los eventos</SelectItem>
+                  {allEvents?.map((ev) => (
+                    <SelectItem key={ev.id} value={ev.id}>
+                      {ev.topic}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-              <Button 
+
+              <Select
+                value={selectedComboId}
+                onValueChange={setSelectedComboId}
+              >
+                <SelectTrigger className="w-full md:w-[250px]">
+                  <SelectValue placeholder="Todos los combos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los combos</SelectItem>
+                  {allCombos?.map((combo) => (
+                    <SelectItem key={combo.id} value={combo.id}>
+                      {combo.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Button
                 variant="outline"
                 onClick={() => refetch()}
                 disabled={isLoading}
+                className="w-full md:w-auto"
               >
                 <RotateCcw className="mr-2 h-4 w-4" />
                 Actualizar
@@ -446,28 +468,25 @@ export default function InviteesPage() {
                   <TableHead>CUIL</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Teléfono</TableHead>
-                  <TableHead>Email Pago</TableHead>
-                  <TableHead>Monto</TableHead>
                   {/* Columnas dinámicas por cada día del evento */}
                   {eventDays.map((day) => (
                     <TableHead key={day.dayNumber} className="text-center">
                       {day.label || `Día ${day.dayNumber}`}
                     </TableHead>
                   ))}
-                  <TableHead className="text-center">Estado Orden</TableHead>
                   <TableHead className="text-center">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6 + eventDays.length + 2} className="text-center">
+                    <TableCell colSpan={4 + eventDays.length + 1} className="text-center">
                       Cargando invitados...
                     </TableCell>
                   </TableRow>
                 ) : filteredInvitees.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6 + eventDays.length + 2} className="text-center">
+                    <TableCell colSpan={4 + eventDays.length + 1} className="text-center">
                       No se encontraron invitados
                     </TableCell>
                   </TableRow>
@@ -478,8 +497,6 @@ export default function InviteesPage() {
                       <TableCell>{invitee.cuil}</TableCell>
                       <TableCell>{invitee.email || '-'}</TableCell>
                       <TableCell>{invitee.phone || '-'}</TableCell>
-                      <TableCell>{invitee.payment?.payerEmail || 'N/A'}</TableCell>
-                      <TableCell>${invitee.payment?.amount?.toLocaleString()}</TableCell>
                       {/* Checkboxes dinámicos por cada día del evento */}
                       {eventDays.map((day) => (
                         <TableCell key={day.dayNumber} className="text-center">
@@ -491,16 +508,6 @@ export default function InviteesPage() {
                           />
                         </TableCell>
                       ))}
-                      <TableCell className="text-center">
-                        <Badge
-                          variant={
-                            invitee.order?.status === 'PAID' ? 'default' :
-                            invitee.order?.status === 'PENDING' ? 'secondary' : 'destructive'
-                          }
-                        >
-                          {invitee.order?.status}
-                        </Badge>
-                      </TableCell>
                       <TableCell className="text-center">
                         <div className="flex justify-center gap-2">
                           <Button
@@ -561,27 +568,8 @@ export default function InviteesPage() {
                       <h3 className="font-medium text-lg">{invitee.name}</h3>
                       <p className="text-sm text-muted-foreground">CUIL: {invitee.cuil}</p>
                     </div>
-                    <Badge 
-                      variant={
-                        invitee.order?.status === 'PAID' ? 'default' : 
-                        invitee.order?.status === 'PENDING' ? 'secondary' : 'destructive'
-                      }
-                    >
-                      {invitee.order?.status}
-                    </Badge>
                   </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="text-muted-foreground">Email Pago</p>
-                      <p className="font-medium">{invitee.payment?.payerEmail || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Monto</p>
-                      <p className="font-medium">${invitee.payment?.amount?.toLocaleString()}</p>
-                    </div>
-                  </div>
-                  
+
                   {/* Asistencias dinámicas por día */}
                   <div className="grid grid-cols-2 gap-4">
                     {eventDays.map((day) => (

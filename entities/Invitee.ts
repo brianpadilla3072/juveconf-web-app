@@ -10,6 +10,15 @@ export interface Attendance {
   };
 }
 
+export interface ParsedMetadata {
+  email?: string;
+  phone?: string;
+  birthdate?: string;
+  city?: string;
+  church?: string;
+  merchandiseSizes?: { [type: string]: string };
+}
+
 export interface Invitee {
   id: string;
   name: string;
@@ -21,6 +30,9 @@ export interface Invitee {
 
   // Metadata adicional como JSON string: { email?, phone?, birthdate?, city?, church? }
   metadata?: string;
+  
+  // Metadata parseada (disponible desde el backend)
+  parsedMetadata?: ParsedMetadata;
 
   // Sistema dinámico de asistencia
   attendance?: Attendance;
