@@ -47,7 +47,7 @@ import { useQueryCombos } from '@/hooks/combos/useQueryCombos';
 import QRAttendanceScanner from '@/components/attendance/QRAttendanceScanner';
 import AttendanceModal from '@/components/attendance/AttendanceModal';
 import { useQRAttendance } from '@/hooks/attendance/useQRAttendance';
-import { useInviteesPDF } from '@/hooks/invitees/useInviteesPDF';
+import { ExportDialog } from '@/components/invitees/ExportDialog';
 import { toast } from 'sonner';
 import { Attendance } from '@/entities/Invitee';
 
@@ -71,20 +71,20 @@ export default function InviteesPage() {
   const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
 
+  // Estado para dialog de exportación
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+
   // Hook para drawer global
   const { openDrawer, closeDrawer } = useDrawer();
 
   // Hook para manejo de asistencia por QR
-  const { 
-    fetchInviteeByQR, 
-    confirmAttendance, 
-    clearData, 
-    inviteeData, 
-    isLoading: isQRLoading 
+  const {
+    fetchInviteeByQR,
+    confirmAttendance,
+    clearData,
+    inviteeData,
+    isLoading: isQRLoading
   } = useQRAttendance();
-
-  // Hook para generar PDF
-  const { generateInviteesPDF, isGenerating: isGeneratingPDF } = useInviteesPDF();
 
   // Queries
   const { invitees, isLoading, error, refetch } = useQueryInvitees({
@@ -233,20 +233,6 @@ export default function InviteesPage() {
     clearData();
   };
 
-  // Manejar descarga de PDF
-  const handleDownloadPDF = async () => {
-    if (!filteredInvitees || filteredInvitees.length === 0) {
-      toast.error('No hay invitados para exportar');
-      return;
-    }
-
-    await generateInviteesPDF(
-      filteredInvitees,
-      new Date().getFullYear(),
-      event,
-      search || undefined
-    );
-  };
 
   if (error) {
     return <div className="p-4 text-red-600">Error al cargar invitados</div>;
@@ -264,12 +250,12 @@ export default function InviteesPage() {
         
         <div className="flex gap-2">
           <Button
-            onClick={handleDownloadPDF}
-            disabled={isGeneratingPDF || !filteredInvitees || filteredInvitees.length === 0}
+            onClick={() => setIsExportDialogOpen(true)}
+            disabled={!event || !filteredInvitees || filteredInvitees.length === 0}
             className="bg-blue-600 hover:bg-blue-700"
           >
             <Download className="mr-2 h-4 w-4" />
-            {isGeneratingPDF ? 'Generando...' : 'Descargar PDF'}
+            Exportar Invitados
           </Button>
 
           <Button
@@ -696,6 +682,16 @@ export default function InviteesPage() {
         event={event}
         onConfirm={handleConfirmQRAttendance}
         isLoading={isQRLoading}
+      />
+
+      {/* Export Dialog */}
+      <ExportDialog
+        open={isExportDialogOpen}
+        onOpenChange={setIsExportDialogOpen}
+        defaultEventId={selectedEventId !== 'all' ? selectedEventId : event?.id}
+        events={allEvents || []}
+        combos={allCombos || []}
+        inviteesCount={filteredInvitees?.length || 0}
       />
     </div>
   );

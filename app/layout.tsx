@@ -3,6 +3,7 @@ import '@mantine/core/styles.css';
 import { MantineProvider } from '@mantine/core';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from 'sonner';
+import { Providers } from './providers';
 
 export const metadata = {
   title: 'JuveConf',
@@ -80,12 +81,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
       <body>
-        <MantineProvider>
-          <AuthProvider>
-            {children}
-            <Toaster richColors position="top-right" />
-          </AuthProvider>
-        </MantineProvider>
+        <Providers>
+          <MantineProvider>
+            <AuthProvider>
+              {children}
+              <Toaster richColors position="top-right" />
+            </AuthProvider>
+          </MantineProvider>
+        </Providers>
       </body>
     </html>
   );
