@@ -38,17 +38,15 @@ import { useDrawer } from '@/hooks/useDrawer';
 import {
   useCreateInvitee,
   useUpdateInvitee,
-  useDeleteInvitee,
-  useMarkAttendance
+  useDeleteInvitee
 } from '@/hooks/invitees/useMutateInvitee';
 import { useQueryPayments } from '@/hooks/payments/useQueryPayments';
 import { useQueryCurrentEvent, useQueryEvents } from '@/hooks/Events/useQueryEvents';
 import { useQueryCombos } from '@/hooks/combos/useQueryCombos';
 import QRAttendanceScanner from '@/components/attendance/QRAttendanceScanner';
-import AttendanceModal from '@/components/attendance/AttendanceModal';
-import AttendanceMethodModal from '@/components/attendance/AttendanceMethodModal';
+import AttendanceDialog from '@/components/attendance/AttendanceDialog';
 import InviteeSearchInput from '@/components/attendance/InviteeSearchInput';
-import { useQRAttendance } from '@/hooks/attendance/useQRAttendance';
+import { useAttendance } from '@/hooks/attendance/useAttendance';
 import { ExportDialog } from '@/components/invitees/ExportDialog';
 import { toast } from 'sonner';
 import { Attendance } from '@/entities/Invitee';
@@ -69,15 +67,10 @@ export default function InviteesPage() {
     paymentId: ''
   });
 
-  // Estados para QR Scanner y modal de asistencia
-  const [isAttendanceMethodModalOpen, setIsAttendanceMethodModalOpen] = useState(false);
+  // Estados para asistencia
   const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
   const [isManualSearchOpen, setIsManualSearchOpen] = useState(false);
-  const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
-
-  // Estados para asistencia rápida desde tabla
-  const [selectedInviteeForAttendance, setSelectedInviteeForAttendance] = useState<any>(null);
-  const [isQuickAttendanceModalOpen, setIsQuickAttendanceModalOpen] = useState(false);
+  const [isAttendanceDialogOpen, setIsAttendanceDialogOpen] = useState(false);
 
   // Estado para dialog de exportación
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
@@ -85,14 +78,15 @@ export default function InviteesPage() {
   // Hook para drawer global
   const { openDrawer, closeDrawer } = useDrawer();
 
-  // Hook para manejo de asistencia por QR
+  // Hook para manejo de asistencia
   const {
-    fetchInviteeByQR,
+    fetchInvitee,
     confirmAttendance,
+    confirmAttendanceMultipleDays,
     clearData,
     inviteeData,
-    isLoading: isQRLoading
-  } = useQRAttendance();
+    isLoading: isAttendanceLoading
+  } = useAttendance();
 
   // Queries
   const { invitees, isLoading, error, refetch } = useQueryInvitees({
@@ -108,7 +102,6 @@ export default function InviteesPage() {
   const { createInvitee, isLoading: isCreating } = useCreateInvitee();
   const { updateInvitee, isLoading: isUpdating } = useUpdateInvitee();
   const { deleteInvitee, isLoading: isDeleting } = useDeleteInvitee();
-  const { markAttendance, isLoading: isMarkingAttendance } = useMarkAttendance();
 
   // Filtered invitees
   const filteredInvitees = invitees?.filter(invitee =>
@@ -213,111 +206,54 @@ export default function InviteesPage() {
   // Manejar escaneo QR exitoso
   const handleQRScanned = async (qrData: { inviteId: string; paymentId: string }) => {
     setIsQRScannerOpen(false);
-
-    const invitee = await fetchInviteeByQR(qrData);
+    const invitee = await fetchInvitee(qrData.inviteId);
     if (invitee) {
-      setIsAttendanceModalOpen(true);
+      setIsAttendanceDialogOpen(true);
     }
-  };
-
-  // Confirmar asistencia desde modal QR
-  const handleConfirmQRAttendance = async (data: {
-    inviteeId: string;
-    dayNumber: number;
-    email?: string;
-    phone?: string;
-    notes?: string;
-  }) => {
-    const success = await confirmAttendance(data);
-    if (success) {
-      setIsAttendanceModalOpen(false);
-      clearData();
-      refetch(); // Refrescar la lista
-    }
-  };
-
-  // Cerrar modal de asistencia
-  const handleCloseAttendanceModal = () => {
-    setIsAttendanceModalOpen(false);
-    clearData();
-  };
-
-  // Manejar selección de método QR
-  const handleSelectQR = () => {
-    setIsAttendanceMethodModalOpen(false);
-    setIsQRScannerOpen(true);
-  };
-
-  // Manejar selección de método Manual
-  const handleSelectManual = () => {
-    setIsAttendanceMethodModalOpen(false);
-    setIsManualSearchOpen(true);
   };
 
   // Manejar selección de invitado desde búsqueda manual
   const handleManualInviteeSelect = async (invitee: any) => {
-    // 1. Cerrar modal de búsqueda
     setIsManualSearchOpen(false);
-
-    // 2. Abrir modal de asistencia (mostrará loading state mientras se cargan datos)
-    setIsAttendanceModalOpen(true);
-
-    // 3. Cargar datos del invitado
-    // paymentId es opcional - puede ser undefined si el invitado no tiene pago
-    const result = await fetchInviteeByQR({
-      inviteId: invitee.id,
-      paymentId: invitee.payment?.id || invitee.paymentId
-    });
-
-    // 4. Si hay error, cerrar el modal
-    if (!result) {
-      setIsAttendanceModalOpen(false);
-      // fetchInviteeByQR ya mostró el error con toast
+    const result = await fetchInvitee(invitee.id);
+    if (result) {
+      setIsAttendanceDialogOpen(true);
     }
   };
 
-  // Cancelar búsqueda manual
-  const handleCancelManualSearch = () => {
-    setIsManualSearchOpen(false);
-  };
-
-  // Handler para abrir modal de asistencia desde fila de tabla
-  const handleOpenQuickAttendance = (invitee: any) => {
-    setSelectedInviteeForAttendance(invitee);
-    setIsQuickAttendanceModalOpen(true);
-  };
-
-  // Handler para confirmar asistencia desde modal rápido
-  const handleQuickAttendanceConfirm = async (data: {
+  // Confirmar asistencia
+  const handleConfirmAttendance = async (data: {
     inviteeId: string;
-    dayNumber: number;
-    email?: string;
-    phone?: string;
+    days: { dayNumber: number; attended: boolean }[];
     notes?: string;
   }) => {
     try {
-      // Registrar asistencia
-      await api.patch(`/invitees/${data.inviteeId}/attendance/day`, {
-        dayNumber: data.dayNumber,
-        attended: true,
-        notes: data.notes
+      // Guardar todos los días en una sola llamada (batch)
+      await confirmAttendanceMultipleDays({
+        inviteeId: data.inviteeId,
+        days: data.days,
+        notes: data.notes,
       });
 
-      // Actualizar email/phone si fueron proporcionados
-      if (data.email || data.phone) {
-        await api.patch(`/invitees/${data.inviteeId}`, {
-          ...(data.email && { email: data.email }),
-          ...(data.phone && { phone: data.phone })
-        });
-      }
-
-      setIsQuickAttendanceModalOpen(false);
-      setSelectedInviteeForAttendance(null);
+      setIsAttendanceDialogOpen(false);
+      clearData();
       refetch();
-      toast.success('Asistencia registrada correctamente');
-    } catch (error: any) {
-      console.error('Error al registrar asistencia:', error);
-      toast.error(error.response?.data?.message || 'Error al registrar asistencia');
+    } catch (error) {
+      // El error ya es manejado por el hook con toast
+    }
+  };
+
+  // Cerrar dialog de asistencia
+  const handleCloseAttendanceDialog = () => {
+    setIsAttendanceDialogOpen(false);
+    clearData();
+  };
+
+  // Tomar asistencia desde tabla
+  const handleOpenQuickAttendance = async (invitee: any) => {
+    const result = await fetchInvitee(invitee.id);
+    if (result) {
+      setIsAttendanceDialogOpen(true);
     }
   };
 
@@ -346,13 +282,23 @@ export default function InviteesPage() {
             Exportar Invitados
           </Button>
 
-          <Button
-            onClick={() => setIsAttendanceMethodModalOpen(true)}
-            className="bg-green-600 hover:bg-green-700"
-          >
-            <QrCode className="mr-2 h-4 w-4" />
-            Tomar Asistencia
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setIsQRScannerOpen(true)}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <QrCode className="mr-2 h-4 w-4" />
+              Escanear QR
+            </Button>
+            <Button
+              onClick={() => setIsManualSearchOpen(true)}
+              variant="outline"
+              className="border-green-600 text-green-600 hover:bg-green-50"
+            >
+              <Search className="mr-2 h-4 w-4" />
+              Búsqueda Manual
+            </Button>
+          </div>
 
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
@@ -778,15 +724,7 @@ export default function InviteesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Attendance Method Selection Modal */}
-      <AttendanceMethodModal
-        isOpen={isAttendanceMethodModalOpen}
-        onClose={() => setIsAttendanceMethodModalOpen(false)}
-        onSelectQR={handleSelectQR}
-        onSelectManual={handleSelectManual}
-      />
-
-      {/* QR Scanner Component */}
+      {/* QR Scanner */}
       <QRAttendanceScanner
         isOpen={isQRScannerOpen}
         onClose={() => setIsQRScannerOpen(false)}
@@ -798,29 +736,37 @@ export default function InviteesPage() {
         isOpen={isManualSearchOpen}
         eventId={selectedEventId !== 'all' ? selectedEventId : event?.id}
         onSelectInvitee={handleManualInviteeSelect}
-        onCancel={handleCancelManualSearch}
+        onCancel={() => setIsManualSearchOpen(false)}
       />
 
-      {/* Attendance Confirmation Modal (QR/Manual Search) */}
-      <AttendanceModal
-        isOpen={isAttendanceModalOpen}
-        onClose={handleCloseAttendanceModal}
+      {/* Attendance Confirmation Dialog */}
+      <AttendanceDialog
+        isOpen={isAttendanceDialogOpen}
+        onClose={handleCloseAttendanceDialog}
         invitee={inviteeData}
-        event={event}
-        onConfirm={handleConfirmQRAttendance}
-        isLoading={isQRLoading}
-      />
+        eventDays={(() => {
+          // Obtener eventDays desde invitee o evento global
+          const eventDaysObj = inviteeData?.payment?.Order?.Event?.eventDays || event?.eventDays;
 
-      {/* Quick Attendance Modal (Table Row) */}
-      <AttendanceModal
-        isOpen={isQuickAttendanceModalOpen}
-        onClose={() => {
-          setIsQuickAttendanceModalOpen(false);
-          setSelectedInviteeForAttendance(null);
-        }}
-        invitee={selectedInviteeForAttendance}
-        event={event}
-        onConfirm={handleQuickAttendanceConfirm}
+          if (!eventDaysObj) return [];
+
+          // Si ya es un array con .days, usarlo
+          if (eventDaysObj.days && Array.isArray(eventDaysObj.days)) {
+            return eventDaysObj.days;
+          }
+
+          // Si es un objeto con claves nombradas, transformarlo
+          return Object.entries(eventDaysObj)
+            .filter(([key]) => key !== 'totalDays')
+            .map(([key, value]: [string, any], index) => ({
+              dayNumber: index + 1,
+              label: key.charAt(0).toUpperCase() + key.slice(1),
+              date: value.date
+            }))
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        })()}
+        onConfirm={handleConfirmAttendance}
+        isLoading={isAttendanceLoading}
       />
 
       {/* Export Dialog */}

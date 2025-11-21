@@ -66,27 +66,15 @@ export default function InviteeSearchInput({
 
     setIsSearching(true);
     try {
-      // Buscar invitados por nombre o CUIL
-      const response = await api.get('/invitees', {
+      const response = await api.get('/invitees/search', {
         params: {
-          ...(eventId ? { eventId } : {}),
-          // Nota: 'search' y 'limit' no están implementados en el backend
+          q: query.trim(),
+          eventId,
         },
       });
 
-      const allInvitees = response.data.items || response.data || [];
-
-      // Filtrar localmente por nombre o CUIL
-      const filtered = allInvitees.filter((inv: InviteeSearchResult) => {
-        const searchLower = query.toLowerCase().trim();
-        return (
-          inv.name.toLowerCase().includes(searchLower) ||
-          inv.cuil.includes(searchLower) ||
-          (inv.email && inv.email.toLowerCase().includes(searchLower))
-        );
-      });
-
-      setSearchResults(filtered);
+      const results = response.data || [];
+      setSearchResults(results);
       setShowResults(true);
     } catch (error: any) {
       console.error('Error searching invitees:', error);
