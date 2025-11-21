@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import api from '@/lib/axios.config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,6 +46,8 @@ import { useQueryCurrentEvent, useQueryEvents } from '@/hooks/Events/useQueryEve
 import { useQueryCombos } from '@/hooks/combos/useQueryCombos';
 import QRAttendanceScanner from '@/components/attendance/QRAttendanceScanner';
 import AttendanceModal from '@/components/attendance/AttendanceModal';
+import AttendanceMethodModal from '@/components/attendance/AttendanceMethodModal';
+import InviteeSearchInput from '@/components/attendance/InviteeSearchInput';
 import { useQRAttendance } from '@/hooks/attendance/useQRAttendance';
 import { ExportDialog } from '@/components/invitees/ExportDialog';
 import { toast } from 'sonner';
@@ -68,8 +70,14 @@ export default function InviteesPage() {
   });
 
   // Estados para QR Scanner y modal de asistencia
+  const [isAttendanceMethodModalOpen, setIsAttendanceMethodModalOpen] = useState(false);
   const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
+  const [isManualSearchOpen, setIsManualSearchOpen] = useState(false);
   const [isAttendanceModalOpen, setIsAttendanceModalOpen] = useState(false);
+
+  // Estados para asistencia rápida desde tabla
+  const [selectedInviteeForAttendance, setSelectedInviteeForAttendance] = useState<any>(null);
+  const [isQuickAttendanceModalOpen, setIsQuickAttendanceModalOpen] = useState(false);
 
   // Estado para dialog de exportación
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
@@ -205,7 +213,7 @@ export default function InviteesPage() {
   // Manejar escaneo QR exitoso
   const handleQRScanned = async (qrData: { inviteId: string; paymentId: string }) => {
     setIsQRScannerOpen(false);
-    
+
     const invitee = await fetchInviteeByQR(qrData);
     if (invitee) {
       setIsAttendanceModalOpen(true);
@@ -218,6 +226,7 @@ export default function InviteesPage() {
     dayNumber: number;
     email?: string;
     phone?: string;
+    notes?: string;
   }) => {
     const success = await confirmAttendance(data);
     if (success) {
@@ -231,6 +240,85 @@ export default function InviteesPage() {
   const handleCloseAttendanceModal = () => {
     setIsAttendanceModalOpen(false);
     clearData();
+  };
+
+  // Manejar selección de método QR
+  const handleSelectQR = () => {
+    setIsAttendanceMethodModalOpen(false);
+    setIsQRScannerOpen(true);
+  };
+
+  // Manejar selección de método Manual
+  const handleSelectManual = () => {
+    setIsAttendanceMethodModalOpen(false);
+    setIsManualSearchOpen(true);
+  };
+
+  // Manejar selección de invitado desde búsqueda manual
+  const handleManualInviteeSelect = async (invitee: any) => {
+    // 1. Cerrar modal de búsqueda
+    setIsManualSearchOpen(false);
+
+    // 2. Abrir modal de asistencia (mostrará loading state mientras se cargan datos)
+    setIsAttendanceModalOpen(true);
+
+    // 3. Cargar datos del invitado
+    // paymentId es opcional - puede ser undefined si el invitado no tiene pago
+    const result = await fetchInviteeByQR({
+      inviteId: invitee.id,
+      paymentId: invitee.payment?.id || invitee.paymentId
+    });
+
+    // 4. Si hay error, cerrar el modal
+    if (!result) {
+      setIsAttendanceModalOpen(false);
+      // fetchInviteeByQR ya mostró el error con toast
+    }
+  };
+
+  // Cancelar búsqueda manual
+  const handleCancelManualSearch = () => {
+    setIsManualSearchOpen(false);
+  };
+
+  // Handler para abrir modal de asistencia desde fila de tabla
+  const handleOpenQuickAttendance = (invitee: any) => {
+    setSelectedInviteeForAttendance(invitee);
+    setIsQuickAttendanceModalOpen(true);
+  };
+
+  // Handler para confirmar asistencia desde modal rápido
+  const handleQuickAttendanceConfirm = async (data: {
+    inviteeId: string;
+    dayNumber: number;
+    email?: string;
+    phone?: string;
+    notes?: string;
+  }) => {
+    try {
+      // Registrar asistencia
+      await api.patch(`/invitees/${data.inviteeId}/attendance/day`, {
+        dayNumber: data.dayNumber,
+        attended: true,
+        notes: data.notes
+      });
+
+      // Actualizar email/phone si fueron proporcionados
+      if (data.email || data.phone) {
+        await api.patch(`/invitees/${data.inviteeId}`, {
+          ...(data.email && { email: data.email }),
+          ...(data.phone && { phone: data.phone })
+        });
+      }
+
+      setIsQuickAttendanceModalOpen(false);
+      setSelectedInviteeForAttendance(null);
+      refetch();
+      toast.success('Asistencia registrada correctamente');
+    } catch (error: any) {
+      console.error('Error al registrar asistencia:', error);
+      toast.error(error.response?.data?.message || 'Error al registrar asistencia');
+    }
   };
 
 
@@ -259,7 +347,7 @@ export default function InviteesPage() {
           </Button>
 
           <Button
-            onClick={() => setIsQRScannerOpen(true)}
+            onClick={() => setIsAttendanceMethodModalOpen(true)}
             className="bg-green-600 hover:bg-green-700"
           >
             <QrCode className="mr-2 h-4 w-4" />
@@ -501,13 +589,24 @@ export default function InviteesPage() {
                             size="sm"
                             onClick={() => handleOpenDetails(invitee)}
                             className="bg-violet-50 hover:bg-violet-100 border-violet-200"
+                            title="Ver detalles"
                           >
                             <Eye className="h-4 w-4 text-violet-600" />
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
+                            onClick={() => handleOpenQuickAttendance(invitee)}
+                            className="bg-green-50 hover:bg-green-100 border-green-200"
+                            title="Tomar Asistencia"
+                          >
+                            <Calendar className="h-4 w-4 text-green-600" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => handleEdit(invitee)}
+                            title="Editar"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -577,6 +676,7 @@ export default function InviteesPage() {
                       size="sm"
                       onClick={() => handleOpenDetails(invitee)}
                       className="bg-violet-50 hover:bg-violet-100 border-violet-200"
+                      title="Ver detalles"
                     >
                       <Eye className="h-4 w-4 mr-1 text-violet-600" />
                       Ver
@@ -584,7 +684,18 @@ export default function InviteesPage() {
                     <Button
                       variant="outline"
                       size="sm"
+                      onClick={() => handleOpenQuickAttendance(invitee)}
+                      className="bg-green-50 hover:bg-green-100 border-green-200"
+                      title="Tomar Asistencia"
+                    >
+                      <Calendar className="h-4 w-4 mr-1 text-green-600" />
+                      Asist.
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={() => handleEdit(invitee)}
+                      title="Editar"
                     >
                       <Edit className="h-4 w-4 mr-1" />
                       Editar
@@ -667,6 +778,14 @@ export default function InviteesPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Attendance Method Selection Modal */}
+      <AttendanceMethodModal
+        isOpen={isAttendanceMethodModalOpen}
+        onClose={() => setIsAttendanceMethodModalOpen(false)}
+        onSelectQR={handleSelectQR}
+        onSelectManual={handleSelectManual}
+      />
+
       {/* QR Scanner Component */}
       <QRAttendanceScanner
         isOpen={isQRScannerOpen}
@@ -674,7 +793,15 @@ export default function InviteesPage() {
         onQRScanned={handleQRScanned}
       />
 
-      {/* Attendance Confirmation Modal */}
+      {/* Manual Invitee Search */}
+      <InviteeSearchInput
+        isOpen={isManualSearchOpen}
+        eventId={selectedEventId !== 'all' ? selectedEventId : event?.id}
+        onSelectInvitee={handleManualInviteeSelect}
+        onCancel={handleCancelManualSearch}
+      />
+
+      {/* Attendance Confirmation Modal (QR/Manual Search) */}
       <AttendanceModal
         isOpen={isAttendanceModalOpen}
         onClose={handleCloseAttendanceModal}
@@ -682,6 +809,18 @@ export default function InviteesPage() {
         event={event}
         onConfirm={handleConfirmQRAttendance}
         isLoading={isQRLoading}
+      />
+
+      {/* Quick Attendance Modal (Table Row) */}
+      <AttendanceModal
+        isOpen={isQuickAttendanceModalOpen}
+        onClose={() => {
+          setIsQuickAttendanceModalOpen(false);
+          setSelectedInviteeForAttendance(null);
+        }}
+        invitee={selectedInviteeForAttendance}
+        event={event}
+        onConfirm={handleQuickAttendanceConfirm}
       />
 
       {/* Export Dialog */}

@@ -34,7 +34,6 @@ export interface ExportConfig {
   includeMetadata?: boolean;
   selectedMetadataFields?: string[];
   selectedMerchTypes?: string[];
-  selectedDays?: number[];
   selectedAdditionalFields?: string[];
 }
 

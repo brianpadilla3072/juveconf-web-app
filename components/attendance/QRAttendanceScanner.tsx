@@ -8,7 +8,7 @@ import { Camera, CameraOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface QRAttendanceScannerProps {
-  onQRScanned: (data: { inviteId: string; paymentId: string }) => void;
+  onQRScanned: (data: { inviteId: string; paymentId?: string }) => void;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -47,8 +47,21 @@ export default function QRAttendanceScanner({ onQRScanned, isOpen, onClose }: QR
         handleQRSuccess(decodedText);
       },
       (errorMessage: string) => {
-        // Silenciar errores de escaneo frecuentes
-        if (!errorMessage.includes('No QR code found')) {
+        // Silenciar errores comunes de escaneo que no son importantes
+        const ignoredErrors = [
+          'No QR code found',
+          'QR code parse error',
+          'IndexSizeError',
+          'The source width is 0',
+          'The source height is 0',
+          'NotFoundException'
+        ];
+
+        const shouldIgnore = ignoredErrors.some(ignored =>
+          errorMessage.includes(ignored)
+        );
+
+        if (!shouldIgnore) {
           console.error('QR scan error:', errorMessage);
         }
       }
@@ -67,18 +80,24 @@ export default function QRAttendanceScanner({ onQRScanned, isOpen, onClose }: QR
       // Usar regex para extraer inviteId y paymentId del formato de objeto JavaScript
       const inviteIdMatch = cleanText.match(/inviteId:\s*([a-f0-9-]{36})/i);
       const paymentIdMatch = cleanText.match(/paymentId:\s*([a-f0-9-]{36})/i);
-      
-      if (!inviteIdMatch || !paymentIdMatch) {
-        throw new Error('No se encontraron IDs válidos en el QR');
-      }
-      
-      const inviteId = inviteIdMatch[1];
-      const paymentId = paymentIdMatch[1];
 
-      // Validar que sean UUIDs válidos (formato básico)
+      // El inviteId es obligatorio, paymentId es opcional
+      if (!inviteIdMatch) {
+        throw new Error('No se encontró inviteId válido en el QR');
+      }
+
+      const inviteId = inviteIdMatch[1];
+      const paymentId = paymentIdMatch ? paymentIdMatch[1] : undefined;
+
+      // Validar que inviteId sea UUID válido (formato básico)
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(inviteId) || !uuidRegex.test(paymentId)) {
-        throw new Error('IDs inválidos en el QR');
+      if (!uuidRegex.test(inviteId)) {
+        throw new Error('inviteId inválido en el QR');
+      }
+
+      // Validar paymentId solo si existe
+      if (paymentId && !uuidRegex.test(paymentId)) {
+        throw new Error('paymentId inválido en el QR');
       }
 
       // Detener el escáner y procesar los datos

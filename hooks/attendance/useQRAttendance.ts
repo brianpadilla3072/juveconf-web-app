@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 interface QRData {
   inviteId: string;
-  paymentId: string;
+  paymentId?: string; // Opcional - permite invitados sin pago
 }
 
 import { Attendance } from '@/entities/Invitee';
@@ -33,6 +33,7 @@ interface AttendanceConfirmation {
   dayNumber: number;
   email?: string;
   phone?: string;
+  notes?: string;
 }
 
 export function useQRAttendance() {
@@ -48,9 +49,9 @@ export function useQRAttendance() {
 
       // Buscar por inviteId primero
       const response = await api.get(`/invitees/${qrData.inviteId}`);
-      
-      // Verificar que el paymentId coincida
-      if (response.data.paymentId !== qrData.paymentId) {
+
+      // Verificar que el paymentId coincida (solo si existe en el QR)
+      if (qrData.paymentId && response.data.paymentId !== qrData.paymentId) {
         throw new Error('Los datos del QR no coinciden con el invitado');
       }
 
@@ -90,7 +91,8 @@ export function useQRAttendance() {
       // Actualizar asistencia usando el nuevo endpoint dinámico
       const attendanceData = {
         dayNumber: data.dayNumber,
-        attended: true
+        attended: true,
+        notes: data.notes || undefined,
       };
 
       await api.patch(`/invitees/${data.inviteeId}/attendance/day`, attendanceData);

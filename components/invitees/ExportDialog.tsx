@@ -61,7 +61,6 @@ export function ExportDialog({
     includeMetadata: true,
     selectedMetadataFields: [],
     selectedMerchTypes: [],
-    selectedDays: [],
     selectedAdditionalFields: [],
   });
 
@@ -111,13 +110,9 @@ export function ExportDialog({
       }
     }
 
-    // Días de asistencia
+    // Días de asistencia (columna única)
     if (config.includeAttendance) {
-      if (config.selectedDays && config.selectedDays.length > 0) {
-        count += config.selectedDays.length;
-      } else {
-        count += eventDays.length;
-      }
+      count += 1; // Una sola columna "Días Asistidos"
     }
 
     count += 1; // Observaciones
@@ -179,20 +174,6 @@ export function ExportDialog({
     });
   };
 
-  // Toggle día
-  const toggleDay = (dayNumber: number) => {
-    setConfig((c) => {
-      const current = c.selectedDays || [];
-      const isSelected = current.includes(dayNumber);
-
-      return {
-        ...c,
-        selectedDays: isSelected
-          ? current.filter((d) => d !== dayNumber)
-          : [...current, dayNumber],
-      };
-    });
-  };
 
   // Seleccionar todos metadata
   const selectAllMetadata = () => {
@@ -448,55 +429,19 @@ export function ExportDialog({
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Checkbox
-                  checked={config.includeAttendance && eventDays.length > 0}
-                  disabled={eventDays.length === 0}
+                  checked={config.includeAttendance}
                   onCheckedChange={(checked) =>
                     setConfig((c) => ({ ...c, includeAttendance: checked as boolean }))
                   }
                 />
                 <div className="flex flex-col gap-1">
-                  <CardTitle className="text-lg">Columnas de Asistencia</CardTitle>
-                  {eventDays.length === 0 && (
-                    <p className="text-xs text-muted-foreground">
-                      No disponible: Este evento no tiene días configurados
-                    </p>
-                  )}
+                  <CardTitle className="text-lg">Días Asistidos</CardTitle>
+                  <CardDescription>
+                    Incluye una columna que muestra los números de los días que cada invitee asistió
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
-            {config.includeAttendance && eventDays.length > 0 && (
-              <CardContent className="space-y-2">
-                {eventDays.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    No hay días configurados para este evento
-                  </p>
-                ) : (
-                  <>
-                    <div className="grid grid-cols-4 gap-2">
-                      {eventDays.map((day) => (
-                        <div key={day.dayNumber} className="flex items-center gap-2">
-                          <Checkbox
-                            checked={
-                              config.selectedDays?.length === 0 ||
-                              config.selectedDays?.includes(day.dayNumber)
-                            }
-                            onCheckedChange={() => toggleDay(day.dayNumber)}
-                          />
-                          <Label className="text-sm font-normal">
-                            {day.label || `Día ${day.dayNumber}`}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {config.selectedDays?.length === 0
-                        ? `Se exportarán todos los ${eventDays.length} días`
-                        : `Se exportarán ${config.selectedDays?.length} días seleccionados`}
-                    </p>
-                  </>
-                )}
-              </CardContent>
-            )}
           </Card>
 
           {/* Sección 3: Merchandising */}
