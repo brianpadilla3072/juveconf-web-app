@@ -2,6 +2,19 @@
 import api from '@/lib/axios.config';
 import { toast } from 'sonner';
 import { useState } from "react";
+import type { MealConfig } from '@/entities/Meal';
+
+/**
+ * `mealConfig` pertenece al evento pero NUNCA se envía por POST/PATCH /events
+ * (la validación del backend lo rechaza). Se modifica solo con
+ * PATCH /meals/config/:eventId. Se quita del payload antes de enviar.
+ */
+function withoutMealFields<T extends object>(data: T): Omit<T, 'mealConfig'> {
+  const { mealConfig, ...rest } = data as T & {
+    mealConfig?: MealConfig | null;
+  };
+  return rest;
+}
 
 interface CreateEventData {
   year: number;
@@ -14,6 +27,8 @@ interface CreateEventData {
   location?: string;
   description?: string;
   isActive?: boolean;
+  // Solo lectura: se ignora al enviar (ver withoutMealFields)
+  mealConfig?: MealConfig | null;
 }
 
 interface UpdateEventData {
@@ -27,6 +42,8 @@ interface UpdateEventData {
   location?: string;
   description?: string;
   isActive?: boolean;
+  // Solo lectura: se ignora al enviar (ver withoutMealFields)
+  mealConfig?: MealConfig | null;
 }
 
 export function useCreateEvent() {
@@ -38,7 +55,7 @@ export function useCreateEvent() {
       setIsLoading(true);
       setError(null);
       
-      const response = await api.post('/events', data);
+      const response = await api.post('/events', withoutMealFields(data));
       toast.success("Evento creado correctamente");
       return response.data;
     } catch (err: any) {
@@ -62,7 +79,7 @@ export function useUpdateEvent() {
       setIsLoading(true);
       setError(null);
       
-      const response = await api.patch(`/events/${id}`, data);
+      const response = await api.patch(`/events/${id}`, withoutMealFields(data));
       toast.success("Evento actualizado correctamente");
       return response.data;
     } catch (err: any) {

@@ -7,6 +7,7 @@ export interface Combo {
   isActive?: boolean;
   isPublished?: boolean;
   isFree?: boolean;
+  mealsEnabled?: boolean;
   description?: string;
   displayOrder?: number;
   metadata?: any;
@@ -50,6 +51,7 @@ export interface CreateComboDto {
   isActive?: boolean;
   isPublished?: boolean;
   isFree?: boolean;
+  mealsEnabled?: boolean;
   description?: string;
   displayOrder?: number;
   metadata?: any;
@@ -64,6 +66,7 @@ export interface UpdateComboDto {
   isActive?: boolean;
   isPublished?: boolean;
   isFree?: boolean;
+  mealsEnabled?: boolean;
   description?: string;
   displayOrder?: number;
   metadata?: any;

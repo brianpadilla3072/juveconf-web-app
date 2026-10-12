@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -706,6 +707,17 @@ export default function EventsPage() {
                 placeholder="Descripción del evento"
               />
             </div>
+            <p className="text-xs text-muted-foreground">
+              Los menús de comida se configuran en{' '}
+              <Link
+                href="/app/comidas"
+                className="text-violet-600 underline"
+                onClick={() => setIsEditDialogOpen(false)}
+              >
+                Comidas
+              </Link>
+              ; se activan por combo en Combos.
+            </p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>

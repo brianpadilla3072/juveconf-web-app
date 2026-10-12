@@ -94,6 +94,18 @@
           "sizes": "96x96"
         }
       ]
+    },
+    {
+      "name": "Buffet",
+      "short_name": "Buffet",
+      "description": "Entrega de comidas con escáner de QR",
+      "url": "/app/comidas/buffet",
+      "icons": [
+        {
+          "src": "/icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
     }
   ],
   "categories": ["productivity", "business", "events"],

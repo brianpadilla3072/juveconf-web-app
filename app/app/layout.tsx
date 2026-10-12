@@ -2,7 +2,8 @@
 import { ClientLoaderWrapper } from "./ClientLoaderWrapper";
 import { Module, useNavigationStore } from "../../store/navigationStore";
 import { useSyncActiveModule } from "@/hooks/useSyncActiveModule";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Home,
   Calendar,
@@ -16,6 +17,8 @@ import {
   Mail,
   DollarSign,
   Tag,
+  Utensils,
+  QrCode,
 } from "lucide-react";
 import { NavItem } from "@/components/app/navigation";
 import { SyncModuleProvider } from "@/components/app/SyncModuleProvider";
@@ -25,6 +28,21 @@ import { Logo } from "../components/Logo/Logo";
 import { getBrandColor, ORG_NAME } from "@/lib/constants";
 import { DrawerProvider } from "@/contexts/DrawerContext";
 import GlobalDrawer from "@/components/GlobalDrawer/GlobalDrawer";
+import { BuffetShell } from "@/components/meals/BuffetShell";
+import { useAuth } from "@/contexts/AuthContext";
+import { useCurrentEvent } from "@/hooks/Events/useCurrentEvent";
+import {
+  BUFFET_HOME_PATH,
+  isBuffetOnlyRole,
+  isBuffetPath,
+  isMealsAdminRole,
+} from "@/lib/roles";
+
+const FullScreenSpinner = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500"></div>
+  </div>
+);
 
 export default function DashboardLayout({
   children,
@@ -41,12 +59,31 @@ export default function DashboardLayout({
     orders: 'Órdenes',
     payments: 'Pagos',
     invitees: 'Invitados',
+    comidas: 'Comidas',
     emails: 'Emails',
     finanzas: 'Finanzas',
     users: 'Usuarios',
     settings: 'Configuración',
   };
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Comidas: se muestra según el rol (los admin siempre, para poder configurar los menús).
+  // Buffet (colaboradores): solo si el evento actual tiene la configuración de comidas.
+  const router = useRouter();
+  const pathname = usePathname();
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const role = user?.role ?? null;
+  const isBuffetOnly = isBuffetOnlyRole(role);
+  const canSeeMealsNav = isMealsAdminRole(role);
+  const canSeeBuffetNav = role === 'COLLABORATOR';
+  const { hasMealConfig } = useCurrentEvent({ enabled: canSeeBuffetNav });
+
+  // El rol BUFFET solo puede estar en el modo buffet
+  useEffect(() => {
+    if (isBuffetOnly && !isBuffetPath(pathname)) {
+      router.replace(BUFFET_HOME_PATH);
+    }
+  }, [isBuffetOnly, pathname, router]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -55,6 +92,28 @@ export default function DashboardLayout({
   const closeSidebar = () => {
     setIsSidebarOpen(false);
   };
+
+  // Espera al perfil para no mostrar el menú completo a un usuario BUFFET
+  if (isAuthLoading) {
+    return (
+      <ClientLoaderWrapper>
+        <FullScreenSpinner />
+      </ClientLoaderWrapper>
+    );
+  }
+
+  // Layout mínimo para BUFFET: sin sidebar, solo encabezado con cierre de sesión
+  if (isBuffetOnly) {
+    return (
+      <ClientLoaderWrapper>
+        <ProtectedRoute>
+          <BuffetShell>
+            {isBuffetPath(pathname) ? children : <FullScreenSpinner />}
+          </BuffetShell>
+        </ProtectedRoute>
+      </ClientLoaderWrapper>
+    );
+  }
 
   return (
     <ClientLoaderWrapper>
@@ -170,6 +229,28 @@ export default function DashboardLayout({
                   onNavigate={closeSidebar}
                 />
               </li>
+              {canSeeMealsNav && (
+                <li>
+                  <NavItem
+                    href="/app/comidas"
+                    icon={<Utensils className="h-5 w-5" />}
+                    label="Comidas"
+                    moduleKey="comidas"
+                    onNavigate={closeSidebar}
+                  />
+                </li>
+              )}
+              {hasMealConfig && canSeeBuffetNav && (
+                <li>
+                  <NavItem
+                    href="/app/comidas/buffet"
+                    icon={<QrCode className="h-5 w-5" />}
+                    label="Buffet"
+                    moduleKey="comidas"
+                    onNavigate={closeSidebar}
+                  />
+                </li>
+              )}
               <li>
                 <NavItem
                   href="/app/emails"

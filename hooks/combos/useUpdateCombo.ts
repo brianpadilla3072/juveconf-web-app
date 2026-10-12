@@ -2,6 +2,8 @@
 import api from "@/lib/axios.config";
 import { UpdateComboDto, Combo } from "@/entities/Combo";
 import { useState } from "react";
+import { toast } from "sonner";
+import { extractApiError } from "@/lib/meals";
 
 export function useUpdateCombo() {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,6 +19,8 @@ export function useUpdateCombo() {
     } catch (err: any) {
       setError(err);
       console.error("Error al actualizar combo:", err);
+      // Muestra el mensaje del servidor (ej: 400 al activar comidas sin menús configurados)
+      toast.error(extractApiError(err, "Error al actualizar combo").message);
       return null;
     } finally {
       setIsLoading(false);

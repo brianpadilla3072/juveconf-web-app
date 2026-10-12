@@ -242,6 +242,7 @@ export default function UsersModule() {
                   <SelectContent>
                     <SelectItem value="USER">Usuario</SelectItem>
                     <SelectItem value="COLLABORATOR">Colaborador</SelectItem>
+                    <SelectItem value="BUFFET">Buffet</SelectItem>
                     <SelectItem value="EDITOR">Editor</SelectItem>
                     <SelectItem value="ADMIN">Administrador</SelectItem>
                     <SelectItem value="DEVELOPER">Desarrollador</SelectItem>
@@ -540,6 +541,7 @@ export default function UsersModule() {
                 <SelectContent>
                   <SelectItem value="USER">Usuario</SelectItem>
                   <SelectItem value="COLLABORATOR">Colaborador</SelectItem>
+                  <SelectItem value="BUFFET">Buffet</SelectItem>
                   <SelectItem value="EDITOR">Editor</SelectItem>
                   <SelectItem value="ADMIN">Administrador</SelectItem>
                   <SelectItem value="DEVELOPER">Desarrollador</SelectItem>

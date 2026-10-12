@@ -4,6 +4,8 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { useRouter } from 'next/navigation';
 import { AuthService } from '@/lib/auth.service';
 import api from '@/lib/axios.config';
+import { homePathForRole } from '@/lib/roles';
+import { resetCurrentEventCache } from '@/hooks/Events/useCurrentEvent';
 
 type User = {
   id: string;
@@ -23,7 +25,7 @@ type AuthContextType = {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  checkAuth: () => Promise<void>;
+  checkAuth: () => Promise<User>;
   updateProfile: (userData: Partial<Omit<User, 'id' | 'email' | 'role' | 'provider' | 'emailVerified'>>) => Promise<User>;
 };
 
@@ -34,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  const checkAuth = async () => {
+  const checkAuth = async (): Promise<User> => {
     try {
       console.log('🔵 [checkAuth] Iniciando verificación...');
       const token = AuthService.getToken();
@@ -43,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('🟡 [checkAuth] No hay token, usuario no autenticado');
         setUser(null);
         setIsLoading(false);
-        return;
+        return null;
       }
 
       console.log('🔵 [checkAuth] Token encontrado, consultando perfil...');
@@ -52,10 +54,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setUser(response.data);
       console.log('✅ [checkAuth] Usuario autenticado correctamente');
+      return response.data as User;
     } catch (error) {
       console.error('🔴 [checkAuth] Error al verificar autenticación:', error);
       setUser(null);
       AuthService.removeToken();
+      return null;
     } finally {
       setIsLoading(false);
     }
@@ -85,15 +89,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       AuthService.setToken(access_token);
 
       console.log('🔵 [AuthContext] Verificando autenticación...');
-      await checkAuth();
+      const profile = await checkAuth();
 
       // Verificar si el usuario debe cambiar su contraseña
       if (requirePasswordChange) {
         console.log('🔵 [AuthContext] Usuario debe cambiar contraseña temporal, redirigiendo a /change-password');
         router.push('/change-password');
       } else {
-        console.log('🔵 [AuthContext] Login completado, redirigiendo a /app');
-        router.push('/app');
+        // El rol BUFFET va directo al modo buffet; el resto al panel
+        const homePath = homePathForRole(profile?.role);
+        console.log(`🔵 [AuthContext] Login completado, redirigiendo a ${homePath}`);
+        router.push(homePath);
       }
     } catch (error: any) {
       console.error('🔴 [AuthContext] Error en login:', error);
@@ -114,6 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     AuthService.removeToken();
+    resetCurrentEventCache();
     setUser(null);
     router.push('/login');
   };

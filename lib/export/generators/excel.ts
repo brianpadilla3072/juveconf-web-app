@@ -10,7 +10,11 @@ import { formatValueByType } from '../utils';
 /**
  * Genera y descarga un archivo Excel
  */
-export function generateExcel(data: ExportData, filename: string): void {
+export function generateExcel(
+  data: ExportData,
+  filename: string,
+  sheetName: string = 'Invitados',
+): void {
   const { schema, rows } = data;
 
   // Construir headers
@@ -59,7 +63,7 @@ export function generateExcel(data: ExportData, filename: string): void {
 
   // Crear libro y agregar hoja
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Invitados');
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
 
   // Descargar archivo
   XLSX.writeFile(wb, filename);

@@ -11,7 +11,7 @@ export interface User {
   emailVerified: boolean;
   picture?: string;
   locale?: string;
-  role: 'SUPERADMIN' | 'DEVELOPER' | 'ADMIN' | 'EDITOR' | 'COLLABORATOR' | 'USER';
+  role: 'SUPERADMIN' | 'DEVELOPER' | 'ADMIN' | 'EDITOR' | 'COLLABORATOR' | 'BUFFET' | 'USER';
   createdAt: string;
   updatedAt: string;
   lastLogin?: string;
@@ -30,7 +30,7 @@ export interface CreateUserDto {
   picture?: string;
   locale?: string;
   password: string;
-  role: 'SUPERADMIN' | 'DEVELOPER' | 'ADMIN' | 'EDITOR' | 'COLLABORATOR' | 'USER';
+  role: 'SUPERADMIN' | 'DEVELOPER' | 'ADMIN' | 'EDITOR' | 'COLLABORATOR' | 'BUFFET' | 'USER';
   dni: string;
 }
 
@@ -46,6 +46,6 @@ export interface UpdateUserDto {
   picture?: string;
   locale?: string;
   password?: string;
-  role?: 'SUPERADMIN' | 'DEVELOPER' | 'ADMIN' | 'EDITOR' | 'COLLABORATOR' | 'USER';
+  role?: 'SUPERADMIN' | 'DEVELOPER' | 'ADMIN' | 'EDITOR' | 'COLLABORATOR' | 'BUFFET' | 'USER';
   dni?: string;
 }

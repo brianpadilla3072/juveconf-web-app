@@ -8,6 +8,7 @@ export type Module =
   | 'orders'
   | 'payments'
   | 'invitees'
+  | 'comidas'
   | 'emails'
   | 'finanzas'
   | 'users'

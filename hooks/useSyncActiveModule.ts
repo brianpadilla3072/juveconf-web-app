@@ -13,6 +13,7 @@ export const useSyncActiveModule = () => {
     else if (pathname.includes('/orders')) setActiveModule('orders')
     else if (pathname.includes('/pagos')) setActiveModule('payments')
     else if (pathname.includes('/invitados')) setActiveModule('invitees')
+    else if (pathname.includes('/comidas')) setActiveModule('comidas')
     else if (pathname.includes('/emails')) setActiveModule('emails')
     else if (pathname.includes('/finanzas')) setActiveModule('finanzas')
     else if (pathname.includes('/analytics')) setActiveModule('analytics')

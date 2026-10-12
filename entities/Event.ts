@@ -1,3 +1,5 @@
+import type { MealConfig } from './Meal';
+
 export interface EventDay {
   date: string;           // YYYY-MM-DD
   dayNumber: number;      // 1, 2, 3, 4...
@@ -25,6 +27,10 @@ export interface Event {
   eventStartDate?: string;
   eventEndDate?: string;
   eventDays?: EventDays;
+
+  // Menú de comidas (solo lectura: se modifica con PATCH /meals/config/:eventId, nunca con /events).
+  // Las comidas se activan por combo (Combo.mealsEnabled), no por evento.
+  mealConfig?: MealConfig | null;
 
   createdAt: string;
   updatedAt: string;

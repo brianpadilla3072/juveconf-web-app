@@ -38,6 +38,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
 import { Trash2, Edit, Plus, Package, DollarSign, Users, Search, RotateCcw, X, List, Eye } from "lucide-react"
 import { toast } from "sonner"
 import { DetailItemsEditor, DetailItem } from "@/components/combos/DetailItemsEditor"
@@ -88,7 +89,8 @@ export default function CombosModule() {
     price: 0,
     personsIncluded: 1,
     eventId: activeEvents[0]?.id || "", // First available event
-    isFree: false
+    isFree: false,
+    mealsEnabled: false
   })
 
   const [editForm, setEditForm] = useState<UpdateComboDto>({})
@@ -124,7 +126,8 @@ export default function CombosModule() {
         price: 0,
         personsIncluded: 1,
         eventId: activeEvents[0]?.id || "",
-        isFree: false
+        isFree: false,
+        mealsEnabled: false
       })
       setDetailItems([])
       setComboDescription('')
@@ -132,9 +135,8 @@ export default function CombosModule() {
       setMerchandiseEnabled(false)
       setMerchandiseItems([])
       refetch()
-    } else {
-      toast.error("Error al crear combo")
     }
+    // Si falla, useCreateCombo ya muestra el mensaje del servidor
   }
 
   const handleEditCombo = async (e: React.FormEvent) => {
@@ -167,9 +169,8 @@ export default function CombosModule() {
       setEditMerchandiseEnabled(false)
       setEditMerchandiseItems([])
       refetch()
-    } else {
-      toast.error("Error al actualizar combo")
     }
+    // Si falla, useUpdateCombo ya muestra el mensaje del servidor
   }
 
   const handleDeleteCombo = async (combo: Combo) => {
@@ -191,7 +192,8 @@ export default function CombosModule() {
       price: combo.price,
       personsIncluded: combo.personsIncluded,
       eventId: combo.eventId,
-      isFree: combo.isFree || false
+      isFree: combo.isFree || false,
+      mealsEnabled: combo.mealsEnabled || false
     })
     setEditDetailItems(combo.metadata?.detailItems || [])
     setEditComboDescription(combo.metadata?.description || '')
@@ -385,6 +387,22 @@ export default function CombosModule() {
                 </div>
               </div>
 
+              <div className="flex items-center space-x-2 py-2">
+                <Switch
+                  id="mealsEnabled"
+                  checked={createForm.mealsEnabled ?? false}
+                  onCheckedChange={(checked) => setCreateForm({...createForm, mealsEnabled: checked})}
+                />
+                <div>
+                  <Label htmlFor="mealsEnabled" className="cursor-pointer font-normal">
+                    Comidas habilitadas
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Permite elegir comidas al comprar este combo. Requiere tener los menús cargados en Comidas.
+                  </p>
+                </div>
+              </div>
+
               <div className="border-t pt-4">
                 <DetailItemsEditor
                   description={comboDescription}
@@ -529,6 +547,11 @@ export default function CombosModule() {
                     ) : (
                       combo.name
                     )}
+                    {combo.mealsEnabled && (
+                      <Badge variant="secondary" className="ml-2 text-xs">
+                        Comidas
+                      </Badge>
+                    )}
                   </TableCell>
                   <TableCell>
                     {combo.event ? (
@@ -646,6 +669,9 @@ export default function CombosModule() {
                       <Badge variant={combo.isPublished ? "default" : "outline"}>
                         {combo.isPublished ? "Publicado" : "No publicado"}
                       </Badge>
+                      {combo.mealsEnabled && (
+                        <Badge variant="secondary">Comidas</Badge>
+                      )}
                     </div>
                   </div>
 
@@ -818,6 +844,22 @@ export default function CombosModule() {
                 <Label htmlFor="edit-isPublished" className="cursor-pointer font-normal">
                   Publicado
                 </Label>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2 py-2">
+              <Switch
+                id="edit-mealsEnabled"
+                checked={editForm.mealsEnabled ?? false}
+                onCheckedChange={(checked) => setEditForm({...editForm, mealsEnabled: checked})}
+              />
+              <div>
+                <Label htmlFor="edit-mealsEnabled" className="cursor-pointer font-normal">
+                  Comidas habilitadas
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Permite elegir comidas al comprar este combo. Requiere tener los menús cargados en Comidas.
+                </p>
               </div>
             </div>
 

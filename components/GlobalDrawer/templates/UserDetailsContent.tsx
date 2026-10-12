@@ -37,6 +37,8 @@ export function UserDetailsContent({ user }: UserDetailsContentProps) {
         return 'bg-green-600 text-white';
       case 'COLLABORATOR':
         return 'bg-yellow-600 text-white';
+      case 'BUFFET':
+        return 'bg-orange-600 text-white';
       case 'USER':
         return 'bg-gray-600 text-white';
       default:
@@ -51,6 +53,7 @@ export function UserDetailsContent({ user }: UserDetailsContentProps) {
       ADMIN: 'Administrador',
       EDITOR: 'Editor',
       COLLABORATOR: 'Colaborador',
+      BUFFET: 'Buffet',
       USER: 'Usuario'
     };
     return labels[role] || role;

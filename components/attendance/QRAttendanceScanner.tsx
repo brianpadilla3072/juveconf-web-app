@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Camera, CameraOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { parseTicketQR } from '@/lib/qr';
 
 interface QRAttendanceScannerProps {
   onQRScanned: (data: { inviteId: string; paymentId?: string }) => void;
@@ -74,31 +75,8 @@ export default function QRAttendanceScanner({ onQRScanned, isOpen, onClose }: QR
 
   const handleQRSuccess = (decodedText: string) => {
     try {
-      // Limpiar el texto del QR
-      const cleanText = decodedText.trim();
-      
-      // Usar regex para extraer inviteId y paymentId del formato de objeto JavaScript
-      const inviteIdMatch = cleanText.match(/inviteId:\s*([a-f0-9-]{36})/i);
-      const paymentIdMatch = cleanText.match(/paymentId:\s*([a-f0-9-]{36})/i);
-
-      // El inviteId es obligatorio, paymentId es opcional
-      if (!inviteIdMatch) {
-        throw new Error('No se encontró inviteId válido en el QR');
-      }
-
-      const inviteId = inviteIdMatch[1];
-      const paymentId = paymentIdMatch ? paymentIdMatch[1] : undefined;
-
-      // Validar que inviteId sea UUID válido (formato básico)
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(inviteId)) {
-        throw new Error('inviteId inválido en el QR');
-      }
-
-      // Validar paymentId solo si existe
-      if (paymentId && !uuidRegex.test(paymentId)) {
-        throw new Error('paymentId inválido en el QR');
-      }
+      // Extrae y valida inviteId (obligatorio) y paymentId (opcional)
+      const { inviteId, paymentId } = parseTicketQR(decodedText);
 
       // Detener el escáner y procesar los datos
       if (scannerRef.current) {

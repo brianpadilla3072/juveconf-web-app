@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { Loader2 } from 'lucide-react'
+import { homePathForRole } from '@/lib/roles'
 
 export default function AuthRedirect({
   children,
@@ -32,9 +33,9 @@ export default function AuthRedirect({
     }
     // Si no requiere autenticación y está autenticado, redirigir a app
     else if (!requireAuth && isAuthenticated) {
-      router.push('/app')
+      router.push(homePathForRole(user?.role))
     }
-  }, [isAuthenticated, isLoading, requireAuth, redirectTo, router])
+  }, [isAuthenticated, isLoading, requireAuth, redirectTo, router, user?.role])
 
   // Mostrar loading mientras se verifica la autenticación
   if (isLoading) {

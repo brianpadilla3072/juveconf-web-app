@@ -4,10 +4,10 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3072';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const url = `${API_BASE_URL}/finanzas/egresos/${params.id}`;
+    const url = `${API_BASE_URL}/finanzas/egresos/${(await params).id}`;
     
     const response = await fetch(url, {
       method: 'GET',
@@ -38,11 +38,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const body = await request.json();
-    const url = `${API_BASE_URL}/finanzas/egresos/${params.id}`;
+    const url = `${API_BASE_URL}/finanzas/egresos/${(await params).id}`;
     
     const response = await fetch(url, {
       method: 'PUT',
@@ -74,10 +74,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const url = `${API_BASE_URL}/finanzas/egresos/${params.id}`;
+    const url = `${API_BASE_URL}/finanzas/egresos/${(await params).id}`;
     
     const response = await fetch(url, {
       method: 'DELETE',
