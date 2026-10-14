@@ -48,8 +48,8 @@ function buildExportData(teams: Team[]): ExportData {
         team: t.name,
         firstName: p.firstName,
         lastName: p.lastName,
-        leader: t.leaderName,
-        phone: t.leaderPhone,
+        leader: t.leaderName ?? '',
+        phone: t.leaderPhone ?? '',
         email: t.leaderEmail ?? '',
       })),
     ),
@@ -160,8 +160,8 @@ export function TeamsListTab({ eventId }: { eventId: string }) {
                         <TableCell>{open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}</TableCell>
                         <TableCell className="font-medium">{t.name}</TableCell>
                         <TableCell>{t.teamType.name}</TableCell>
-                        <TableCell>{t.leaderName}</TableCell>
-                        <TableCell>{t.leaderPhone}</TableCell>
+                        <TableCell>{t.leaderName ?? '—'}</TableCell>
+                        <TableCell>{t.leaderPhone ?? '—'}</TableCell>
                         <TableCell className="text-center">
                           {t.players.length} / {t.teamType.maxPlayers}
                         </TableCell>
