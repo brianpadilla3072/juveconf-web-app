@@ -18,6 +18,7 @@ import {
   DollarSign,
   Tag,
   Utensils,
+  Trophy,
   QrCode,
 } from "lucide-react";
 import { NavItem } from "@/components/app/navigation";
@@ -60,6 +61,7 @@ export default function DashboardLayout({
     payments: 'Pagos',
     invitees: 'Invitados',
     comidas: 'Comidas',
+    equipos: 'Equipos',
     emails: 'Emails',
     finanzas: 'Finanzas',
     users: 'Usuarios',
@@ -236,6 +238,17 @@ export default function DashboardLayout({
                     icon={<Utensils className="h-5 w-5" />}
                     label="Comidas"
                     moduleKey="comidas"
+                    onNavigate={closeSidebar}
+                  />
+                </li>
+              )}
+              {canSeeMealsNav && (
+                <li>
+                  <NavItem
+                    href="/app/equipos"
+                    icon={<Trophy className="h-5 w-5" />}
+                    label="Equipos"
+                    moduleKey="equipos"
                     onNavigate={closeSidebar}
                   />
                 </li>
