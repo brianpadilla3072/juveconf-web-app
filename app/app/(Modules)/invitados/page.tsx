@@ -50,10 +50,10 @@ import { useAttendance } from '@/hooks/attendance/useAttendance';
 import { ExportDialog } from '@/components/invitees/ExportDialog';
 import { toast } from 'sonner';
 import { Attendance } from '@/entities/Invitee';
+import { useGlobalFiltersStore } from '@/store/globalFiltersStore';
 
 export default function InviteesPage() {
   const [search, setSearch] = useState('');
-  const [selectedEventId, setSelectedEventId] = useState<string>('all');
   const [selectedComboId, setSelectedComboId] = useState<string>('all');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -78,6 +78,9 @@ export default function InviteesPage() {
   // Hook para drawer global
   const { openDrawer, closeDrawer } = useDrawer();
 
+  // Filtro global de año + evento (selectores del header)
+  const { selectedYear, selectedEventId } = useGlobalFiltersStore();
+
   // Hook para manejo de asistencia
   const {
     fetchInvitee,
@@ -90,7 +93,8 @@ export default function InviteesPage() {
 
   // Queries
   const { invitees, isLoading, error, refetch } = useQueryInvitees({
-    eventId: selectedEventId !== 'all' ? selectedEventId : undefined,
+    year: selectedYear,
+    eventId: selectedEventId || undefined,
     comboId: selectedComboId !== 'all' ? selectedComboId : undefined
   });
   const { payments } = useQueryPayments();
@@ -430,23 +434,6 @@ export default function InviteesPage() {
             {/* Segunda fila: Selects de filtros y botón actualizar */}
             <div className="flex flex-col md:flex-row gap-2">
               <Select
-                value={selectedEventId}
-                onValueChange={setSelectedEventId}
-              >
-                <SelectTrigger className="w-full md:w-[250px]">
-                  <SelectValue placeholder="Todos los eventos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos los eventos</SelectItem>
-                  {allEvents?.map((ev) => (
-                    <SelectItem key={ev.id} value={ev.id}>
-                      {ev.topic}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select
                 value={selectedComboId}
                 onValueChange={setSelectedComboId}
               >
@@ -734,7 +721,7 @@ export default function InviteesPage() {
       {/* Manual Invitee Search */}
       <InviteeSearchInput
         isOpen={isManualSearchOpen}
-        eventId={selectedEventId !== 'all' ? selectedEventId : event?.id}
+        eventId={selectedEventId || event?.id}
         onSelectInvitee={handleManualInviteeSelect}
         onCancel={() => setIsManualSearchOpen(false)}
       />
@@ -773,7 +760,7 @@ export default function InviteesPage() {
       <ExportDialog
         open={isExportDialogOpen}
         onOpenChange={setIsExportDialogOpen}
-        defaultEventId={selectedEventId !== 'all' ? selectedEventId : event?.id}
+        defaultEventId={selectedEventId || event?.id}
         events={allEvents || []}
         combos={allCombos || []}
         inviteesCount={filteredInvitees?.length || 0}

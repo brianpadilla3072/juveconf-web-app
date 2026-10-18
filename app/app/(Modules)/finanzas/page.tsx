@@ -50,6 +50,7 @@ import {
 import { toast } from 'sonner';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import api from '@/lib/axios.config';
+import { useGlobalFiltersStore } from '@/store/globalFiltersStore';
 
 interface Ingreso {
   id: string;
@@ -88,7 +89,7 @@ export default function FinanzasPage() {
   const [ingresos, setIngresos] = useState<Ingreso[]>([]);
   const [egresos, setEgresos] = useState<Egreso[]>([]);
   const [balance, setBalance] = useState<Balance | null>(null);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const { selectedYear } = useGlobalFiltersStore();
   const [activeTab, setActiveTab] = useState('dashboard');
 
   // Form states
@@ -247,18 +248,6 @@ export default function FinanzasPage() {
         <div>
           <h1 className="text-3xl font-bold">Finanzas</h1>
           <p className="text-muted-foreground">Control de ingresos y egresos</p>
-        </div>
-        <div className="flex gap-2">
-          <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Año" />
-            </SelectTrigger>
-            <SelectContent>
-              {[2023, 2024, 2025, 2026].map(year => (
-                <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       </div>
 

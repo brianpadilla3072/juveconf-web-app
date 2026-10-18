@@ -3,7 +3,7 @@ import api from "@/lib/axios.config";
 import { PreSale } from "@/entities/PreSale";
 import { useEffect, useState } from "react";
 
-export function useQueryPreSales() {
+export function useQueryPreSales(year?: number, eventId?: string) {
   const [preSales, setPreSales] = useState<PreSale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -11,7 +11,8 @@ export function useQueryPreSales() {
   const fetchPreSales = async () => {
     try {
       setIsLoading(true);
-      const res = await api.get("/presales");
+      const params = { ...(eventId ? { eventId } : year ? { year } : {}) };
+      const res = await api.get("/presales", { params });
       setPreSales(res.data);
       setError(null);
     } catch (err: any) {
@@ -25,7 +26,7 @@ export function useQueryPreSales() {
 
   useEffect(() => {
     fetchPreSales();
-  }, []);
+  }, [year, eventId]);
 
   const refetch = () => {
     fetchPreSales();

@@ -49,9 +49,11 @@ import { toast } from "sonner"
 import { useDrawer } from '@/hooks/useDrawer'
 import { PaymentDetailsContent } from '@/components/GlobalDrawer/templates/PaymentDetailsContent'
 import { getTicketDownloadUrl } from '@/lib/config'
+import { useGlobalFiltersStore } from '@/store/globalFiltersStore'
 
 export default function PaymentsModule() {
-  const { payments, isLoading, error, refetch } = useQueryPayments()
+  const { selectedYear } = useGlobalFiltersStore()
+  const { payments, isLoading, error, refetch } = useQueryPayments(selectedYear)
   const { createPayment, isLoading: isCreating } = useCreatePayment()
   const { updatePayment, isLoading: isUpdating } = useUpdatePayment()
   const { deletePayment, isLoading: isDeleting } = useDeletePayment()
@@ -180,7 +182,7 @@ export default function PaymentsModule() {
     )
   }
 
-  // Filter payments
+  // Filter payments (year ya viene filtrado del server)
   const filteredPayments = payments.filter(payment => {
     if (payment.deletedAt) return false
     if (!search.trim()) return true

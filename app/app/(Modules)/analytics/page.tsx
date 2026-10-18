@@ -1,103 +1,39 @@
 "use client"
-import { useState } from "react"
-import { Calendar, Package, ShoppingCart, Users, TrendingUp, DollarSign, UserCheck, BarChart3 } from "lucide-react"
+import { Calendar, ShoppingCart, Users, TrendingUp, DollarSign, UserCheck, BarChart3 } from "lucide-react"
 import { useDashboardOverview } from "@/app/hooks/Dashboard/useDashboardOverview"
 import { useRevenueTrends } from "@/app/hooks/Dashboard/useRevenueTrends"
 import { useOrdersAnalytics } from "@/app/hooks/Dashboard/useOrdersAnalytics"
 import { useAttendanceAnalytics } from "@/app/hooks/Dashboard/useAttendanceAnalytics"
 import { useCombosRanking } from "@/app/hooks/Dashboard/useCombosRanking"
-import { useQueryEvents } from "@/hooks/Events/useQueryEvents"
+import { useGlobalFiltersStore } from "@/store/globalFiltersStore"
 import { KPICard } from "@/app/components/Dashboard/KPICard"
 import { LineChart } from "@/app/components/Dashboard/Charts/LineChart"
 import { BarChart } from "@/app/components/Dashboard/Charts/BarChart"
 import { PieChart } from "@/app/components/Dashboard/Charts/PieChart"
 import { AreaChart } from "@/app/components/Dashboard/Charts/AreaChart"
-import { YearSelector } from "@/app/components/Dashboard/YearSelector"
 import { ChartSkeleton } from "@/app/components/Dashboard/ChartSkeleton"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 
 export default function AnalyticsPage() {
-  const currentYear = new Date().getFullYear()
-  const [selectedYear, setSelectedYear] = useState(currentYear)
-  const [selectedEventId, setSelectedEventId] = useState<string>("")
-  const [isYearChanging, setIsYearChanging] = useState(false)
+  const { selectedYear, selectedEventId } = useGlobalFiltersStore()
 
-  // Load events
-  const { events, isLoading: isLoadingEvents } = useQueryEvents()
-  const activeEvents = events?.filter(e =>
-    !e.deletedAt &&
-    e.year >= currentYear - 4
-  ) || []
-
-  // Generate year options (current year and 4 years back)
-  const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i)
-
-  const handleYearChange = (newYear: number) => {
-    setIsYearChanging(true)
-    setSelectedYear(newYear)
-    setTimeout(() => setIsYearChanging(false), 500)
-  }
-
-  const handleEventChange = (eventId: string) => {
-    setSelectedEventId(eventId === "all" ? "" : eventId)
-  }
-
-  // Fetch data with event filter
+  // Fetch data con el filtro de año y evento del selector global (header)
   const { data: overviewData, loading: overviewLoading } = useDashboardOverview(selectedYear, selectedEventId || undefined)
   const { data: revenueData, loading: revenueLoading } = useRevenueTrends(12, selectedEventId || undefined)
   const { data: ordersData, loading: ordersLoading } = useOrdersAnalytics(selectedYear, selectedEventId || undefined)
   const { data: attendanceData, loading: attendanceLoading } = useAttendanceAnalytics(selectedYear, selectedEventId || undefined)
   const { data: combosData, loading: combosLoading } = useCombosRanking(selectedYear, 5, selectedEventId || undefined)
 
-  const isLoading = overviewLoading || revenueLoading || ordersLoading || isYearChanging || isLoadingEvents
-
-  if (isLoadingEvents) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-violet-500"></div>
-      </div>
-    )
-  }
+  const isLoading = overviewLoading || revenueLoading || ordersLoading
 
   return (
     <div className="space-y-6">
       <div className="mb-8">
-        {/* Header with filters */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800">Analíticas por Evento</h2>
-            <p className="text-sm text-gray-500 mt-1">Filtra las métricas por evento específico</p>
-          </div>
-
-          <div className="flex gap-4">
-            {/* Event Selector */}
-            <Select value={selectedEventId || "all"} onValueChange={handleEventChange}>
-              <SelectTrigger className="w-[250px]">
-                <SelectValue placeholder="Seleccionar evento" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos los eventos</SelectItem>
-                {activeEvents.map(event => (
-                  <SelectItem key={event.id} value={event.id}>
-                    {event.topic} - {event.year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Year Selector */}
-            <YearSelector
-              selectedYear={selectedYear}
-              onYearChange={handleYearChange}
-              years={yearOptions}
-            />
-          </div>
+        {/* Header */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">Analíticas por Evento</h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Filtrado por el año y evento seleccionados arriba
+          </p>
         </div>
 
         {isLoading ? (
@@ -154,7 +90,7 @@ export default function AnalyticsPage() {
                   <h3 className="text-lg font-bold text-gray-800">Tendencias de Ingresos</h3>
                   <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">Últimos 12 meses</span>
                 </div>
-                {revenueLoading || isYearChanging ? (
+                {revenueLoading ? (
                   <ChartSkeleton height={300} />
                 ) : revenueData ? (
                   <LineChart
@@ -182,7 +118,7 @@ export default function AnalyticsPage() {
                   <h3 className="text-lg font-bold text-gray-800">Órdenes por Estado</h3>
                   <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{selectedYear}</span>
                 </div>
-                {ordersLoading || isYearChanging ? (
+                {ordersLoading ? (
                   <ChartSkeleton height={300} />
                 ) : ordersData ? (
                   <PieChart
@@ -207,7 +143,7 @@ export default function AnalyticsPage() {
                   <h3 className="text-lg font-bold text-gray-800">Combos Más Populares</h3>
                   <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{selectedYear}</span>
                 </div>
-                {combosLoading || isYearChanging ? (
+                {combosLoading ? (
                   <ChartSkeleton height={300} />
                 ) : combosData ? (
                   <BarChart
@@ -235,7 +171,7 @@ export default function AnalyticsPage() {
                   <h3 className="text-lg font-bold text-gray-800">Asistencia por Evento</h3>
                   <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">{selectedYear}</span>
                 </div>
-                {attendanceLoading || isYearChanging ? (
+                {attendanceLoading ? (
                   <ChartSkeleton height={300} />
                 ) : attendanceData && attendanceData.byEvent.length > 0 ? (
                   (() => {

@@ -30,6 +30,8 @@ import { getBrandColor, ORG_NAME } from "@/lib/constants";
 import { DrawerProvider } from "@/contexts/DrawerContext";
 import GlobalDrawer from "@/components/GlobalDrawer/GlobalDrawer";
 import { BuffetShell } from "@/components/meals/BuffetShell";
+import { GlobalYearSelector } from "@/components/app/GlobalYearSelector";
+import { GlobalEventSelector } from "@/components/app/GlobalEventSelector";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrentEvent } from "@/hooks/Events/useCurrentEvent";
 import {
@@ -324,6 +326,10 @@ export default function DashboardLayout({
               </div>
 
               <div className="flex items-center space-x-4">
+                <div className="hidden md:flex items-center gap-2">
+                  <GlobalYearSelector />
+                  <GlobalEventSelector />
+                </div>
                 <button className="relative p-1 rounded-full hover:bg-gray-100 opacity-50 cursor-not-allowed" disabled>
                   <svg
                     className="h-6 w-6 text-gray-400"

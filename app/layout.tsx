@@ -6,9 +6,9 @@ import { Toaster } from 'sonner';
 import { Providers } from './providers';
 
 export const metadata = {
-  title: 'JuveConf',
+  title: 'App - Juve',
   description: 'Aplicación para la gestión de eventos juveniles, finanzas y administración de la organización Juventud en Conferencia',
-  applicationName: 'JuveConf',
+  applicationName: 'App - Juve',
   authors: [{ name: 'Juventud en Conferencia' }],
   generator: 'Next.js',
   keywords: ['juveconf', 'juventud', 'conferencia', 'eventos', 'finanzas', 'religioso', 'administración'],
@@ -21,11 +21,14 @@ export const metadata = {
   },
   icons: {
     icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png' },
       { url: '/favicon.png' },
       { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
       { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
     apple: [
+      { url: '/apple-touch-icon.png' },
       { url: '/icons/icon-152x152.png', sizes: '152x152', type: 'image/png' },
       { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
     ],
@@ -42,25 +45,25 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'JuveConf',
+    title: 'App - Juve',
   },
   openGraph: {
     type: 'website',
-    siteName: 'JuveConf',
-    title: 'JuveConf',
+    siteName: 'App - Juve',
+    title: 'App - Juve',
     description: 'Aplicación para la gestión de eventos juveniles, finanzas y administración de la organización Juventud en Conferencia',
     images: [
       {
         url: '/icons/icon-512x512.png',
         width: 512,
         height: 512,
-        alt: 'JuveConf',
+        alt: 'App - Juve',
       },
     ],
   },
   twitter: {
     card: 'summary',
-    title: 'JuveConf',
+    title: 'App - Juve',
     description: 'Aplicación para la gestión de eventos juveniles, finanzas y administración',
     images: ['/icons/icon-512x512.png'],
   },
@@ -71,12 +74,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <head>
         <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="icon" type="image/png" href="/icon.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="theme-color" content="#8b3fff" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="JuveConf" />
+        <meta name="apple-mobile-web-app-title" content="App - Juve" />
         <meta name="msapplication-TileColor" content="#8b3fff" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>

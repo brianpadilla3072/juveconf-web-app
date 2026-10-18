@@ -17,6 +17,7 @@ import React, { useMemo, useState, useEffect } from "react"
 import { Order } from "@/entities/Order";
 import { useDrawer } from '@/hooks/useDrawer'
 import { OrderDetailsContent } from '@/components/GlobalDrawer/templates/OrderDetailsContent'
+import { useGlobalFiltersStore } from '@/store/globalFiltersStore'
 
 // Format date helper function
 const formatDate = (dateString: string) => {
@@ -73,13 +74,16 @@ export default function OrdersModule() {
   // Create order hook
   const { createOrder, isLoading: isCreating } = useCreateOrder();
 
+  // Filtro global de año + evento (server-side)
+  const { selectedYear, selectedEventId } = useGlobalFiltersStore();
+
   // Use the orders hooks
-  const { orders: reviewOrders, loading: reviewLoading, error: reviewError, refetch: refetchReview } = useOrdersInReview();
-  const { orders: paidOrders, loading: paidLoading, error: paidError, refetch: refetchPaid } = useOrdersPaid();
+  const { orders: reviewOrders, loading: reviewLoading, error: reviewError, refetch: refetchReview } = useOrdersInReview(selectedYear, selectedEventId || undefined);
+  const { orders: paidOrders, loading: paidLoading, error: paidError, refetch: refetchPaid } = useOrdersPaid(selectedYear, selectedEventId || undefined);
 
   // Query hooks for form
   const { events } = useQueryEvents();
-  const { combos } = useQueryCombos();
+  const { combos } = useQueryCombos(selectedYear, selectedEventId || undefined);
   const { preSales } = useQueryPreSales();
 
   // Mantine theme hook

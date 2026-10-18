@@ -4,7 +4,7 @@ import { Combo } from "@/entities/Combo";
 import { useEffect, useState } from "react";
 
 
-export function useQueryCombos() {
+export function useQueryCombos(year?: number, eventId?: string) {
   const [combos, setCombos] = useState<Combo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -12,7 +12,8 @@ export function useQueryCombos() {
   const fetchCombos = async () => {
     try {
       setIsLoading(true);
-      const res = await api.get("/combos");
+      const params = { ...(eventId ? { eventId } : year ? { year } : {}) };
+      const res = await api.get("/combos", { params });
 
       // Enrich combos with current price if not already included
       const enrichedCombos = await Promise.all(
@@ -65,7 +66,7 @@ export function useQueryCombos() {
 
   useEffect(() => {
     fetchCombos();
-  }, []);
+  }, [year, eventId]);
 
   const refetch = () => {
     fetchCombos();

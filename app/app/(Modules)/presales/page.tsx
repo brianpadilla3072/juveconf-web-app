@@ -37,6 +37,7 @@ import { toast } from "sonner"
 import { useDrawer } from '@/hooks/useDrawer'
 import { PreSaleDetailsContent } from '@/components/GlobalDrawer/templates/PreSaleDetailsContent'
 import { Checkbox } from "@/components/ui/checkbox"
+import { useGlobalFiltersStore } from "@/store/globalFiltersStore"
 import {
   Select,
   SelectContent,
@@ -46,7 +47,8 @@ import {
 } from "@/components/ui/select"
 
 export default function PreSalesModule() {
-  const { preSales, isLoading, error, refetch } = useQueryPreSales()
+  const { selectedYear, selectedEventId } = useGlobalFiltersStore()
+  const { preSales, isLoading, error, refetch } = useQueryPreSales(selectedYear, selectedEventId || undefined)
   const { combos } = useQueryCombos()
   const { events, isLoading: isLoadingEvents } = useQueryEvents()
   const { createPreSale, isLoading: isCreating } = useCreatePreSale()

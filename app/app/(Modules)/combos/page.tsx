@@ -52,9 +52,11 @@ import {
 } from "@/components/ui/tooltip"
 import { useDrawer } from '@/hooks/useDrawer'
 import { ComboDetailsContent } from '@/components/GlobalDrawer/templates/ComboDetailsContent'
+import { useGlobalFiltersStore } from '@/store/globalFiltersStore'
 
 export default function CombosModule() {
-  const { combos, isLoading, error, refetch } = useQueryCombos()
+  const { selectedYear, selectedEventId } = useGlobalFiltersStore()
+  const { combos, isLoading, error, refetch } = useQueryCombos(selectedYear, selectedEventId || undefined)
   const { createCombo, isLoading: isCreating } = useCreateCombo()
   const { updateCombo, isLoading: isUpdating } = useUpdateCombo()
   const { deleteCombo, isLoading: isDeleting } = useDeleteCombo()
@@ -232,7 +234,7 @@ export default function CombosModule() {
     )
   }
 
-  // Filter combos
+  // Filter combos (year/event ya vienen filtrados del server)
   const filteredCombos = combos.filter(combo => {
     if (combo.deletedAt) return false
     if (!search.trim()) return true

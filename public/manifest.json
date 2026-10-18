@@ -1,6 +1,6 @@
 {
-  "name": "JuveConf",
-  "short_name": "JuveConf",
+  "name": "App - Juve",
+  "short_name": "App - Juve",
   "description": "Aplicación para la gestión de eventos juveniles, finanzas y administración de la organización Juventud en Conferencia",
   "start_url": "/",
   "display": "standalone",

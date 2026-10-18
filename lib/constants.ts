@@ -6,9 +6,9 @@
 // ==================== NOMBRE DEL PROYECTO ====================
 export const APP_CONFIG = {
   // Nombres de la aplicación
-  name: "JuveConf",
+  name: "App - Juve",
   fullName: "Juventud en Conferencia",
-  shortName: "JuveConf",
+  shortName: "App - Juve",
   description:
     "Aplicación para la gestión de eventos juveniles, finanzas y administración de la organización Juventud en Conferencia",
 

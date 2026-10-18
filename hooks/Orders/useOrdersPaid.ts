@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import api from '@/lib/axios.config';
 import { Order } from '@/entities/Order';
 
-export const useOrdersPaid = () => {
+export const useOrdersPaid = (year?: number, eventId?: string) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,7 +13,8 @@ export const useOrdersPaid = () => {
     setError(null);
 
     try {
-      const response = await api.get<Order[]>('/orders/paid');
+      const params = { ...(eventId ? { eventId } : year ? { year } : {}) };
+      const response = await api.get<Order[]>('/orders/paid', { params });
 
       if (Array.isArray(response.data)) {
         setOrders(response.data);
@@ -31,7 +32,7 @@ export const useOrdersPaid = () => {
 
   useEffect(() => {
     fetchOrdersPaid();
-  }, []);
+  }, [year, eventId]);
 
   const refetch = () => {
     fetchOrdersPaid();

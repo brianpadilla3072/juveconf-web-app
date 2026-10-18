@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import api from '@/lib/axios.config';
 import { Order } from '@/entities/Order';
 
-export const useOrdersInReview = () => {
+export const useOrdersInReview = (year?: number, eventId?: string) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,7 +13,8 @@ export const useOrdersInReview = () => {
     setError(null);
 
     try {
-      const response = await api.get<Order[]>('/orders/review');
+      const params = { ...(eventId ? { eventId } : year ? { year } : {}) };
+      const response = await api.get<Order[]>('/orders/review', { params });
       
       if (Array.isArray(response.data)) {
         setOrders(response.data);
@@ -31,7 +32,7 @@ export const useOrdersInReview = () => {
 
   useEffect(() => {
     fetchOrdersInReview();
-  }, []);
+  }, [year, eventId]);
 
   const refetch = () => {
     fetchOrdersInReview();

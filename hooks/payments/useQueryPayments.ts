@@ -3,7 +3,7 @@ import api from "@/lib/axios.config";
 import { Payment } from "@/entities/Payment";
 import { useEffect, useState } from "react";
 
-export function useQueryPayments() {
+export function useQueryPayments(year?: number) {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -11,7 +11,8 @@ export function useQueryPayments() {
   const fetchPayments = async () => {
     try {
       setIsLoading(true);
-      const res = await api.get("/payments");
+      const params = year ? { year } : undefined;
+      const res = await api.get("/payments", { params });
       setPayments(res.data);
       setError(null);
     } catch (err: any) {
@@ -69,7 +70,7 @@ export function useQueryPayments() {
 
   useEffect(() => {
     fetchPayments();
-  }, []);
+  }, [year]);
 
   const refetch = () => {
     fetchPayments();

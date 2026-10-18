@@ -16,7 +16,10 @@ export function emptyMealConfig(): MealConfig {
   return { slots: [], discountTiers: { ...EMPTY_DISCOUNT_TIERS } };
 }
 
-/** Plantilla de turnos y menús de JueConfe 2026 (carta oficial; los descuentos se completan a mano) */
+/**
+ * Plantilla de turnos y menús de JueConfe 2026 (carta oficial, 4 comidas).
+ * Descuento por cantidad de comidas por persona: 2 = 10%, 3 = 15%, 4 = 20%.
+ */
 export function buildJueConfeMealTemplate(): MealConfig {
   return {
     slots: [
@@ -25,36 +28,30 @@ export function buildJueConfeMealTemplate(): MealConfig {
         name: 'Viernes noche',
         order: 1,
         options: [
-          { n: 1, name: 'Menú pizza muzzarella (8 porciones) + agua', price: 10000 },
-          { n: 2, name: 'Menú pizza jamón y muzzarella (8 porciones) + agua', price: 10000 },
+          { n: 1, name: 'Media pizza muzzarella + agua', price: 7500 },
+          { n: 2, name: 'Media pizza jamón y muzzarella + agua', price: 7500 },
         ],
-      },
-      {
-        code: 'SAT_NOON',
-        name: 'Sábado mediodía',
-        order: 2,
-        options: [{ n: 1, name: 'Menú deportivo: sándwich de fiambre + agua', price: 3500 }],
       },
       {
         code: 'SAT_NIGHT',
         name: 'Sábado noche',
-        order: 3,
-        options: [{ n: 1, name: 'Sándwich de milanesa de pollo + agua', price: 8000 }],
+        order: 2,
+        options: [{ n: 1, name: 'Sándwich de milanesa + agua', price: 12500 }],
       },
       {
         code: 'SUN_NOON',
         name: 'Domingo mediodía',
-        order: 4,
-        options: [{ n: 1, name: 'Choripán al disco + agua', price: 8000 }],
+        order: 3,
+        options: [{ n: 1, name: 'Choripán al disco + agua', price: 10000 }],
       },
       {
         code: 'SUN_NIGHT',
         name: 'Domingo noche',
-        order: 5,
-        options: [{ n: 1, name: 'Sándwich de milanesa + agua', price: 8000 }],
+        order: 4,
+        options: [{ n: 1, name: 'Sándwich de milanesa + agua', price: 12500 }],
       },
     ],
-    discountTiers: { ...EMPTY_DISCOUNT_TIERS },
+    discountTiers: { '2': 10, '3': 15, '4': 20 },
   };
 }
 
