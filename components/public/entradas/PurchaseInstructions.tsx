@@ -90,7 +90,7 @@ export default function PurchaseInstructions() {
                 <h3 className="text-lg font-semibold  text-white mb-2">2. Pago</h3>
                 <p className=" text-white/60 mb-4">Realiza la transferencia a la cuenta:</p>
                 <div className="bg-piedra-100/30 p-4 rounded-lg backdrop-blur-lg bg-white/10">
-                  <p className="text-sm font-medium text-neutral-300">consagradosajesus</p>
+                  <p className="text-sm font-medium text-neutral-300">confe.juve</p>
                 </div>
               </div>
               <div className="text-center">
