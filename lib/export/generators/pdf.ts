@@ -49,7 +49,7 @@ export function generatePDF(
   // Subtítulo
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  const subtitle = options.eventName || 'JUVECONF 2025';
+  const subtitle = options.eventName || `JUVECONFE ${new Date().getFullYear()}`;
   doc.text(subtitle, landscape ? 148.5 : 105, 23, { align: 'center' });
 
   // Fecha de generación
@@ -145,7 +145,7 @@ export function generatePDF(
     // Marca de agua
     doc.setFontSize(7);
     doc.text(
-      'Generado con JUVECONF System',
+      'Generado con JUVECONFE System',
       landscape ? 148.5 : 105,
       pageHeight - 5,
       { align: 'center' },

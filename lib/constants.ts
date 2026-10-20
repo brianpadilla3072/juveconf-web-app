@@ -13,7 +13,7 @@ export const APP_CONFIG = {
     "Aplicación para la gestión de eventos juveniles, finanzas y administración de la organización Juventud en Conferencia",
 
   // URLs
-  websiteUrl: "https://juveconf.org",
+  websiteUrl: "https://juve.vidaeternaiglesia.com",
   apiUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3072",
 
   // Metadatos
